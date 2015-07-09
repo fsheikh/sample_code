@@ -35,10 +35,10 @@ public:
         std::pair <unsigned, unsigned> input_pair(17,6);
         unsigned constexpr TOTAL_OUTPUT = 4;
         std::pair <unsigned, unsigned> output_pairs[TOTAL_OUTPUT];
-        output_pairs[0] = std::pair<unsigned, unsigned>::pair(17,0);
-        output_pairs[1] = std::pair<unsigned, unsigned>::pair(18,1);
-        output_pairs[2] = std::pair<unsigned, unsigned>::pair(20,1);
-        output_pairs[2] = std::pair<unsigned, unsigned>::pair(22,0);
+        output_pairs[0] = std::pair<unsigned, unsigned>(17,0);
+        output_pairs[1] = std::pair<unsigned, unsigned>(18,1);
+        output_pairs[2] = std::pair<unsigned, unsigned>(20,1);
+        output_pairs[2] = std::pair<unsigned, unsigned>(22,0);
         
         unsigned index_count = 0;
         unsigned success = 0;
