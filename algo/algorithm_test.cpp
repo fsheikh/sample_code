@@ -2,7 +2,7 @@
 //  algorithm_test.cpp
 //  
 //
-//  Created by Faheem Sheikh on 7/3/15.
+//  Unit-testing sample
 //
 //
 
@@ -13,24 +13,10 @@ class AlgorithmTest
 {
     
 public:
-    AlgorithmTest()
-    {
-        
-    }
+    AlgorithmTest() { }
     void first_test()
     {
         
-        
-#if 0
-        unsigned base;
-        unsigned size;
-        std::cout << "Base ?";
-        std::cin >> base;
-        std::cout << std::endl;
-        std::cout << "Size ?";
-        std::cin >> size;
-        std::cout << std::endl;
-#endif
         
         std::pair <unsigned, unsigned> input_pair(17,6);
         unsigned constexpr TOTAL_OUTPUT = 4;
@@ -55,7 +41,7 @@ public:
                                                             };
         
         auto ret_val = for_aligned_regions(input_pair.first, input_pair.second, sfunc);
-        
+        std::cout << ret_val << std::endl;        
         if ((success != 0) || (index_count != TOTAL_OUTPUT))
             std::cout << "TEST FAILED at index: " << index_count << std::endl;
         else
@@ -69,13 +55,6 @@ public:
 
 int main(int argc, char **argv)
 {
-#if 0
-    std::cout << "MSB in 5:" << order_highest(5) << std::endl;
-    std::cout << "LSB in 5:" << order_lowest(5) << std::endl;
-    std::cout << "MSB in 17:" << order_highest(17) << std::endl;
-    std::cout << "LSB in 17:" << order_lowest(17) << std::endl;
-#endif
-    
     AlgorithmTest *a = new AlgorithmTest();
     a->first_test();
     

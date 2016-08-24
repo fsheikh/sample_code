@@ -2,7 +2,7 @@
 //  algorithm_test.h
 //  
 //
-//  Created by Faheem Sheikh on 7/3/15.
+//  Some generic functions to unit-test.
 //
 //
 
@@ -16,7 +16,7 @@
 int order_highest(int num)
 {
     
-    return (sizeof(num)*8 - 1) - __builtin_clz(num);
+    return (sizeof(num) * 8 - 1) - __builtin_clz(num);
 }
 
 int order_lowest(int num)
@@ -27,7 +27,7 @@ int order_lowest(int num)
 int min_of_two(int a, int b)
 {
     
-    if (a<b)
+    if (a < b)
         return a;
     else
         return b;
