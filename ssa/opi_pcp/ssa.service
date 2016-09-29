@@ -1,0 +1,17 @@
+# Location:/lib/systemd/system/ssa.service
+# Tested with Debian 8.5 Jessie
+# NOTE: In case of multiple sound cards, please check /etc/asound.conf
+[Unit]
+Description=Secure School Announcer
+Wants=sound.target
+After=sound.target
+
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python -u /home/fahim/ssa_target.py > /home/fahim/ssa.log 2>&1
+
+[Install]
+WantedBy=multi-user.target
+
+

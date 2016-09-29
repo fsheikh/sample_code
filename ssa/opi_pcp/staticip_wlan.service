@@ -1,0 +1,15 @@
+# Location:/lib/systemd/system/ssa.service
+# Tested with Debian 8.5 Jessie
+[Unit]
+Description=Static IP configuration
+After=multi-user.target
+
+
+[Service]
+Type=idle
+ExecStart=/bin/bash /home/fahim/static_ip_wlan.sh
+
+[Install]
+WantedBy=multi-user.target
+
+
