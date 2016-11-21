@@ -51,7 +51,6 @@ def dbpsk_modulate(sound_data, in_msg, sample_rate):
     two_pi_fc_t = 2 * np.pi * CenterFreq * time_seq
     current_phase = 0
     dbpsk_signal  = np.zeros(len(sound_data))
-
     # Modulation loops over each character of input message,
     # differentially modulates it with last characters and then
     # upconverts on a carrier signal
@@ -59,7 +58,7 @@ def dbpsk_modulate(sound_data, in_msg, sample_rate):
     for mod_idx in np.arange(len(in_msg)):
         # Binary representation of each character in one byte
         char_to_send = bin(ord(in_msg[mod_idx]))[2:].zfill(BitsPerChar)
-        start_idx = mod_idx * 8 * BitsPerChar
+        start_idx = mod_idx * BitsPerChar * SamplesPerSymbol
         for sym_idx in np.arange(0, BitsPerChar, 1):
             coded_bit = int(char_to_send[sym_idx]) ^ coded_bit
             current_phase = np.pi if coded_bit else 0
@@ -103,8 +102,8 @@ def dbpsk_demod(rx_data, sample_rate, L):
             detected_bitstream[demod] = (pb ^ 1)
         else:
             detected_bitstream[demod] = detected_bitstream[demod-1]
-            pb = detected_bitstream[demod]
-            pp = cp
+        pb = detected_bitstream[demod]
+        pp = cp
 
     return detected_bitstream
 
@@ -117,7 +116,7 @@ def report_error(d_bitstream, input_msg):
     error_count = 0
     for d_idx in d_bitstream:
         str_sym += str(d_idx)
-    print "Decode BitStream", str_sym
+    #print "Decode BitStream", str_sym
     for s_idx in np.arange(len(input_msg)):
         if (input_msg[s_idx] != chr(int(str_sym[s_idx*8:(s_idx+1)*8],2))):
             error_count += 1
@@ -136,9 +135,10 @@ if __name__ == '__main__':
     # Stereo to Mono conversion
     data = stereo_samples[:,1].reshape(-1)
     modulated_ = dbpsk_modulate(data, args.input_data, sample_rate)
+    modulated_ = modulated_.astype("int16")
     print "Writing Sound+Data in: ", OutFileName, "..."
     wav.write('output.wav', sample_rate, modulated_)
     # Demodulation and error detection calls
-    demod_msg = dbpsk_demod(modulated_, sample_rate, len(args.input_data)) 
+    demod_msg = dbpsk_demod(modulated_, sample_rate, len(args.input_data))
     report_error(demod_msg, args.input_data)        
 
