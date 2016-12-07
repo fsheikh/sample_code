@@ -14,7 +14,7 @@ public:
         for (size_t index = 0; index < N; index++) {
             reg8[index] = 0;
         }
-        for (size_t index = 0; index < M; index++) {
+        for (size_t index = 0; index <= M; index++) {
             regs[index] = 0;
         }
     }

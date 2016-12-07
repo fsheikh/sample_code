@@ -1,9 +1,7 @@
 
-# A rudimentary build script
+# A rudimentary build script demonstrating code analysis tools of GCC/Clang
 
-.PHONY: clean link_gmb s_analyze c_gcc c_clang
-
-
+.PHONY: clean link_gmb s_analyze c_gcc c_clang all
 
 c_gcc: bugs.c
 	gcc -Werror -Wall -O2 -o $@ $<
@@ -16,6 +14,7 @@ s_analyze: bugs.c
 
 g_sanitizer: bugs.cpp
 	g++ -std=c++11 -O1 -g -o $@ $<
+
 c_sanitizer: bugs.cpp
 	clang++-3.5 -std=c++11 -O1 -g -fsanitize=address -fno-omit-frame-pointer -o $@ $<
 
