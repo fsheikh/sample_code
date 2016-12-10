@@ -20,7 +20,10 @@ public:
     }
     void Change_Device_State()
     {
-
+        std::cout << "Changing Device State" << std::endl;
+    }
+    void set_reg8(size_t reg_idx, uint8_t bit_set) {
+        reg8[reg_idx] |= (1u << bit_set);
     }
 
 };
@@ -31,4 +34,7 @@ int main(int argc, char *argv[])
     Device dev;
     Device * p = new Device();
     p->Change_Device_State();
+    delete p;
+    p->set_reg8(1, 1);
+    std::cout << "Program Completed!" << std::endl;
 }
