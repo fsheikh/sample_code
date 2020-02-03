@@ -30,6 +30,7 @@ url_local_map = {piya_say_naina : local_directory+'\\q1.mp3',
 				 khawaja : local_directory+'\\q2.mp3',
 				 zikar_parivash_ka : local_directory+'\\g1.mp3'}
 
+				 
 logger.info(url_local_map)
 
 # if same file already has been downloaded skip it
@@ -53,8 +54,29 @@ hop_length = 1024
 # Separate harmonics and percussives into two waveforms
 y_harmonic, y_percussive = rosa.effects.hpss(y)
 
+
 logger.info('Audio file loaded, harmonics, percussion separated...')
 
+ax = plt.subplot(2,1,1)
+C_harmonic = np.abs(rosa.cqt(y_harmonic, sr=sr, hop_length=hop_length, n_bins=60))
+rosa.display.specshow(rosa.amplitude_to_db(C_harmonic, ref=np.max),
+                        sr=sr, x_axis='time', y_axis='cqt_note', hop_length=hop_length)
+
+plt.colorbar(format='%+2.0f dB')
+plt.title('Harmonic CQT')
+plt.tight_layout()
+
+C_percussive = np.abs(rosa.cqt(y_percussive, sr=sr, hop_length=hop_length, n_bins=60))
+ax = plt.subplot(2,1,2)
+rosa.display.specshow(rosa.amplitude_to_db(C_percussive, ref=np.max),
+                        sr=sr, x_axis='time', y_axis='cqt_note', hop_length=hop_length)
+
+plt.colorbar(format='%+2.0f dB')
+plt.title('Percussive CQT')
+plt.tight_layout()
+
+plt.show()
+"""
 # Beat track on the percussive signal
 tempo, beat_frames = rosa.beat.beat_track(y=y_percussive,
                                              sr=sr)
@@ -92,3 +114,4 @@ ax.title.set_text('chroma')
 
 plt.show()
 logger.info('Done with feature extraction!')
+"""
