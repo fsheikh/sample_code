@@ -60,13 +60,14 @@ logger.info('Audio file loaded, harmonics, percussion separated...')
 ax = plt.subplot(2,1,1)
 C_harmonic = np.abs(rosa.cqt(y_harmonic, sr=sr, hop_length=hop_length, n_bins=60))
 rosa.display.specshow(rosa.amplitude_to_db(C_harmonic, ref=np.max),
-                        sr=sr, x_axis='time', y_axis='cqt_note', hop_length=hop_length)
+                        sr=sr, x_axis='time', y_axis='cqt_hz', hop_length=hop_length)
 
 plt.colorbar(format='%+2.0f dB')
 plt.title('Harmonic CQT')
 plt.tight_layout()
 
-C_percussive = np.abs(rosa.cqt(y_percussive, sr=sr, hop_length=hop_length, n_bins=60))
+
+C_percussive = np.abs(rosa.cqt(y_percussive, sr=sr, hop_length=hop_length, n_bins=96))
 ax = plt.subplot(2,1,2)
 rosa.display.specshow(rosa.amplitude_to_db(C_percussive, ref=np.max),
                         sr=sr, x_axis='time', y_axis='cqt_note', hop_length=hop_length)
@@ -76,42 +77,3 @@ plt.title('Percussive CQT')
 plt.tight_layout()
 
 plt.show()
-"""
-# Beat track on the percussive signal
-tempo, beat_frames = rosa.beat.beat_track(y=y_percussive,
-                                             sr=sr)
-
-logger.info('Computing MFCCs')
-
-# Compute MFCC features from the raw signal
-mfcc = rosa.feature.mfcc(y=y, sr=sr, hop_length=hop_length, n_mfcc=5)
-
-ax = plt.subplot(2,2,1)
-disp.specshow(mfcc, x_axis='time', y_axis='mel', sr=sr, hop_length=hop_length)
-
-ax.title.set_text('mfcc')
-# And the first-order differences (delta features)
-mfcc_delta = rosa.feature.delta(mfcc)
-ax = plt.subplot(2,2,2)
-disp.specshow(mfcc_delta, x_axis='time', y_axis='mel', sr=sr, hop_length=hop_length)
-ax.title.set_text('delta-mfcc')
-# Stack and synchronize between beat events
-# This time, we'll use the mean value (default) instead of median
-beat_mfcc_delta = rosa.util.sync(np.vstack([mfcc, mfcc_delta]),beat_frames)
-ax=plt.subplot(2,2,3)
-disp.specshow(beat_mfcc_delta, x_axis='time', sr=sr, hop_length=hop_length)
-ax.title.set_text('beat-mfcc')
-
-
-logger.info('Computing chromagram')
-# Compute chroma features from the harmonic signal
-chromagram = rosa.feature.chroma_cqt(y=y_harmonic,
-                                        sr=sr)
-
-ax = plt.subplot(2,2,4)
-disp.specshow(chromagram, cmap='gray_r', y_axis='chroma', sr=sr, hop_length=hop_length)
-ax.title.set_text('chroma')
-
-plt.show()
-logger.info('Done with feature extraction!')
-"""
