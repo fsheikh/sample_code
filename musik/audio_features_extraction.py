@@ -40,6 +40,9 @@ meray_sohnaya = 'https://drive.google.com/uc?id=1Wjs2tO5X5GOJgI3nyGJ3RNjAl0ENEwX
 mera_imaan_pak = 'https://drive.google.com/uc?id=1ebmOKPeAZ7Ouj8wJ9M3kflbTJEmXOd_e'
 maye_ni_maye = 'https://drive.google.com/uc?id=18PITR8ZsTSaF4XuXALL5h9j8Tj4REJaW'
 kise_da_yaar = 'https://drive.google.com/uc?id=1SWQ4Av4ck5Fy8XqX9lbv-f0MWGHD8iIL'
+mere_saaqi = 'https://drive.google.com/uc?id=17NTxevTz827ClaR1ZISjzbMn9RZBYxoi'
+ruthi_rut = 'https://drive.google.com/uc?id=1A-YO4pTd4u0rK-KrHOxTBjjP4ArfwpdJ'
+rashk_e_qamar = 'https://drive.google.com/uc?id=17y9uvNrCG0kwSbv3alkH0XjdlkMf5zNC'
 
 # Youtube wish-list
 yt_rumi_qawali='https://www.youtube.com/watch?v=FjggJH45RRE'
@@ -55,16 +58,19 @@ url_map = {piya_say_naina : 'piya_say_naina.mp3',
 		   meray_sohnaya : 'meray_sohnaya.mp3',
 		   mera_imaan_pak : 'mera_imaan_pak.mp3',
 		   maye_ni_maye : 'maye_ni_maye.mp3',
-		   kise_da_yaar : 'kise_da_yaar.mp3'
-		   }
-
+		   kise_da_yaar : 'kise_da_yaar.mp3',
+		   mere_saaqi : 'mere_saaqi.mp3',
+		   ruthi_rut : 'ruthi_rut.mp3',
+		   rashk_e_qamar : 'rashk_e_qamar.mp3'
+		  }
 
 # Constants (should probably be parameterized)
 ActualSampleRate = 22050
 ObserveDurationInSec = 120
 # With above sample rate, this length translates to 46ms
 HopLength = 1024
-FreqBins = 96
+# Starting with C1(midi:24) we like to go till C8(midi:108)
+FreqBins = 84 
 
 # Main loop
 for song in url_map:
@@ -92,6 +98,8 @@ for song in url_map:
 	
 	fig, (ax1, ax2) = plt.subplots(2,1)
 	C_harmonic = np.abs(rosa.cqt(y_harmonic, sr=sr, hop_length=HopLength, n_bins=FreqBins))
+	logger.info("Dimensions=%d Shape[0]=%d Shape[1]=%d", C_harmonic.ndim, C_harmonic.shape[0], C_harmonic.shape[1])
+	
 	rosa.display.specshow(rosa.amplitude_to_db(C_harmonic, ref=np.max),
                         sr=sr, x_axis='time', y_axis='cqt_hz', hop_length=HopLength, ax=ax1)
 	
