@@ -65,8 +65,7 @@ url_map = {piya_say_naina : 'piya_say_naina.mp3',
     rashk_e_qamar : 'rashk_e_qamar.mp3'
 }
 
-
-#url_map = {khawaja : 'khawaja.mp3' }
+#url_map = {piya_say_naina : 'piya_say_naina.mp3' }
 # Constants (should probably be parameterized)
 ActualSampleRate = 22050
 ObserveDurationInSec = 120
@@ -78,7 +77,7 @@ FreqBins = 84
 C1Midi = 24;
 
 # Collecting mean, std.deviation and norm of harmonic and percussive CQT (3*2 features)
-midi_features = np.empty([FreqBins, 7], dtype=float)
+midi_features = np.empty([FreqBins, 4], dtype=float)
 # First column contains midi number of notes/freqeuncies
 midi_features[:,0] = np.arange(C1Midi,C1Midi+FreqBins, dtype=float)
 
@@ -118,21 +117,25 @@ for song in url_map:
 
     ax1.set_title('Harmonic CQT')
 
-    C_percussive = np.abs(rosa.cqt(y_percussive, sr=sr, hop_length=HopLength, n_bins=FreqBins))
-    midi_features[:,4] = np.linalg.norm(C_percussive, axis=1)
-    midi_features[:,5] = np.mean(C_percussive, axis=1)
-    midi_features[:,6] = np.std(C_percussive, axis=1)
-    rosa.display.specshow(rosa.amplitude_to_db(C_percussive, ref=np.max),
-            sr=sr, x_axis='time', y_axis='cqt_note', hop_length=HopLength, ax=ax2)
-    logger.info("Max Percussive Norm=%12.8f with midi=%d", np.max(midi_features[:,4]), np.argmax(midi_features[:,4]) + C1Midi)
+    # CQT on precussive component has failed to indicate any significant features
+    # useful for classifying Qawalis versus song/ghazals, trying with tempo/beat variations
+    #C_percussive = np.abs(rosa.cqt(y_percussive, sr=sr, hop_length=HopLength, n_bins=FreqBins))
+    tempo, beat_timestamps = rosa.beat.beat_track(y_percussive, sr=sr, hop_length=HopLength, trim=True, units='time')
+    tempo_envelope = 60.0 / np.gradient(beat_timestamps)
+    stable_tempo_count = np.count_nonzero(tempo_envelope == tempo)
+    logger.info("Beat timestamps length=%d stable tempo count=%d mean=%6.4f std-dev=%6.4f",
+                beat_timestamps.size, stable_tempo_count, np.mean(tempo_envelope), np.std(tempo_envelope))
+    plt.subplot(2,1,2)
+    plt.vlines(beat_timestamps, 0, 1, alpha=0.5, color='r', linestyle='--', label='Beats')
+    plt.plot(beat_timestamps, tempo_envelope)
     feature_file = str(graphs_subdir / local_song_path.stem)
-    logger.info("Writing features to file %s", feature_file+'.txt')
-    np.savetxt(feature_file+'.txt', midi_features, 'midi=%6.4f: normH=%6.4f, meanH=%6.4f, std-devH=%6.4f, normP=%6.4f, meanP=%6.4f, std-devP=%6.4f')
+    logger.info("Writing harmonic features to file %s with tempo=%6.4f", feature_file+'.txt', tempo)
+    np.savetxt(feature_file+'.txt', midi_features, 'midi=%6.4f: normH=%6.4f, meanH=%6.4f, std-devH=%6.4f')
 
-    ax2.set_title('Percussive CQT')
+    #ax2.set_title('Percussive CQT')
     # Colorbar does not seem to work at all without a current image
     # fig.colorbar(cm.get_cmap('RdBu_r'), ax=ax2, format='%+2.0f dB')
     fig.tight_layout()
 
     fig.savefig(feature_file + '.png')
-    logger.info('***Done extracting features from %s ***', url_map[song])
+    logger.info('***Done extracting features from %s ***\n', url_map[song])
