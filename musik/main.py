@@ -54,7 +54,7 @@ url_map = {piya_say_naina : 'piya_say_naina.mp3',
 }
 
 #url_map = {rashk_e_qamar : 'rashk_e_qamar.mp3' }
-url_map = {yt_rumi_qawali : 'rumi.mp3' }
+#url_map = {yt_rumi_qawali : 'rumi.mp3' }
 if __name__ == "__main__":
     logger.info("Feature extraction driver started")
 
@@ -63,4 +63,5 @@ if __name__ == "__main__":
         song.extract_cqt()
         song.extract_beats()
         song.extract_mfcc_similarity()
+        song.extract_cqt_dft()
     logger.info("Feature extraction done, check output directory for results!")

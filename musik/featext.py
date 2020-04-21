@@ -102,6 +102,49 @@ class AudioFeatureExtractor:
         plt.close(fig)
         logger.info('***CQT extracted from %s ***\n', self.m_songName)
 
+    def extract_cqt_dft(self, FFTSize=256):
+
+        if (FFTSize % 2 != 0):
+            log_error() << "Better to choose a power of 2 size for FFT"
+            exit()
+
+        HalfFFT = int(FFTSize / 2) + 1;
+
+        Cqt = np.abs(rosa.cqt(self.m_dataSong, sr=self.m_sr, hop_length=self.m_hopLength, n_bins=AudioFeatureExtractor.FreqBins))
+        logger.info("CQT Dimensions: Rows=%d Columns=%d", Cqt.shape[0], Cqt.shape[1])
+        if (AudioFeatureExtractor.FreqBins != Cqt.shape[0]):
+            logger.error("Unexpected CQT dimensions")
+            exit()
+
+        timeIndices = np.arange(0, Cqt.shape[1], HalfFFT)
+        fftMatrix = np.zeros((Cqt.shape[0], timeIndices.size * HalfFFT))
+        logger.info("Size of fft matrix mxn=%dx%d", fftMatrix.shape[0], fftMatrix.shape[1])
+
+        # 50% overlapping FFT
+        for index in timeIndices:
+            if index == 0:
+                paddingMatrix = np.zeros((AudioFeatureExtractor.FreqBins, HalfFFT))
+                paddedCqt = np.append(paddingMatrix, Cqt[:,0:HalfFFT], axis=1)
+                logger.info("padded mxn=%dx%d append HalfFFT=%d", paddedCqt.shape[0], paddedCqt.shape[1], HalfFFT)
+                fftMatrix[:, 0 : HalfFFT] = abs(np.fft.rfft2(paddedCqt, [AudioFeatureExtractor.FreqBins, FFTSize], [0,1]))
+            else:
+                fftMatrix[:,index : index + HalfFFT] = abs(np.fft.rfft2(Cqt[:,index - HalfFFT - 1: index + HalfFFT - 1],
+                                                   [AudioFeatureExtractor.FreqBins, FFTSize], [0,1]))
+        logger.info("Cqt DFT calculation done")
+        fig = plt.figure(figsize=(10,6))
+        plt.subplot(2,1,1)
+        rosa.display.specshow(rosa.amplitude_to_db(Cqt, ref=np.max),
+            sr=self.m_sr, x_axis='time', y_axis='cqt_hz', hop_length=self.m_hopLength)
+        plt.title('Raw CQT')
+        plt.subplot(2,1,2)
+        rosa.display.specshow(rosa.amplitude_to_db(fftMatrix, ref=np.max), sr=self.m_sr, x_axis='time', y_axis='cqt', hop_length=self.m_hopLength)
+        plt.title('2DFT of CQT')
+        fig.tight_layout()
+        fig.savefig(self.m_output + '-cqt2dft.png')
+        plt.close(fig)
+        logger.info('***CQT-DFT extracted from %s ***\n', self.m_songName)
+
+
     def extract_beats(self):
 
         # Separate harmonics and percussives into two waveforms
