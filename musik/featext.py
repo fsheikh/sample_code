@@ -11,6 +11,7 @@ import matplotlib.cm as cm
 import os
 from pathlib import Path
 import logging
+from youtube_dl import YoutubeDL
 
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
@@ -27,6 +28,12 @@ class AudioFeatureExtractor:
     C1Midi = 24
     C8Midi = 108
     FreqBins = C8Midi - C1Midi
+    # Youtube-dl parameters for downloading from youtube
+    YdlParams = {'postprocessors': [{ 'key': 'FFmpegExtractAudio', 'preferredcodec' : 'mp3', 'preferredquality' : '128'}],
+                 'logger' : logger,
+                 'outtmpl' : str(local_directory),
+                 'noplaylist' : True
+                }
 
     def __init__(self, song_name, url='None'):
         logger.info('Instantiating %s for song=%s with url=%s', self.__class__.__name__, song_name, url)
@@ -51,7 +58,15 @@ class AudioFeatureExtractor:
             logger.info('File %s already exists, skipping Download', song_name)
         else:
             logger.info('Downloading %s from %s', song_name, url)
-            gd.download(self.m_url, str(self.m_songPath), quiet=False, proxy=None)
+            if "youtube" in self.m_url:
+                # update the output template in parameters and ask youtube-dl to download
+                # Need to update the download path it seems library appends extenstion based on encoding
+                AudioFeatureExtractor.YdlParams['outtmpl'] = str(AudioFeatureExtractor.local_directory / self.m_songPath.stem)
+                with YoutubeDL(AudioFeatureExtractor.YdlParams) as ydl:
+                    ydl.download([self.m_url])
+            else:
+                # Download from the own data-set shared via google drive
+                gd.download(self.m_url, str(self.m_songPath), quiet=False, proxy=None)
         # Load snippet from song
         self.m_dataSong, self.m_sr = rosa.load(str(self.m_songPath), sr=self.m_sampleRate, mono=True,
                                         offset=0.0, duration=self.m_observeDurationInSec)
@@ -61,7 +76,7 @@ class AudioFeatureExtractor:
 
     def extract_cqt(self):
 
-        # Separate harmonics and percussives into two waveforms
+        # Separate harmonics and percussive components into two waveforms
         y_harmonic, y_percussive = rosa.effects.hpss(self.m_dataSong)
 
         logger.info('Harmonics, percussion separated...')
@@ -84,6 +99,7 @@ class AudioFeatureExtractor:
         ax2.set_title('Percussive CQT')
         fig.tight_layout()
         fig.savefig(self.m_output + '-cqt.png')
+        plt.close(fig)
         logger.info('***CQT extracted from %s ***\n', self.m_songName)
 
     def extract_beats(self):
@@ -108,6 +124,7 @@ class AudioFeatureExtractor:
 
         fig.tight_layout()
         fig.savefig(self.m_output + '-beat.png')
+        plt.close(fig)
         logger.info('***Beats extracted from %s ***\n', self.m_songName)
 
 
@@ -129,4 +146,5 @@ class AudioFeatureExtractor:
         rosa.display.specshow(mfcc_sim, sr=self.m_sr, x_axis='time', y_axis='time', hop_length=self.m_hopLength)
         fig.tight_layout()
         fig.savefig(self.m_output + '-mfcc.png')
+        plt.close(fig)
         logger.info('***MFCC extracted from %s ***\n', self.m_songName)
