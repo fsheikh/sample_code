@@ -43,7 +43,7 @@ class AudioFeatureExtractor:
         self.m_output = str(AudioFeatureExtractor.graphs_subdir / Path(song_name).stem)
         # Constants per instance (should probably be parameterized)
         self.m_sampleRate = 22050
-        self.m_observeDurationInSec = 120
+        self.m_observeDurationInSec = 60
         # With above sample rate, this length translates to 46ms
         self.m_hopLength = 1024
 
@@ -102,42 +102,56 @@ class AudioFeatureExtractor:
         plt.close(fig)
         logger.info('***CQT extracted from %s ***\n', self.m_songName)
 
-    def extract_cqt_dft(self, FFTSize=256):
+    def extract_thresholdcqt_dft(self, FFTSizeC=128, FFTSizeT=2048):
 
-        if (FFTSize % 2 != 0):
+        if (FFTSizeC % 2 != 0 or FFTSizeT % 2 != 0):
             log_error() << "Better to choose a power of 2 size for FFT"
             exit()
 
-        HalfFFT = int(FFTSize / 2) + 1;
-
         Cqt = np.abs(rosa.cqt(self.m_dataSong, sr=self.m_sr, hop_length=self.m_hopLength, n_bins=AudioFeatureExtractor.FreqBins))
-        logger.info("CQT Dimensions: Rows=%d Columns=%d", Cqt.shape[0], Cqt.shape[1])
-        if (AudioFeatureExtractor.FreqBins != Cqt.shape[0]):
+        CqtMedian = np.median(Cqt, axis=1, keepdims=True)
+        ThresholdCqt = Cqt > CqtMedian
+        ThresholdCqt.astype(int)
+        logger.info("CQT Dimensions: Rows=%d Columns=%d", ThresholdCqt.shape[0], ThresholdCqt.shape[1])
+        if (AudioFeatureExtractor.FreqBins != ThresholdCqt.shape[0]):
             logger.error("Unexpected CQT dimensions")
             exit()
 
-        timeIndices = np.arange(0, Cqt.shape[1], HalfFFT)
-        fftMatrix = np.zeros((Cqt.shape[0], timeIndices.size * HalfFFT))
-        logger.info("Size of fft matrix mxn=%dx%d", fftMatrix.shape[0], fftMatrix.shape[1])
+        logger.info("Calculated Threshold on CQT")
 
-        # 50% overlapping FFT
-        for index in timeIndices:
-            if index == 0:
-                paddingMatrix = np.zeros((AudioFeatureExtractor.FreqBins, HalfFFT))
-                paddedCqt = np.append(paddingMatrix, Cqt[:,0:HalfFFT], axis=1)
-                logger.info("padded mxn=%dx%d append HalfFFT=%d", paddedCqt.shape[0], paddedCqt.shape[1], HalfFFT)
-                fftMatrix[:, 0 : HalfFFT] = abs(np.fft.rfft2(paddedCqt, [AudioFeatureExtractor.FreqBins, FFTSize], [0,1]))
+        # CQT size corresponds to m_observeDurationInSec * m_sr / m_hopLength
+        # We move the window every 4 seconds which means
+        #WindowHop = int(4 * self.m_sr/ self.m_hopLength)
+        #windowIndices = np.arange(0, ThresholdCqt.shape[1], WindowHop)
+        fftMatrix = np.fft.fft2(Cqt, [FFTSizeC, FFTSizeT])
+        fftShifted = np.abs(np.fft.fftshift(fftMatrix)**2)
+        logger.info("Configured Size of fft matrix mxn=%dx%d", fftMatrix.shape[0], fftMatrix.shape[1])
+        '''
+        # Overlapping FFT
+        for index in windowIndices:
+            logger.info("Processing window index=%d", index)
+            fftFull = np.fft.fft2(ThresholdCqt[:,index: index + FFTSize], [AudioFeatureExtractor.FreqBins, FFTSize], [0,1])
+            fftFull = np.abs(np.fft.fftshift(fftFull)**2)
+            # Keep only low energy freq components
+            if index < ThresholdCqt.shape[1] - WindowHop:
+                fftMatrix[:, index: index + WindowHop] = fftFull[:, 0 : WindowHop]
             else:
-                fftMatrix[:,index : index + HalfFFT] = abs(np.fft.rfft2(Cqt[:,index - HalfFFT - 1: index + HalfFFT - 1],
-                                                   [AudioFeatureExtractor.FreqBins, FFTSize], [0,1]))
-        logger.info("Cqt DFT calculation done")
+                logger.warning("window index=%d not processed!", index)
+        '''
+        fftdB = rosa.amplitude_to_db(fftShifted, ref=np.max)
+        logger.info("Threshold Cqt DFT calculation done")
         fig = plt.figure(figsize=(10,6))
         plt.subplot(2,1,1)
         rosa.display.specshow(rosa.amplitude_to_db(Cqt, ref=np.max),
             sr=self.m_sr, x_axis='time', y_axis='cqt_hz', hop_length=self.m_hopLength)
-        plt.title('Raw CQT')
+        #rosa.display.specshow(ThresholdCqt,
+        #    sr=self.m_sr, x_axis='time', y_axis='cqt_hz', hop_length=self.m_hopLength)
+        plt.colorbar()
+        plt.title('Threshold CQT')
         plt.subplot(2,1,2)
-        rosa.display.specshow(rosa.amplitude_to_db(fftMatrix, ref=np.max), sr=self.m_sr, x_axis='time', y_axis='cqt', hop_length=self.m_hopLength)
+        rosa.display.specshow(fftdB,
+            sr=self.m_sr, x_axis=None, y_axis=None)
+        plt.colorbar()
         plt.title('2DFT of CQT')
         fig.tight_layout()
         fig.savefig(self.m_output + '-cqt2dft.png')
