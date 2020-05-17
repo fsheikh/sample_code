@@ -43,7 +43,7 @@ class AudioFeatureExtractor:
         self.m_output = str(AudioFeatureExtractor.graphs_subdir / Path(song_name).stem)
         # Constants per instance (should probably be parameterized)
         self.m_sampleRate = 22050
-        self.m_observeDurationInSec = 60
+        self.m_observeDurationInSec = 120
         # With above sample rate, this length translates to 46ms
         self.m_hopLength = 1024
 
@@ -102,18 +102,18 @@ class AudioFeatureExtractor:
         plt.close(fig)
         logger.info('***CQT extracted from %s ***\n', self.m_songName)
 
-    def extract_thresholdcqt_dft(self, FFTSizeC=128, FFTSizeT=2048):
+    def extract_pcqt_dft(self, FFTSizeC=128, FFTSizeT=2048):
 
         if (FFTSizeC % 2 != 0 or FFTSizeT % 2 != 0):
             log_error() << "Better to choose a power of 2 size for FFT"
             exit()
 
-        Cqt = np.abs(rosa.cqt(self.m_dataSong, sr=self.m_sr, hop_length=self.m_hopLength, n_bins=AudioFeatureExtractor.FreqBins))
-        CqtMedian = np.median(Cqt, axis=1, keepdims=True)
-        ThresholdCqt = Cqt > CqtMedian
-        ThresholdCqt.astype(int)
-        logger.info("CQT Dimensions: Rows=%d Columns=%d", ThresholdCqt.shape[0], ThresholdCqt.shape[1])
-        if (AudioFeatureExtractor.FreqBins != ThresholdCqt.shape[0]):
+        y_percussive = rosa.effects.percussive(self.m_dataSong, margin=10.0)
+
+        #rosa.output.write_wav(self.m_output + '-yp.wav', y_percussive, self.m_sr)
+        Cqt = np.abs(rosa.cqt(y_percussive, sr=self.m_sr, hop_length=self.m_hopLength, n_bins=AudioFeatureExtractor.FreqBins))
+        logger.info("CQT Dimensions: Rows=%d Columns=%d", Cqt.shape[0], Cqt.shape[1])
+        if (AudioFeatureExtractor.FreqBins != Cqt.shape[0]):
             logger.error("Unexpected CQT dimensions")
             exit()
 
@@ -139,22 +139,19 @@ class AudioFeatureExtractor:
                 logger.warning("window index=%d not processed!", index)
         '''
         fftdB = rosa.amplitude_to_db(fftShifted, ref=np.max)
-        logger.info("Threshold Cqt DFT calculation done")
+        logger.info("Cqt DFT calculation done")
         fig = plt.figure(figsize=(10,6))
         plt.subplot(2,1,1)
         rosa.display.specshow(rosa.amplitude_to_db(Cqt, ref=np.max),
             sr=self.m_sr, x_axis='time', y_axis='cqt_hz', hop_length=self.m_hopLength)
-        #rosa.display.specshow(ThresholdCqt,
-        #    sr=self.m_sr, x_axis='time', y_axis='cqt_hz', hop_length=self.m_hopLength)
         plt.colorbar()
-        plt.title('Threshold CQT')
+        plt.title('Percussive CQT')
         plt.subplot(2,1,2)
-        rosa.display.specshow(fftdB,
-            sr=self.m_sr, x_axis=None, y_axis=None)
+        rosa.display.specshow(fftdB, sr=self.m_sr, x_axis=None, y_axis=None)
         plt.colorbar()
         plt.title('2DFT of CQT')
         fig.tight_layout()
-        fig.savefig(self.m_output + '-cqt2dft.png')
+        fig.savefig(self.m_output + '-pcqt2dft.png')
         plt.close(fig)
         logger.info('***CQT-DFT extracted from %s ***\n', self.m_songName)
 

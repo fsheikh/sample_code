@@ -63,5 +63,5 @@ if __name__ == "__main__":
         song.extract_cqt()
         song.extract_beats()
         song.extract_mfcc_similarity()
-        song.extract_cqt_dft()
+        song.extract_pcqt_dft()
     logger.info("Feature extraction done, check output directory for results!")
