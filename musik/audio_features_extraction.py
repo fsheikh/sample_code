@@ -74,7 +74,7 @@ HopLength = 1024
 # Starting with C1(midi:24) we like to go till C8(midi:108)
 FreqBins = 84 
 # librosa uses C1 as default start point for some of its APIs
-C1Midi = 24;
+C1Midi = 24
 
 # Collecting mean, std.deviation and norm of harmonic and percussive CQT (3*2 features)
 midi_features = np.empty([FreqBins, 4], dtype=float)

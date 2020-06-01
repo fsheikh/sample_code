@@ -158,9 +158,9 @@ class AudioFeatureExtractor:
 
     def extract_beats(self):
 
-        # Separate harmonics and percussives into two waveforms
-        y_harmonic, y_percussive = rosa.effects.hpss(self.m_dataSong)
-        logger.info('Harmonics, percussion separated...')
+        # Extract percussive waveform
+        y_percussive = rosa.effects.percussive(self.m_dataSong, margin=10.0)
+        logger.info('Percussion extracted...')
 
         tempo, beat_timestamps = rosa.beat.beat_track(y_percussive, sr=self.m_sr, hop_length=self.m_hopLength, trim=True, units='time')
         tempo_envelope = 60.0 / np.gradient(beat_timestamps)
@@ -183,17 +183,19 @@ class AudioFeatureExtractor:
 
 
     def extract_mfcc_similarity(self):
-        logger.info('Calculating self-similarity based on MFCC')
-        mfcc_y = rosa.feature.mfcc(self.m_dataSong, sr=self.m_sr, hop_length=self.m_hopLength)
+        logger.info('Calculating percussive self-similarity based on MFCC')
+        y_percussive = rosa.effects.percussive(self.m_dataSong, margin=10.0)
+        logger.info('Percussion extracted...')
+        mfcc_y = rosa.feature.mfcc(y_percussive, sr=self.m_sr, hop_length=self.m_hopLength)
         logger.info("mfcc: Rows=%d Columns=%d", mfcc_y.shape[0], mfcc_y.shape[1])
         norm_mfcc = np.linalg.norm(mfcc_y, axis=1, keepdims=True)
         mean_mfcc = np.mean(mfcc_y, axis=1, keepdims=True)
         mfcc_x = (mfcc_y - mean_mfcc) / norm_mfcc
-        mfcc_sim = rosa.segment.cross_similarity(mfcc_x, mfcc_x, k=3)
+        mfcc_sim = rosa.segment.cross_similarity(mfcc_y, mfcc_y, k=3)
         fig = plt.figure(figsize=(10,6))
         plt.subplot(2,1,1)
         plt.title('mean centered normalized mfcc')
-        rosa.display.specshow(mfcc_x, sr=self.m_sr, x_axis='time', y_axis='time', hop_length=self.m_hopLength)
+        rosa.display.specshow(mfcc_y, sr=self.m_sr, x_axis='time', y_axis='time', hop_length=self.m_hopLength)
         plt.colorbar()
         plt.subplot(2,1,2)
         plt.title('self-similarity mfcc')
@@ -202,3 +204,77 @@ class AudioFeatureExtractor:
         fig.savefig(self.m_output + '-mfcc.png')
         plt.close(fig)
         logger.info('***MFCC extracted from %s ***\n', self.m_songName)
+
+    def extract_low_timber(self, N=2048):
+        # Timber on percussive component
+        y_percussive = rosa.effects.percussive(self.m_dataSong, margin=10.0)
+        logger.info('Percussion extracted')
+
+        # Experiments on local data set indicated that at least for Qawali songs
+        # contrast and flatness seem like good candidates
+
+        #y_centroid = rosa.feature.spectral_centroid(self.m_dataSong, sr=self.m_sr, n_fft=N, hop_length=self.m_hopLength)
+        #logger.info('Centroid calculated with size=%d', y_centroid.shape[-1])
+        #fig = plt.figure(figsize=(10,6))
+        #plt.subplot(3,2,1)
+        #plt.title('Spectral Centroid')
+        #frame_time = np.arange(0, y_centroid.shape[-1] / self.m_sr, 1 / self.m_sr)
+        #plt.semilogy(self.m_hopLength * frame_time, y_centroid.T)
+        #plt.ylabel('Hz')
+        #plt.xlabel('Time (sec)')
+        #plt.grid(True)
+
+        #y_bw = rosa.feature.spectral_bandwidth(self.m_dataSong, sr=self.m_sr, n_fft=N, hop_length=self.m_hopLength)
+        #logger.info("Spectral bandwidth calculated")
+        #plt.subplot(3,2,2)
+        #plt.title('Spectral Bandwidth')
+        #frame_time = np.arange(0, y_bw.shape[-1] / self.m_sr, 1 / self.m_sr)
+        #plt.semilogy(self.m_hopLength * frame_time, y_bw.T)
+        #plt.ylabel('Hz')
+        #plt.xlabel('Time (sec)')
+        #plt.grid(True)
+
+        fig = plt.figure(figsize=(10,6))
+        plt.subplot(2,1,1)
+        y_contrast = rosa.feature.spectral_contrast(self.m_dataSong, sr=self.m_sr, n_fft=N, hop_length=self.m_hopLength, fmin=160.0, n_bands=6)
+        logger.info("Spectral constrat calculated")
+        plt.title("Spectral Contrast")
+        rosa.display.specshow(y_contrast, sr=self.m_sr, x_axis='time', hop_length=self.m_hopLength)
+        plt.ylabel('Octave subbands')
+        plt.tight_layout()
+
+        y_flatness = rosa.feature.spectral_flatness(self.m_dataSong, n_fft=N, hop_length=self.m_hopLength)
+        logger.info('Spectral flatness calculated')
+        plt.subplot(2,1,2)
+        plt.title('Spectral flatness')
+        frame_time = np.arange(0, y_flatness.shape[-1] / self.m_sr, 1 / self.m_sr)
+        # Tonality defined by G Peeters "A large set of audio features for sound description"
+        plt.plot(self.m_hopLength * frame_time, 10 * np.log10(y_flatness.T))
+        plt.ylim([-60, 0])
+        plt.ylabel('Tonality')
+        plt.xlabel('Time (sec)')
+        plt.grid(True)
+
+        #y_rolloff = rosa.feature.spectral_rolloff(self.m_dataSong, sr=self.m_sr, n_fft=N, hop_length=self.m_hopLength)
+        #logger.info('Spectral Roll-off calculated')
+        #plt.subplot(3,2,5)
+        #plt.title('Spectral Rolloff')
+        #frame_time = np.arange(0, y_rolloff.shape[-1] / self.m_sr, 1 / self.m_sr)
+        #plt.semilogy(self.m_hopLength * frame_time, y_rolloff.T)
+        #plt.ylabel('Hz')
+        #plt.xlabel('Time (sec)')
+        #plt.grid(True)
+
+        #y_zerocross = rosa.feature.zero_crossing_rate(self.m_dataSong, frame_length=N, hop_length=self.m_hopLength)
+        #logger.info("Zero crossing rate calculated")
+        #plt.subplot(3,2,6)
+        #plt.title('Zero crossing rate')
+        #frame_time = np.arange(0, y_zerocross.shape[-1] / self.m_sr, 1 / self.m_sr)
+        #plt.plot(self.m_hopLength * frame_time, y_zerocross.T)
+        #plt.ylabel('ZC Rate')
+        #plt.xlabel('Time (sec)')
+        #plt.grid(True)
+
+        fig.savefig(self.m_output + '-percussive-low-timber.png')
+        plt.close(fig)
+        logger.info('***Low timber features extracted from %s ***\n', self.m_songName)
