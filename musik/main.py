@@ -12,6 +12,7 @@
 
 import os
 import logging
+from classify import DesiGenreDetector
 from featext import AudioFeatureExtractor
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__name__)
@@ -60,8 +61,10 @@ if __name__ == "__main__":
 
     for songLink in url_map:
         song = AudioFeatureExtractor(url_map[songLink], songLink)
-        song.extract_cqt()
-        song.extract_beats()
-        song.extract_mfcc_similarity()
-        song.extract_pcqt_dft()
+        q_features = song.extract_qawali_features()
+        detector = DesiGenreDetector(q_features)
+        if detector.isQawali():
+            logger.info("%s is a Qawali", url_map[songLink])
+        else:
+            logger.info("%s is not a Qawali", url_map[songLink])
     logger.info("Feature extraction done, check output directory for results!")

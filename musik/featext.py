@@ -278,3 +278,54 @@ class AudioFeatureExtractor:
         fig.savefig(self.m_output + '-percussive-low-timber.png')
         plt.close(fig)
         logger.info('***Low timber features extracted from %s ***\n', self.m_songName)
+
+    def extract_qawali_features(self):
+        qFeatures = {"FrameSize": self.m_hopLength,
+                        "SampleRate": self.m_sr,
+                        "PitchEnergy": np.array(np.zeros(self.m_hopLength)),
+                        "SpectralContrast": np.array(np.zeros(self.m_hopLength)),
+                        "SpectralFlatness": np.array(np.zeros(self.m_hopLength))}
+        harmonicSignal = rosa.effects.harmonic(self.m_dataSong, margin=10.0)
+        percussiveSignal = rosa.effects.percussive(self.m_dataSong, margin=10.0)
+        # Previous experiments showed that Qawali recordings distinguish themselves
+        # with energy of fundamental pitches and their harmonics. This is presumably since pitch
+        # profile across this genre is similar (?)
+        pitchEstimates = np.abs(rosa.cqt(harmonicSignal, sr=self.m_sr, hop_length=self.m_hopLength, n_bins=AudioFeatureExtractor.FreqBins))
+        qFeatures['PitchEnergy'] = pitchEstimates
+        pitchFrames = np.arange(0, pitchEstimates.shape[-1] / self.m_sr, 1 / self.m_sr)
+        logger.info("Pitch estimates size=%dx%d pitch frames=%d", pitchEstimates.shape[0], pitchEstimates.shape[1], pitchFrames.size)
+        fig = plt.figure(figsize=(10,6))
+        plt.subplot(2,2,1)
+        rosa.display.specshow(rosa.amplitude_to_db(pitchEstimates, ref=np.max),
+            sr=self.m_sr, x_axis='time', y_axis='cqt_hz', hop_length=self.m_hopLength)
+        plt.title('Harmonic Pitch Profile')
+        pitchEnergy  = np.linalg.norm(pitchEstimates, axis=1)
+        logger.info("Pitch energy size=%d", pitchEnergy.size)
+        plt.subplot(2,2,2)
+        plt.title('Pitch Energy')
+        plt.bar(np.arange(0,pitchEnergy.size), pitchEnergy)
+        # TODO: Convert to midi numbers
+        plt.xlabel('Pitch Number')
+        # In order to detect taali/tabla combination we want to look at low level timbre
+        # features, manual experiments revealed following two features appear to be distinctive
+        # for qawali recordings.
+        plt.subplot(2,2,3)
+        specContrast = rosa.feature.spectral_contrast(percussiveSignal, sr=self.m_sr, n_fft=2048, hop_length=self.m_hopLength, fmin=160.0, n_bands=6)
+        qFeatures['SpectralContrast'] = specContrast
+        plt.title("Spectral Contrast")
+        rosa.display.specshow(specContrast, sr=self.m_sr, x_axis='time', hop_length=self.m_hopLength)
+        plt.ylabel('Octave subbands')
+        plt.tight_layout()
+
+        specFlatness = rosa.feature.spectral_flatness(percussiveSignal, n_fft=2048, hop_length=self.m_hopLength)
+        qFeatures['SpectralFlatness'] = specFlatness
+        plt.subplot(2,2,4)
+        plt.title('Spectral flatness')
+        frame_time = np.arange(0, specFlatness.shape[-1] / self.m_sr, 1 / self.m_sr)
+        logger.info("Time frame size=%d", frame_time.size)
+        plt.plot(self.m_hopLength * frame_time, 10 * np.log10(specFlatness.T))
+        plt.ylim([-60, 0])
+        fig.savefig(self.m_output + '-qfeatures.png')
+        plt.close(fig)
+        logger.info("Qawali related features computed!")
+        return qFeatures
