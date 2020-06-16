@@ -5,6 +5,7 @@
 # classify the song as a South Asian genre like Qawali, Ghazal,
 # geet, kafi, thumri, etc...
 
+from itertools import groupby
 from sklearn.cluster import KMeans
 import numpy as np
 import logging
@@ -24,31 +25,7 @@ def consecutive_detected_frames(framesArray, elemToMatch):
         logger.warning("No matching element found")
         return 0
 
-    # Make sure all non-matching indices are zero 
-    nonMatch = np.where(framesArray != elemToMatch)[0]
-    for nm in nonMatch:
-        if (framesArray[nm] != 0.0):
-            logger.warning("Input[%d]=%6.4f non-zero?", nm, framesArray[nm])
-            framesArray[nm] = 0.0
-
-    # Due to the fact that non-matching indices are forced as zero, we
-    # can simply do a maximum of run-length
-    # TODO: There should be a better way to do this instead of loop/if-else
-    runList = []
-    runLen = 0
-    ss = 0
-    print(framesArray.shape)
-    while ss < framesArray.size:
-        if framesArray[ss] != elemToMatch and runLen != 0:
-            runList.append(runLen)
-            runLen = 0
-        else:
-            runLen = runLen + 1
-            logger.debug("index=%d run-length=%d", ss, runLen)
-        ss = ss + 1
-    runList.append(runLen)
-    retVal = max(runList)
-    print(framesArray, runList)
+    retVal = max([sum(1 for i in g) for k,g in groupby(framesArray)])
     logger.info("Longest sequence length=%d of match=%6.4f", retVal, elemToMatch)
     return retVal
 
