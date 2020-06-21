@@ -5,29 +5,37 @@
 # classify the song as a South Asian genre like Qawali, Ghazal,
 # geet, kafi, thumri, etc...
 
+from itertools import dropwhile
 from itertools import groupby
 from sklearn.cluster import KMeans
 import numpy as np
 import logging
 
-logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__name__)
 
 # Function takes a 1-D numpy array as input and looks for the longest
-# sequence of given element
-def consecutive_detected_frames(framesArray, elemToMatch):
+# sequence of given element, returns a tuple with positive and consecutive
+# positive elements
+def pac_elements(framesArray, elemToMatch):
+    retTuple = (0,0)
     # only works for 1-D array
     if (framesArray.size != framesArray.shape[-1]):
-        logger.error("Input not a 1D array? with size=%d", framesArray.size)
-        return 0
+        logger.error("CDF:Input not a 1D array? with size=%d", framesArray.size)
+        return retTuple
 
     if not np.any(framesArray == elemToMatch ):
-        logger.warning("No matching element found")
-        return 0
+        logger.warning("CDF:No matching element found")
+        return retTuple
 
-    retVal = max([sum(1 for i in g) for k,g in groupby(framesArray)])
-    logger.info("Longest sequence length=%d of match=%6.4f", retVal, elemToMatch)
-    return retVal
+    groups = []
+    for k,g in groupby(framesArray):
+        groups.append(list(g))
+    print(groups)
+    elemNoMatchKey = lambda x : x != elemToMatch
+    retTuple = (np.count_nonzero(framesArray == elemToMatch), max([sum(1 for i in dropwhile(elemNoMatchKey, g)) for k,g in groupby(framesArray)]))
+    logger.info("CDF:Positive =%d, Longest sequence=%d of match=%6.4f", retTuple[0], retTuple[1], elemToMatch)
+    return retTuple
 
 
 class DesiGenreDetector:
@@ -37,10 +45,10 @@ class DesiGenreDetector:
     # with user
     ExpectedFeatures = ['FrameSize', 'SampleRate', 'PitchEnergy', 'SpectralContrast', 'SpectralFlatness']
     ObserveDurationSec = 3
-    ClusterGroups = 2
+    ClusterGroups = 3
     MidiC1 = 24
+    MidiC2 = 36.0
     MidiE2 = 40.0
-    MidiA2 = 44.0
     def __init__(self, featureDict):
         logger.info("Initializing Qawali classifier")
         if not all(feature in DesiGenreDetector.ExpectedFeatures for feature in featureDict):
@@ -56,53 +64,62 @@ class DesiGenreDetector:
                 # We want a frame step index corresponding to Observation window
                 totalSamples = inputSizes[0] * featureDict['FrameSize']
                 # Number of frames that make up an observation
-                self.m_observationSize = totalSamples / (DesiGenreDetector.ObserveDurationSec * featureDict['SampleRate'])
-                self.m_observationFrames = inputSizes[0]/self.m_observationSize
-                logger.info("Observation Frames=%d Observation Windows=%d", self.m_observationSize, self.m_observationFrames)
+                self.m_observationSize = totalSamples // (DesiGenreDetector.ObserveDurationSec * featureDict['SampleRate'])
+                self.m_observationFrames = inputSizes[0] // self.m_observationSize
+                logger.info("Observation windows size=%d Observation frames=%d", self.m_observationSize, self.m_observationFrames)
                 self.m_features = featureDict
                 # For energy based detection, we use cluster approach and need a map of pitch numbers
                 # against energy measured during observation. For pitch numbers we use Midi numbers
-                # starting from C1, so fill first column with midi numbers
-                self.m_pitchMap = np.zeros((DesiGenreDetector.ClusterGroups, inputSizes[0]))
-                self.m_pitchMap[:,0] = np.arange((DesiGenreDetector.MidiC1, DesiGenreDetector.MidiC1 + inputSizes[0]))
+                # starting from C1 and relying on frequency bins used by the feature extractor
+                self.m_pitchMap = np.zeros((featureDict['PitchEnergy'].shape[0], DesiGenreDetector.ClusterGroups))
+                self.m_pitchMap[:,0] = np.arange(DesiGenreDetector.MidiC1, DesiGenreDetector.MidiC1 + featureDict['PitchEnergy'].shape[0])
 
                 # Finally we make a partial decision per feature per Frame, allocate arrays for storing these
                 # partial results
                 self.m_energyDecision = np.zeros(self.m_observationFrames)
-                self.m_constrastDecision = np.zeros(1, self.m_observationFrames)
-                self.m_flatnessDecision = np.zeros(1,self.m_observationFrames)
+                self.m_constrastDecision = np.zeros(self.m_observationFrames)
+                self.m_flatnessDecision = np.zeros(self.m_observationFrames)
 
 
     def isQawali(self):
-        for frameIdx in range(0,self.m_observationFrames):
+        for frameIdx in range(0, self.m_observationFrames):
             startFrame = frameIdx * self.m_observationSize
-            endFrame = frameIdx * self.m_observationSize
+            endFrame = frameIdx * self.m_observationSize + self.m_observationSize
             # Cluster pitch energy into groups, input is a 2-D feature set with first column
             # as midi number and second column containing pitch energy
-            self.m_pitchMap[:,1] = np.linalg.norm(m_feature['PitchEnergy'][:,startFrame, endFrame], axis=1)
-            [maxEnergy, maxEnegyPitch] = [np.max(self.m_pitchMap), np.argmax(self.m_pitchMap)]
-            logger.debug("Frame=%d, maximum energy=%6.4f, corresponding pitch=%d", frameIdx, maxEnergy, maxEnergyPitch)
+            self.m_pitchMap[:,1] = np.linalg.norm(self.m_features['PitchEnergy'][:,startFrame:endFrame], axis=1)
+            [maxEnergy, maxEnergyPitch] = [np.max(self.m_pitchMap[:,1]), np.argmax(self.m_pitchMap[:,1])]
+            logger.info("Frame=%d, maximum energy=%6.4f, corresponding pitch=%d", frameIdx, maxEnergy, maxEnergyPitch + DesiGenreDetector.MidiC1)
             # Our intention here simply is to categorize into low and high energy groups and then see if there is
             # a max energy cluster around midi 40-44
             energyClusters = KMeans(n_clusters=DesiGenreDetector.ClusterGroups, random_state=0)
-            energyClusters.fit(energyPerPitch)
-            # Locate cluster with maximum energy
-            maxEnegyCluster = np.where(energyClusters.cluster_centers_ == np.amax(energyClusters.cluster_centers_))
-
-            # we expect a tuple with a single 2-D array containing pitch corresponding to maximum energy
-            if (len(maxEnergyCluster) != 1) and maxEnergyCluster[0] != 2:
-                logger.error("Unexpected size=%d of maximum energy cluster", len(maxEnergyCluster))
+            energyClusters.fit(self.m_pitchMap)
+            # Cluster centers is 2-D array with first column coming from input i.e. pitchMap
+            # Second column is energy clusters, sort the array along this axis and pick the last
+            # row corresponding to maximum energy
+            sortedEnergyClusters = energyClusters.cluster_centers_[np.argsort(energyClusters.cluster_centers_[:, 1])]
+            maxEnergyCluster = sortedEnergyClusters[DesiGenreDetector.ClusterGroups - 1]
+            # Sanity check on extracted max energy cluster
+            if (maxEnergyCluster.size != DesiGenreDetector.ClusterGroups):
+                logger.error("Unexpected size=%d of maximum energy cluster", maxEnergyCluster.size)
             else:
-                # Does maximum energy cluster include interesting midi range E2-A2
-                if maxEnegyCluster[0][0] > DesiGenreDetector.MidiE2 and maxEnegyCluster[0][0] < DesiGenreDetector.MidiA2:
-                    logger.info("Maximum energy pitch in frame index=%d clustered around=%6.4f lies between E2-A2", frameIdx, maxEnegyCluster[0][0])
+                logger.info("max energy cluster=(%6.4f, %6.4f)", maxEnergyCluster[0], maxEnergyCluster[1])
+                # Does maximum energy cluster include interesting midi range C2-E2
+                if maxEnergyCluster[0] in np.arange(DesiGenreDetector.MidiC2, DesiGenreDetector.MidiE2, 0.5):
+                    #logger.info("Maximum energy pitch in frame index=%d clustered around=%6.4f between C2-E2", frameIdx, maxEnergyCluster[1])
                     self.m_energyDecision[frameIdx] = 1.0
                 else:
-                    logger.info("Maximum energy pitch clustered around=%6.4f outside E2-A2", maxEnegyCluster[0][0])
+                    logger.info("Maximum energy pitch=%6.4f clustered around=%6.4f outside F2-A2", maxEnergyCluster[0], maxEnergyCluster[1])
 
             # TODO: Detection based on other features
 
-        if (consecutive_detected_frames(self.m_energyDecision, 1.0) > self.m_observationFrames/3):
-            logger.info("More than one-third of observed frames are consecutively labelled positive")
+        # Pitch energy classification heuristic: Look for at least 30% positive
+        # and 15% consecutive positive frames.
+        posThreshold = self.m_observationFrames / 3
+        conThreshold = self.m_observationFrames / 6
+        peDetection = pac_elements(self.m_energyDecision, 1.0)
+        if (peDetection[0] > posThreshold and peDetection[1] > conThreshold):
             return True
+        else:
+            logger.info("Positive detected=%d and consecutive detected=%d do not meet heuristic", peDetection[0], peDetection[1])
         return False

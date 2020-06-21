@@ -54,17 +54,21 @@ url_map = {piya_say_naina : 'piya_say_naina.mp3',
     yt_rumi_qawali : 'rumi.mp3'
 }
 
-#url_map = {rashk_e_qamar : 'rashk_e_qamar.mp3' }
-#url_map = {yt_rumi_qawali : 'rumi.mp3' }
+# Make a ground-truth map indexed on url_map
+# to help with error calculations
+#url_map = {khawaja : 'khawaja.mp3',
+#           ruthi_rut : 'ruthi_rut.mp3' }
+
 if __name__ == "__main__":
     logger.info("Feature extraction driver started")
 
+    # TODO: introduce false-negative, true-negative and false positive counters
     for songLink in url_map:
         song = AudioFeatureExtractor(url_map[songLink], songLink)
         q_features = song.extract_qawali_features()
         detector = DesiGenreDetector(q_features)
         if detector.isQawali():
-            logger.info("%s is a Qawali", url_map[songLink])
+            logger.info("*** %s is a Qawali ***\n", url_map[songLink])
         else:
-            logger.info("%s is not a Qawali", url_map[songLink])
+            logger.info("!!! %s is not a Qawali !!!\n", url_map[songLink])
     logger.info("Feature extraction done, check output directory for results!")
