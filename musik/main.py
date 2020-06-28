@@ -80,13 +80,13 @@ if __name__ == "__main__":
                 logger.info("*** %s is correctly marked as a Qawali ***\n", ggt_map[songLink][0])
             else:
                 errorCount = errorCount + 1.0
-                logger.info("???Missed detecting=%s as Qawali???", ggt_map[songLink][0])
+                logger.info("???Missed detecting=%s as Qawali???\n", ggt_map[songLink][0])
         else:
             if detector.isQawali():
                 errorCount = errorCount + 1
                 logger.info("%s is detected a Qawali but ground-truth=%s\n", ggt_map[songLink][0], ggt_map[songLink][1])
             else:
-                logger.info("%s is corectly not marked as Qawali", ggt_map[songLink][0])
+                logger.info("%s is corectly not marked as Qawali\n", ggt_map[songLink][0])
 
-    logger.info("...Error rate=%6.4f percent...", 100 * (errorCount/totalQ))
+    logger.info("...Error rate=%6.4f percent...\n", 100 * (errorCount/totalQ))
 

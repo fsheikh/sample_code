@@ -44,7 +44,7 @@ class DesiGenreDetector:
     # This modules assumes that a feature set has been agreed upon
     # with user
     ExpectedFeatures = ['FrameSize', 'SampleRate', 'PitchEnergy', 'SpectralContrast', 'SpectralFlatness']
-    ObserveDurationSec = 3
+    ObserveDurationSec = 2
     ClusterGroups = 3
     MidiC1 = 24
     MidiC2 = 36.0
@@ -64,9 +64,9 @@ class DesiGenreDetector:
                 # We want a frame step index corresponding to Observation window
                 totalSamples = inputSizes[0] * featureDict['FrameSize']
                 # Number of frames that make up an observation
-                self.m_observationSize = totalSamples // (DesiGenreDetector.ObserveDurationSec * featureDict['SampleRate'])
+                self.m_observationSize = (DesiGenreDetector.ObserveDurationSec * featureDict['SampleRate']) // featureDict['FrameSize']
                 self.m_observationFrames = inputSizes[0] // self.m_observationSize
-                logger.info("Observation windows size=%d Observation frames=%d", self.m_observationSize, self.m_observationFrames)
+                logger.info("total samples=%d Observation windows size=%d Observation frames=%d", totalSamples, self.m_observationSize, self.m_observationFrames)
                 self.m_features = featureDict
                 # For energy based detection, we use cluster approach and need a map of pitch numbers
                 # against energy measured during observation. For pitch numbers we use Midi numbers
@@ -126,7 +126,7 @@ class DesiGenreDetector:
             # Detection based on spectral flatness
             flatnessAverage = np.mean(10* np.log10(self.m_features['SpectralFlatness'][:,startFrame:endFrame]))
 
-            if int(flatnessAverage) in np.arange(-18,-21,-1):
+            if int(flatnessAverage) in np.arange(-17,-21,-1):
                 self.m_flatnessDecision[frameIdx] = 1.0
             else:
                 logger.info("Mean flatness=%6.4f outside expected range", flatnessAverage)
