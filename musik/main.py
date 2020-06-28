@@ -36,39 +36,57 @@ rashk_e_qamar = 'https://drive.google.com/uc?id=17y9uvNrCG0kwSbv3alkH0XjdlkMf5zN
 yt_rumi_qawali='https://www.youtube.com/watch?v=FjggJH45RRE'
 
 
-url_map = {piya_say_naina : 'piya_say_naina.mp3',
-    khawaja : 'khawaja.mp3',
-    zikar_parivash_ka : 'zikar_parivash_ka.mp3',
-    shikwa : 'shikwa.mp3',
-    is_karam_ka : 'is_karam_ka.mp3',
-    mast_nazron_say : 'mast_nazron_say.mp3',
-    mohay_apnay_rang : 'mohay_apnay_rang.mp3',
-    sikh_chaj : 'sikh_chaj.mp3',
-    meray_sohnaya : 'meray_sohnaya.mp3',
-    mera_imaan_pak : 'mera_imaan_pak.mp3',
-    maye_ni_maye : 'maye_ni_maye.mp3',
-    kise_da_yaar : 'kise_da_yaar.mp3',
-    mere_saaqi : 'mere_saaqi.mp3',
-    ruthi_rut : 'ruthi_rut.mp3',
-    rashk_e_qamar : 'rashk_e_qamar.mp3',
-    yt_rumi_qawali : 'rumi.mp3'
+# Map with song URLs and self-labelled genre-ground-truth (ggt)
+# Second element of tuple is the Genre with following legend
+# Q: Qawali
+# G: Ghazal
+# T: Thumri
+# S: Song filmi or non-filmi geet
+# F: Folk including dohay and kafian
+ggt_map = {piya_say_naina : ('piya_say_naina.mp3', 'Q'),
+    khawaja : ('khawaja.mp3', 'Q'),
+    zikar_parivash_ka : ('zikar_parivash_ka.mp3', 'G'),
+    shikwa : ('shikwa.mp3', 'Q'),
+    is_karam_ka : ('is_karam_ka.mp3', 'Q'),
+    mast_nazron_say : ('mast_nazron_say.mp3', 'Q'),
+    mohay_apnay_rang : ('mohay_apnay_rang.mp3', 'Q'),
+    sikh_chaj : ('sikh_chaj.mp3', 'Q'),
+    meray_sohnaya : ('meray_sohnaya.mp3', 'S'),
+    mera_imaan_pak : ('mera_imaan_pak.mp3', 'S'),
+    maye_ni_maye : ('maye_ni_maye.mp3', 'F'),
+    kise_da_yaar : ('kise_da_yaar.mp3', 'S'),
+    mere_saaqi : ('mere_saaqi.mp3', 'Q'),
+    ruthi_rut : ('ruthi_rut.mp3', 'S'),
+    rashk_e_qamar : ('rashk_e_qamar.mp3', 'Q'),
+    yt_rumi_qawali : ('rumi.mp3', 'Q')
 }
 
-# Make a ground-truth map indexed on url_map
-# to help with error calculations
-#url_map = {khawaja : 'khawaja.mp3',
-#           ruthi_rut : 'ruthi_rut.mp3' }
+#ggt_map = { khawaja : ('khawaja.mp3', 'Q'),
+#                ruthi_rut : ('ruthi_rut.mp3', 'G') }
 
 if __name__ == "__main__":
-    logger.info("Feature extraction driver started")
+    logger.info("Desi Music information retrieval: starting...")
 
-    # TODO: introduce false-negative, true-negative and false positive counters
-    for songLink in url_map:
-        song = AudioFeatureExtractor(url_map[songLink], songLink)
+    # TODO: separate false-negative, true-negative and false positive counters
+    errorCount = 0.0
+    totalQ = 0.0
+    for songLink in ggt_map:
+        song = AudioFeatureExtractor(ggt_map[songLink][0], songLink)
         q_features = song.extract_qawali_features()
         detector = DesiGenreDetector(q_features)
-        if detector.isQawali():
-            logger.info("*** %s is a Qawali ***\n", url_map[songLink])
+        totalQ = totalQ + 1.0
+        if ggt_map[songLink][1] == 'Q':
+            if detector.isQawali():
+                logger.info("*** %s is correctly marked as a Qawali ***\n", ggt_map[songLink][0])
+            else:
+                errorCount = errorCount + 1.0
+                logger.info("???Missed detecting=%s as Qawali???", ggt_map[songLink][0])
         else:
-            logger.info("!!! %s is not a Qawali !!!\n", url_map[songLink])
-    logger.info("Feature extraction done, check output directory for results!")
+            if detector.isQawali():
+                errorCount = errorCount + 1
+                logger.info("%s is detected a Qawali but ground-truth=%s\n", ggt_map[songLink][0], ggt_map[songLink][1])
+            else:
+                logger.info("%s is corectly not marked as Qawali", ggt_map[songLink][0])
+
+    logger.info("...Error rate=%6.4f percent...", 100 * (errorCount/totalQ))
+

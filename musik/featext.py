@@ -43,7 +43,7 @@ class AudioFeatureExtractor:
         self.m_output = str(AudioFeatureExtractor.graphs_subdir / Path(song_name).stem)
         # Constants per instance (should probably be parameterized)
         self.m_sampleRate = 22050
-        self.m_observeDurationInSec = 120
+        self.m_observeDurationInSec = 60
         # With above sample rate, this length translates to 46ms
         self.m_hopLength = 1024
 

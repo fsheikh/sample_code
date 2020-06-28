@@ -79,6 +79,7 @@ class DesiGenreDetector:
                 self.m_energyDecision = np.zeros(self.m_observationFrames)
                 self.m_constrastDecision = np.zeros(self.m_observationFrames)
                 self.m_flatnessDecision = np.zeros(self.m_observationFrames)
+                self.m_overallDecision = np.zeros(self.m_observationFrames)
 
 
     def isQawali(self):
@@ -89,7 +90,7 @@ class DesiGenreDetector:
             # as midi number and second column containing pitch energy
             self.m_pitchMap[:,1] = np.linalg.norm(self.m_features['PitchEnergy'][:,startFrame:endFrame], axis=1)
             [maxEnergy, maxEnergyPitch] = [np.max(self.m_pitchMap[:,1]), np.argmax(self.m_pitchMap[:,1])]
-            logger.info("Frame=%d, maximum energy=%6.4f, corresponding pitch=%d", frameIdx, maxEnergy, maxEnergyPitch + DesiGenreDetector.MidiC1)
+            #logger.info("Frame=%d, maximum energy=%6.4f, corresponding pitch=%d", frameIdx, maxEnergy, maxEnergyPitch + DesiGenreDetector.MidiC1)
             # Our intention here simply is to categorize into low and high energy groups and then see if there is
             # a max energy cluster around midi 40-44
             energyClusters = KMeans(n_clusters=DesiGenreDetector.ClusterGroups, random_state=0)
@@ -111,13 +112,46 @@ class DesiGenreDetector:
                 else:
                     logger.info("Maximum energy pitch=%6.4f clustered around=%6.4f outside F2-A2", maxEnergyCluster[0], maxEnergyCluster[1])
 
-            # TODO: Detection based on other features
+            # Detection based on spectral contrast, feature set per observation window is
+            # a 2D array with size=(subbands, self.m_observationSize), qawali classification is based
+            # on observing maximum average value in highest subbad and minimum in first subband
+            # TODO: If this heuristic does not work well, consider KMean or similar as well
+            specContrastAverage = np.mean(self.m_features['SpectralContrast'][:,startFrame:endFrame], axis=1)
+            specContrastMM = [np.argmin(specContrastAverage), np.argmax(specContrastAverage)]
+            if specContrastMM[0] == 1 and specContrastMM[1] == specContrastAverage.shape[-1] - 1:
+                self.m_constrastDecision[frameIdx] = 1.0
+            else:
+                logger.warning("Spectral contrast min-subband=%d max-subband=%d", specContrastMM[0], specContrastMM[1])
 
-        # Pitch energy classification heuristic: Look for at least 30% positive
+            # Detection based on spectral flatness
+            flatnessAverage = np.mean(10* np.log10(self.m_features['SpectralFlatness'][:,startFrame:endFrame]))
+
+            if int(flatnessAverage) in np.arange(-18,-21,-1):
+                self.m_flatnessDecision[frameIdx] = 1.0
+            else:
+                logger.info("Mean flatness=%6.4f outside expected range", flatnessAverage)
+
+            # overall is a majority decision
+            self.m_overallDecision[frameIdx] = self.m_flatnessDecision[frameIdx] + self.m_constrastDecision[frameIdx] + self.m_energyDecision[frameIdx]
+            if self.m_overallDecision[frameIdx] >= 2.0:
+                self.m_overallDecision[frameIdx] = 1.0
+            else:
+                self.m_overallDecision[frameIdx] = 0.0
+
+        logger.info("Printing pitch-energy decisions")
+        print(self.m_energyDecision)
+        logger.info("Printing spectral-constrast decisions")
+        print(self.m_constrastDecision)
+        logger.info("Printing spectral-flatness decisions")
+        print(self.m_flatnessDecision)
+        logger.info("Printing overall decisions")
+        print(self.m_overallDecision)
+        # Qawali classification heuristic: Look for at least 30% positive
         # and 15% consecutive positive frames.
         posThreshold = self.m_observationFrames / 3
         conThreshold = self.m_observationFrames / 6
-        peDetection = pac_elements(self.m_energyDecision, 1.0)
+        peDetection = pac_elements(self.m_overallDecision, 1.0)
+
         if (peDetection[0] > posThreshold and peDetection[1] > conThreshold):
             return True
         else:
