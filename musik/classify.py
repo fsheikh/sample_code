@@ -45,10 +45,10 @@ class DesiGenreDetector:
     # with user
     ExpectedFeatures = ['FrameSize', 'SampleRate', 'PitchEnergy', 'SpectralContrast', 'SpectralFlatness']
     ObserveDurationSec = 2
-    ClusterGroups = 3
+    ClusterGroups = 4
     MidiC1 = 24
+    MidiG1 = 31.0
     MidiC2 = 36.0
-    MidiE2 = 40.0
     def __init__(self, featureDict):
         logger.info("Initializing Qawali classifier")
         if not all(feature in DesiGenreDetector.ExpectedFeatures for feature in featureDict):
@@ -99,18 +99,20 @@ class DesiGenreDetector:
             # Second column is energy clusters, sort the array along this axis and pick the last
             # row corresponding to maximum energy
             sortedEnergyClusters = energyClusters.cluster_centers_[np.argsort(energyClusters.cluster_centers_[:, 1])]
+            logger.info("---Pitch Energy cluster centers---")
+            print(sortedEnergyClusters)
             maxEnergyCluster = sortedEnergyClusters[DesiGenreDetector.ClusterGroups - 1]
             # Sanity check on extracted max energy cluster
             if (maxEnergyCluster.size != DesiGenreDetector.ClusterGroups):
                 logger.error("Unexpected size=%d of maximum energy cluster", maxEnergyCluster.size)
             else:
                 logger.info("max energy cluster=(%6.4f, %6.4f)", maxEnergyCluster[0], maxEnergyCluster[1])
-                # Does maximum energy cluster include interesting midi range C2-E2
-                if maxEnergyCluster[0] in np.arange(DesiGenreDetector.MidiC2, DesiGenreDetector.MidiE2, 0.5):
-                    #logger.info("Maximum energy pitch in frame index=%d clustered around=%6.4f between C2-E2", frameIdx, maxEnergyCluster[1])
+                # Does maximum energy cluster include interesting midi range G1-C2
+                if maxEnergyCluster[0] in np.arange(DesiGenreDetector.MidiG1, DesiGenreDetector.MidiC2, 0.5):
+                    #logger.info("Maximum energy pitch in frame index=%d clustered around=%6.4f between G1-C2", frameIdx, maxEnergyCluster[1])
                     self.m_energyDecision[frameIdx] = 1.0
                 else:
-                    logger.info("Maximum energy pitch=%6.4f clustered around=%6.4f outside F2-A2", maxEnergyCluster[0], maxEnergyCluster[1])
+                    logger.info("Maximum energy pitch=%6.4f clustered around=%6.4f outside G1-C2", maxEnergyCluster[0], maxEnergyCluster[1])
 
             # Detection based on spectral contrast, feature set per observation window is
             # a 2D array with size=(subbands, self.m_observationSize), qawali classification is based
@@ -123,17 +125,23 @@ class DesiGenreDetector:
             else:
                 logger.warning("Spectral contrast min-subband=%d max-subband=%d", specContrastMM[0], specContrastMM[1])
 
-            # Detection based on spectral flatness
-            flatnessAverage = np.mean(10* np.log10(self.m_features['SpectralFlatness'][:,startFrame:endFrame]))
-
-            if int(flatnessAverage) in np.arange(-17,-21,-1):
+            # Detection based on gradient of spectral flatness in dB
+            flatnessdB = np.diff(10 * np.log10((self.m_features['SpectralFlatness'][:,startFrame:endFrame])))
+            # Run k-means on a single feature(each row a sample, each column a feature?)
+            flatnessClusters = KMeans(n_clusters=DesiGenreDetector.ClusterGroups, random_state=0)
+            flatnessClusters.fit(flatnessdB.reshape(-1,1))
+            logger.info("---Flatness measure cluster centers---")
+            sortedFlatClusters = flatnessClusters.cluster_centers_[np.argsort(flatnessClusters.cluster_centers_[:,0])]
+            print(sortedFlatClusters)
+            # With two clusters, maximum is the last one
+            if int(sortedFlatClusters[DesiGenreDetector.ClusterGroups-1]) in np.arange(10, 20, 1):
                 self.m_flatnessDecision[frameIdx] = 1.0
             else:
-                logger.info("Mean flatness=%6.4f outside expected range", flatnessAverage)
+                logger.info("Max flatness clustered around=%6.4f outside expected range", sortedFlatClusters[DesiGenreDetector.ClusterGroups-1])
 
             # overall is a majority decision
             self.m_overallDecision[frameIdx] = self.m_flatnessDecision[frameIdx] + self.m_constrastDecision[frameIdx] + self.m_energyDecision[frameIdx]
-            if self.m_overallDecision[frameIdx] >= 2.0:
+            if self.m_overallDecision[frameIdx] == 3.0:
                 self.m_overallDecision[frameIdx] = 1.0
             else:
                 self.m_overallDecision[frameIdx] = 0.0
@@ -152,7 +160,7 @@ class DesiGenreDetector:
         conThreshold = self.m_observationFrames / 6
         peDetection = pac_elements(self.m_overallDecision, 1.0)
 
-        if (peDetection[0] > posThreshold and peDetection[1] > conThreshold):
+        if (peDetection[0] >= posThreshold and peDetection[1] >= conThreshold):
             return True
         else:
             logger.info("Positive detected=%d and consecutive detected=%d do not meet heuristic", peDetection[0], peDetection[1])
