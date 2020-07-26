@@ -46,7 +46,7 @@ class AudioFeatureExtractor:
         self.m_observeDurationInSec = 60
         # With above sample rate, this length translates to 46ms
         self.m_hopLength = 1024
-
+        self.m_subBands = 5
         # Collecting mean, std.deviation and norm of harmonic and percussive CQT (3*2 features)
         self.m_perMidi = np.empty([AudioFeatureExtractor.FreqBins, 4], dtype=float)
         # First column contains midi number of notes/freqeuncies
@@ -287,6 +287,7 @@ class AudioFeatureExtractor:
                         "SpectralFlatness": np.array(np.zeros(self.m_hopLength))}
         harmonicSignal = rosa.effects.harmonic(self.m_dataSong, margin=10.0)
         percussiveSignal = rosa.effects.percussive(self.m_dataSong, margin=10.0)
+        #rosa.output.write_wav(self.m_output + 'percussive-segment.wav', percussiveSignal, self.m_sr)
         # Previous experiments showed that Qawali recordings distinguish themselves
         # with energy of fundamental pitches and their harmonics. This is presumably since pitch
         # profile across this genre is similar (?)
@@ -307,25 +308,42 @@ class AudioFeatureExtractor:
         # TODO: Convert to midi numbers
         plt.xlabel('Pitch Number')
         # In order to detect taali/tabla combination we want to look at low level timbre
-        # features, manual experiments revealed following two features appear to be distinctive
-        # for qawali recordings.
+        # features, manual experiments based on some liteature study on timbral features revealed
+        # following two features appear to be distinctive for qawali recordings.
+        # Spectral constrat fmin*n_bands can't seem to be higher than a threshold (could not detect a direct relation to Nyquist rate?)
         plt.subplot(2,2,3)
-        specContrast = rosa.feature.spectral_contrast(percussiveSignal, sr=self.m_sr, n_fft=2048, hop_length=self.m_hopLength, fmin=160.0, n_bands=6)
+        specContrast = rosa.feature.spectral_contrast(percussiveSignal, sr=self.m_sr, n_fft=2048, hop_length=self.m_hopLength,
+                                                     fmin=220.0, n_bands=self.m_subBands, quantile=0.1)
         qFeatures['SpectralContrast'] = specContrast
         plt.title("Spectral Contrast")
         rosa.display.specshow(specContrast, sr=self.m_sr, x_axis='time', hop_length=self.m_hopLength)
         plt.ylabel('Octave subbands')
         plt.tight_layout()
 
-        specFlatness = rosa.feature.spectral_flatness(percussiveSignal, n_fft=2048, hop_length=self.m_hopLength)
-        qFeatures['SpectralFlatness'] = specFlatness
+        aggregateContrast = np.linalg.norm(specContrast, axis=1)
+        subbands = np.arange(0, self.m_subBands + 1)
         plt.subplot(2,2,4)
-        plt.title('Spectral flatness')
-        frame_time = np.arange(0, specFlatness.shape[-1] / self.m_sr, 1 / self.m_sr)
-        logger.info("Time frame size=%d", frame_time.size)
-        plt.plot(self.m_hopLength * frame_time, 10 * np.log10(specFlatness.T))
-        plt.ylim([-60, 0])
+        plt.bar(subbands, aggregateContrast)
         fig.savefig(self.m_output + '-qfeatures.png')
         plt.close(fig)
         logger.info("Qawali related features computed!")
         return qFeatures
+"""
+        specFlatness = rosa.feature.spectral_flatness(percussiveSignal, n_fft=2048, hop_length=self.m_hopLength)
+        flatnessDelta = np.median(specFlatness)
+        # if median flatness is less than -20dB, we replace it with the minimum value
+        #if flatnessDelta < 0.01:
+        #    flatnessDelta = 0.01
+        #flatnessPeaks = rosa.util.peak_pick(specFlatness[0,:], 10,10,10,10, flatnessDelta, 5)
+        # Numpy "where" is useful but does not work with 'and' return is a tuple with
+        # actual indices in second element
+        stableFrames = np.where(np.logical_and(specFlatness < 0.05, specFlatness > 0.01))[1]
+        qFeatures['SpectralFlatness'] = np.array(np.zeros(specFlatness.size))
+        qFeatures['SpectralFlatness'][stableFrames] = 1.0
+        plt.subplot(2,2,4)
+        plt.title('Spectral flatness')
+        frame_time = np.arange(0, specFlatness.shape[-1] / self.m_sr, 1 / self.m_sr)
+        logger.info("Time frame size=%d", frame_time.size)
+        #plt.plot(self.m_hopLength * frame_time, specFlatness.T)
+        plt.vlines(self.m_hopLength * frame_time[stableFrames], 0.01, 0.05, color='r', linestyles='dashed', alpha=0.8, label='Stable Frames')
+"""

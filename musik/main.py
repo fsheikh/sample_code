@@ -69,13 +69,13 @@ ggt_map = {piya_say_naina : ('piya_say_naina.mp3', 'Q'),
 
 
 # Smaller set for quick testing
-#ggt_map = { khawaja : ('khawaja.mp3', 'Q'),
+#ggt_map = { piya_say_naina : ('piya_say_naina.mp3', 'Q'),
 #            mera_imaan_pak : ('mera_imaan_pak.mp3', 'S'),
 #            sikh_chaj : ('sikh_chaj.mp3', 'Q'),
 #            ruthi_rut : ('ruthi_rut.mp3', 'G') }
 
 if __name__ == "__main__":
-    logger.info("Desi Music information retrieval: starting...")
+    logger.info("\n\nDesi Music information retrieval: starting...\n\n")
 
     # TODO: separate false-negative, true-negative and false positive counters
     errorCount = 0.0
@@ -84,19 +84,21 @@ if __name__ == "__main__":
         song = AudioFeatureExtractor(ggt_map[songLink][0], songLink)
         q_features = song.extract_qawali_features()
         detector = DesiGenreDetector(q_features)
+        # Successful detection means the detector output matched groud truth
+        # otherwise error
         totalQ = totalQ + 1.0
         if ggt_map[songLink][1] == 'Q':
             if detector.isQawali():
                 logger.info("*** %s is correctly marked as a Qawali ***\n", ggt_map[songLink][0])
             else:
                 errorCount = errorCount + 1.0
-                logger.info("???Missed detecting=%s as Qawali???\n", ggt_map[songLink][0])
+                logger.info("??? =%s is Qawali but detection missed ???\n", ggt_map[songLink][0])
         else:
             if detector.isQawali():
-                errorCount = errorCount + 1
-                logger.info("%s is detected a Qawali but ground-truth=%s\n", ggt_map[songLink][0], ggt_map[songLink][1])
+                errorCount = errorCount + 1.0
+                logger.info("!!! %s is detected a Qawali but ground-truth=%s !!!\n", ggt_map[songLink][0], ggt_map[songLink][1])
             else:
-                logger.info("%s is corectly not marked as Qawali\n", ggt_map[songLink][0])
+                logger.info("*** %s is corectly not marked as Qawali ***\n", ggt_map[songLink][0])
 
-    logger.info("...Error rate=%6.4f percent...\n", 100 * (errorCount/totalQ))
+    logger.info("...Total = %6.4f Errors = %6.4f Error rate=%6.4f percent...\n", totalQ, errorCount, 100 * (errorCount/totalQ))
 
