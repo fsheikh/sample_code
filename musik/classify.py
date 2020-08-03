@@ -159,8 +159,8 @@ class DesiGenreDetector:
         print(self.m_overallDecision)
         # Qawali classification heuristic: Look for at least 33.33% positive
         # and 20% consecutive positive frames.
-        posThreshold = self.m_observationFrames / 3
-        conThreshold = self.m_observationFrames / 5
+        posThreshold = self.m_observationFrames * 0.3
+        conThreshold = self.m_observationFrames * 0.2
         peDetection = pac_elements(self.m_overallDecision, 1.0)
 
         if (peDetection[0] >= posThreshold or peDetection[1] >= conThreshold):
