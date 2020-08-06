@@ -140,6 +140,43 @@ ytq_map = { yt_rumiQawali : ('rumi.mp3', 'Q'),
             yt_harLehzaBashakal : ('har_lehza_bashakal.mp3', 'Q'),
             yt_tuKareemiMun : ('tu_kareemi_mun.mp3', 'Q')
 }
+gtzan_genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
+gtzan_map = {}
+
+# Given directory path where gtzan has been unpacked
+# and associated genre defined in that dataset, constructs a map
+# with full location to song sample and its associated genre
+def construct_gtzan_map(directoryPath='', genre=''):
+    genre_map = {}
+    if directoryPath == None or genre == None:
+        logging.error("Invalid inputs to map constructor")
+        raise ValueError
+
+    if not os.path.exists(directoryPath):
+        logging.error("Given dataset path=%s not valid", directoryPath)
+        raise ValueError
+
+    genrePath = os.path.join(directoryPath, genre)
+
+    if not os.path.exists(genrePath):
+        logging.error("Genre directory=%s within dataset not found", genrePath)
+        raise ValueError
+
+    # GTZAN data-set contains wave files
+    for wavFile in os.listdir(genrePath):
+        if not wavFile.endswith(".wav"):
+            logging.warning("File=%s not in wave format, skipping", waveFile)
+        else:
+            mapKey = "gtzan_"+ os.path.splitext(os.path.basename(wavFile))[0]
+            relativeSongPath = genre + "/" + wavFile
+            logging.info("Adding %s to map at key = %s with genre=%s", relativeSongPath, mapKey, genre[0:2])
+            genre_map[mapKey] = (relativeSongPath, genre[0:2])
+
+    return genre_map
+
+
+
+
 
 # Runs feature extractor and genre detection loop on the given dataset.
 # Returns a list with total items processed, true-negatives, false-negatives and
@@ -175,7 +212,7 @@ def genre_errors(dataset, genre='Q'):
 if __name__ == "__main__":
     logger.info("\n\nDesi Music information retrieval: starting...\n\n")
 
-    RunSet = "youtube"
+    RunSet = "gtzan_rock"
 
     if RunSet == 'small':
         ss_stats = genre_errors(small_set)
@@ -207,6 +244,116 @@ if __name__ == "__main__":
         s_rate = 100 * (success/total)
         f_rate = 100 * (fails/total)
         logger.info("\nResults youtube-set\n")
+        logger.info("\n-------------------\n")
+        logger.info("Total = %6.4f Errors = %6.4f Error rate=%6.4f percent...\n", total, fails, f_rate)
+
+    if RunSet == "gtzan_blues":
+        gtzan_map = construct_gtzan_map('/home/fsheikh/musik/genres', 'blues')
+        gtb_stats = genre_errors(gtzan_map)
+        total = gtb_stats[0]
+        fails = gtb_stats[1] + gtb_stats[2]
+        success = gtb_stats[3] + gtb_stats[4]
+        s_rate = 100 * (success/total)
+        f_rate = 100 * (fails/total)
+        logger.info("\nResults GTZAN-Blues\n")
+        logger.info("\n-------------------\n")
+        logger.info("Total = %6.4f Errors = %6.4f Error rate=%6.4f percent...\n", total, fails, f_rate)
+
+    if RunSet == "gtzan_classical":
+        gtzan_map = construct_gtzan_map('/home/fsheikh/musik/genres', 'classical')
+        gtb_stats = genre_errors(gtzan_map)
+        total = gtb_stats[0]
+        fails = gtb_stats[1] + gtb_stats[2]
+        success = gtb_stats[3] + gtb_stats[4]
+        s_rate = 100 * (success/total)
+        f_rate = 100 * (fails/total)
+        logger.info("\nResults GTZAN-Classical\n")
+        logger.info("\n-------------------\n")
+        logger.info("Total = %6.4f Errors = %6.4f Error rate=%6.4f percent...\n", total, fails, f_rate)
+
+    if RunSet == "gtzan_country":
+        gtzan_map = construct_gtzan_map('/home/fsheikh/musik/genres', 'country')
+        gtb_stats = genre_errors(gtzan_map)
+        total = gtb_stats[0]
+        fails = gtb_stats[1] + gtb_stats[2]
+        success = gtb_stats[3] + gtb_stats[4]
+        s_rate = 100 * (success/total)
+        f_rate = 100 * (fails/total)
+        logger.info("\nResults GTZAN-Country\n")
+        logger.info("\n-------------------\n")
+        logger.info("Total = %6.4f Errors = %6.4f Error rate=%6.4f percent...\n", total, fails, f_rate)
+
+
+    if RunSet == "gtzan_disco":
+        gtzan_map = construct_gtzan_map('/home/fsheikh/musik/genres', 'disco')
+        gtb_stats = genre_errors(gtzan_map)
+        total = gtb_stats[0]
+        fails = gtb_stats[1] + gtb_stats[2]
+        success = gtb_stats[3] + gtb_stats[4]
+        s_rate = 100 * (success/total)
+        f_rate = 100 * (fails/total)
+        logger.info("\nResults GTZAN-Disco\n")
+        logger.info("\n-------------------\n")
+        logger.info("Total = %6.4f Errors = %6.4f Error rate=%6.4f percent...\n", total, fails, f_rate)
+
+
+    if RunSet == "gtzan_hiphop":
+        gtzan_map = construct_gtzan_map('/home/fsheikh/musik/genres', 'hiphop')
+        gtb_stats = genre_errors(gtzan_map)
+        total = gtb_stats[0]
+        fails = gtb_stats[1] + gtb_stats[2]
+        success = gtb_stats[3] + gtb_stats[4]
+        s_rate = 100 * (success/total)
+        f_rate = 100 * (fails/total)
+        logger.info("\nResults GTZAN-Hiphop\n")
+        logger.info("\n-------------------\n")
+        logger.info("Total = %6.4f Errors = %6.4f Error rate=%6.4f percent...\n", total, fails, f_rate)
+
+    if RunSet == "gtzan_jazz":
+        gtzan_map = construct_gtzan_map('/home/fsheikh/musik/genres', 'jazz')
+        gtb_stats = genre_errors(gtzan_map)
+        total = gtb_stats[0]
+        fails = gtb_stats[1] + gtb_stats[2]
+        success = gtb_stats[3] + gtb_stats[4]
+        s_rate = 100 * (success/total)
+        f_rate = 100 * (fails/total)
+        logger.info("\nResults GTZAN-Jazz\n")
+        logger.info("\n-------------------\n")
+        logger.info("Total = %6.4f Errors = %6.4f Error rate=%6.4f percent...\n", total, fails, f_rate)
+
+    if RunSet == "gtzan_pop":
+        gtzan_map = construct_gtzan_map('/home/fsheikh/musik/genres', 'pop')
+        gtb_stats = genre_errors(gtzan_map)
+        total = gtb_stats[0]
+        fails = gtb_stats[1] + gtb_stats[2]
+        success = gtb_stats[3] + gtb_stats[4]
+        s_rate = 100 * (success/total)
+        f_rate = 100 * (fails/total)
+        logger.info("\nResults GTZAN-Pop\n")
+        logger.info("\n-------------------\n")
+        logger.info("Total = %6.4f Errors = %6.4f Error rate=%6.4f percent...\n", total, fails, f_rate)
+
+    if RunSet == "gtzan_reggae":
+        gtzan_map = construct_gtzan_map('/home/fsheikh/musik/genres', 'reggae')
+        gtb_stats = genre_errors(gtzan_map)
+        total = gtb_stats[0]
+        fails = gtb_stats[1] + gtb_stats[2]
+        success = gtb_stats[3] + gtb_stats[4]
+        s_rate = 100 * (success/total)
+        f_rate = 100 * (fails/total)
+        logger.info("\nResults GTZAN-Reggae\n")
+        logger.info("\n-------------------\n")
+        logger.info("Total = %6.4f Errors = %6.4f Error rate=%6.4f percent...\n", total, fails, f_rate)
+
+    if RunSet == "gtzan_rock":
+        gtzan_map = construct_gtzan_map('/home/fsheikh/musik/genres', 'rock')
+        gtb_stats = genre_errors(gtzan_map)
+        total = gtb_stats[0]
+        fails = gtb_stats[1] + gtb_stats[2]
+        success = gtb_stats[3] + gtb_stats[4]
+        s_rate = 100 * (success/total)
+        f_rate = 100 * (fails/total)
+        logger.info("\nResults GTZAN-Rock\n")
         logger.info("\n-------------------\n")
         logger.info("Total = %6.4f Errors = %6.4f Error rate=%6.4f percent...\n", total, fails, f_rate)
 

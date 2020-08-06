@@ -25,6 +25,7 @@ class AudioFeatureExtractor:
     # e.g. on windows local_directory = Path('C:\\personal\\musik\\')
     local_directory = Path('/home/fsheikh/musik')
     graphs_subdir = local_directory / 'graphs'
+    gztan_subdir = local_directory / 'genres'
     C1Midi = 24
     C8Midi = 108
     FreqBins = C8Midi - C1Midi
@@ -38,12 +39,16 @@ class AudioFeatureExtractor:
     def __init__(self, song_name, url='None'):
         logger.info('Instantiating %s for song=%s with url=%s', self.__class__.__name__, song_name, url)
         self.m_songName = song_name
-        self.m_songPath = AudioFeatureExtractor.local_directory / song_name
         self.m_url = url
+        if "gtzan" in url:
+            self.m_songPath = AudioFeatureExtractor.gztan_subdir / song_name
+            self.m_observeDurationInSec = 30
+        else:
+            self.m_songPath = AudioFeatureExtractor.local_directory / song_name
+            self.m_observeDurationInSec = 60
         self.m_output = str(AudioFeatureExtractor.graphs_subdir / Path(song_name).stem)
         # Constants per instance (should probably be parameterized)
         self.m_sampleRate = 22050
-        self.m_observeDurationInSec = 60
         # With above sample rate, this length translates to 46ms
         self.m_hopLength = 1024
         self.m_subBands = 5
