@@ -62,7 +62,15 @@ yt_awainTeTenuDasan = 'https://www.youtube.com/watch?v=P-Qe5yYLusU'
 yt_udeekMainuSajna = 'https://www.youtube.com/watch?v=tbuOpgJOrH4'
 yt_injVichrayMurrNayeAye = 'https://www.youtube.com/watch?v=4OmZe5Cv9kc'
 yt_manKunToMaula = 'https://www.youtube.com/watch?v=Z5OWke4L-fE'
-
+yt_kaanRozkeRooh = 'https://www.youtube.com/watch?v=CK1Ypt3dOUs'
+yt_aeyMairayHamnashin = 'https://www.youtube.com/watch?v=aWAxus8MfsM'
+yt_nerreNerreVass = 'https://www.youtube.com/watch?v=WnPYEjOOc0A'
+yt_tumheDilLagi = 'https://www.youtube.com/watch?v=K9kAI20osxc'
+yt_laalMeriPat = 'https://www.youtube.com/watch?v=SihdsEzawaU&t=75s'
+yt_aamadaBaQatal = 'https://www.youtube.com/watch?v=Vfs0_cPcOtg'
+yt_guftamKayRoshan = 'https://www.youtube.com/watch?v=NB6ZS6US-hc'
+yt_tuKareemiMun = 'https://www.youtube.com/watch?v=EAzXFx_9dGc'
+yt_harLehzaBashakal = 'https://www.youtube.com/watch?v=4mJzU3fhJjY'
 # Map with song URLs and self-labelled genre-ground-truth (ggt)
 # Second element of tuple is the Genre with following legend
 # Q: Qawali
@@ -95,7 +103,8 @@ ggt_map = {piya_say_naina : ('piya_say_naina.mp3', 'Q'),
 small_set = { piya_say_naina : ('piya_say_naina.mp3', 'Q'),
             mera_imaan_pak : ('mera_imaan_pak.mp3', 'S'),
             sikh_chaj : ('sikh_chaj.mp3', 'Q'),
-            ruthi_rut : ('ruthi_rut.mp3', 'G') }
+            ruthi_rut : ('ruthi_rut.mp3', 'G')
+            }
 
 # youtube qawali map
 ytq_map = { yt_rumiQawali : ('rumi.mp3', 'Q'),
@@ -122,7 +131,14 @@ ytq_map = { yt_rumiQawali : ('rumi.mp3', 'Q'),
             yt_awainTeTenuDasan : ('awayen_tay_tenu_dasan.mp3', 'Q'),
             #yt_udeekMainuSajna : ('udeek_mainu_sajna.mp3','Q'), # (suspected other instruments)
             yt_injVichrayMurrNayeAye : ('inj_vichray_murr.mp3', 'Q'),
-            yt_manKunToMaula : ('man_kun_tow_maula.mp3', 'Q')
+            yt_manKunToMaula : ('man_kun_tow_maula.mp3', 'Q'),
+            yt_kaanRozkeRooh : ('kaan_roz_ke_rooh.mp3', 'Q'),
+            yt_aeyMairayHamnashin : ('aey_mairay_hamnashin.mp3', 'Q'),
+            yt_tumheDilLagi : ('tumhe_dil_lagi.mp3', 'Q'),
+            yt_laalMeriPat : ('laal_meri_pat.mp3', 'Q'),
+            yt_aamadaBaQatal : ('aamada_ba_qatal.mp3', 'Q'),
+            yt_harLehzaBashakal : ('har_lehza_bashakal.mp3', 'Q'),
+            yt_tuKareemiMun : ('tu_kareemi_mun.mp3', 'Q')
 }
 
 # Runs feature extractor and genre detection loop on the given dataset.
@@ -159,7 +175,7 @@ def genre_errors(dataset, genre='Q'):
 if __name__ == "__main__":
     logger.info("\n\nDesi Music information retrieval: starting...\n\n")
 
-    RunSet = "full"
+    RunSet = "youtube"
 
     if RunSet == 'small':
         ss_stats = genre_errors(small_set)
