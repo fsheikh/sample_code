@@ -1,3 +1,19 @@
+# Kmeans based unsupervised classifier for Qawali/songs
+
+# Copyright (C) 2020  Faheem Sheikh (fahim.sheikh@gmail.com)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 # Module containing class whose objects are initialized with
 # a suitable feature set extracted from a song, and then supply
@@ -85,7 +101,7 @@ class DesiGenreDetector:
 
 
     def isQawali(self):
-        for frameIdx in range(0, self.m_observationFrames):
+        for frameIdx in range(0, self.m_obser.vationFrames):
             startFrame = frameIdx * self.m_observationSize
             endFrame = frameIdx * self.m_observationSize + self.m_observationSize
             # Cluster pitch energy into groups, input is a 2-D feature set with first column
