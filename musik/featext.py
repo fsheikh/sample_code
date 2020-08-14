@@ -46,6 +46,7 @@ class AudioFeatureExtractor:
     C1Midi = 24
     C8Midi = 108
     FreqBins = C8Midi - C1Midi
+    SubBands = 6
     # Youtube-dl parameters for downloading from youtube
     YdlParams = {'postprocessors': [{ 'key': 'FFmpegExtractAudio', 'preferredcodec' : 'mp3', 'preferredquality' : '128'}],
                  'logger' : logger,
@@ -68,7 +69,6 @@ class AudioFeatureExtractor:
         self.m_sampleRate = 22050
         # With above sample rate, this length translates to 46ms
         self.m_hopLength = 1024
-        self.m_subBands = 5
         # Collecting mean, std.deviation and norm of harmonic and percussive CQT (3*2 features)
         self.m_perMidi = np.empty([AudioFeatureExtractor.FreqBins, 4], dtype=float)
         # First column contains midi number of notes/freqeuncies
@@ -301,7 +301,11 @@ class AudioFeatureExtractor:
         plt.close(fig)
         logger.info('***Low timber features extracted from %s ***\n', self.m_songName)
 
-    def extract_qawali_features(self):
+    # Features directly extracted from Audio, which can help distinguish
+    # Qawalis from other genres, time_reduce by default keeps extracted
+    # features a function of time, reducing time dimension requires a function
+    # to be applied which in this case is energy (L2 norm)
+    def extract_qawali_features(self, time_reduce=False):
         qFeatures = {"FrameSize": self.m_hopLength,
                         "SampleRate": self.m_sr,
                         "PitchEnergy": np.array(np.zeros(self.m_hopLength)),
@@ -314,7 +318,6 @@ class AudioFeatureExtractor:
         # with energy of fundamental pitches and their harmonics. This is presumably since pitch
         # profile across this genre is similar (?)
         pitchEstimates = np.abs(rosa.cqt(harmonicSignal, sr=self.m_sr, hop_length=self.m_hopLength, n_bins=AudioFeatureExtractor.FreqBins))
-        qFeatures['PitchEnergy'] = pitchEstimates
         pitchFrames = np.arange(0, pitchEstimates.shape[-1] / self.m_sr, 1 / self.m_sr)
         logger.info("Pitch estimates size=%dx%d pitch frames=%d", pitchEstimates.shape[0], pitchEstimates.shape[1], pitchFrames.size)
         fig = plt.figure(figsize=(10,6))
@@ -323,7 +326,7 @@ class AudioFeatureExtractor:
             sr=self.m_sr, x_axis='time', y_axis='cqt_hz', hop_length=self.m_hopLength)
         plt.title('Harmonic Pitch Profile')
         pitchEnergy  = np.linalg.norm(pitchEstimates, axis=1)
-        logger.info("Pitch energy size=%d", pitchEnergy.size)
+        #logger.info("Pitch energy size=%d", pitchEnergy.size)
         plt.subplot(2,2,2)
         plt.title('Pitch Energy')
         plt.bar(np.arange(0,pitchEnergy.size), pitchEnergy)
@@ -335,7 +338,7 @@ class AudioFeatureExtractor:
         # Spectral constrat fmin*n_bands can't seem to be higher than a threshold (could not detect a direct relation to Nyquist rate?)
         plt.subplot(2,2,3)
         specContrast = rosa.feature.spectral_contrast(percussiveSignal, sr=self.m_sr, n_fft=2048, hop_length=self.m_hopLength,
-                                                     fmin=220.0, n_bands=self.m_subBands, quantile=0.1)
+                                                     fmin=220.0, n_bands=AudioFeatureExtractor.SubBands - 1, quantile=0.1)
         qFeatures['SpectralContrast'] = specContrast
         plt.title("Spectral Contrast")
         rosa.display.specshow(specContrast, sr=self.m_sr, x_axis='time', hop_length=self.m_hopLength)
@@ -343,12 +346,20 @@ class AudioFeatureExtractor:
         plt.tight_layout()
 
         aggregateContrast = np.linalg.norm(specContrast, axis=1)
-        subbands = np.arange(0, self.m_subBands + 1)
+        subbands = np.arange(0, AudioFeatureExtractor.SubBands)
         plt.subplot(2,2,4)
         plt.bar(subbands, aggregateContrast)
         fig.savefig(self.m_output + '-qfeatures.png')
         plt.close(fig)
         logger.info("Qawali related features computed!")
+
+        # Report features based on reduction parameter
+        if time_reduce:
+            qFeatures['PitchEnergy'] = pitchEnergy
+            qFeatures['SpectralContrast'] = aggregateContrast
+        else:
+            qFeatures['PitchEnergy'] = pitchEstimates
+            qFeatures['SpectralContrast'] = specContrast
         return qFeatures
 """
         specFlatness = rosa.feature.spectral_flatness(percussiveSignal, n_fft=2048, hop_length=self.m_hopLength)

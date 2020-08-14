@@ -29,6 +29,7 @@ import os
 import logging
 from classify import DesiGenreDetector
 from featext import AudioFeatureExtractor
+from qlearner import QawaliClassifier
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__name__)
 
@@ -110,7 +111,7 @@ training_data = {piya_say_naina : ('piya_say_naina.mp3', 'Q'),
     yt_kuchIssAdaSay : ('kuch_iss_ada.mp3', 'Q'),
     yt_veekhanYaarTayParhan : ('veekhan_yaar.mp3', 'Q'),
     yt_aamadaBaQatal : ('aamada_ba_qatal.mp3', 'Q'),
-    yt_nerreNerreVass : ('nerre_nerre_vas.mp3', 'Q'),
+    yt_nerreNerreVass : ('nerre_nerre_vass.mp3', 'Q'),
     yt_ajabAndaazTujhKo : ('ajab_andaz.mp3', 'Q'),
     meray_sohnaya : ('meray_sohnaya.mp3', 'S'),
     mera_imaan_pak : ('mera_imaan_pak.mp3', 'S'),
@@ -161,8 +162,17 @@ test_data = { yt_rumiQawali : ('rumi.mp3', 'Q'),
 }
 
 if __name__ == "__main__":
-    logger.info("\n\n Supervised Qawali Recognition...\n\n")
-
+    logger.info("\n\n Supervised Qawali Learning...\n\n")
+    # Features are pitch energy per Midi/frequency and spectral energy
+    # per audio subband, defined within FeatureExtractor module
+    N = AudioFeatureExtractor.FreqBins + AudioFeatureExtractor.SubBands
+    qc = QawaliClassifier(N)
     # Loop over training data, extract features, concatenate features
     # instantiate neural network, pass features to network and monitor
     # loss for training sequence
+    for song in training_data:
+        songData = AudioFeatureExtractor(training_data[song][0], song)
+        songFeatures = songData.extract_qawali_features(time_reduce=True)
+        # Input parameters are features and genre
+        qc.load(songFeatures, training_data[song][1])
+    qc.train()
