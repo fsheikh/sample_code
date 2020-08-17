@@ -108,15 +108,15 @@ training_data = {piya_say_naina : ('piya_say_naina.mp3', 'Q'),
     is_karam_ka : ('is_karam_ka.mp3', 'Q'),
     mohay_apnay_rang : ('mohay_apnay_rang.mp3', 'Q'),
     mere_saaqi : ('mere_saaqi.mp3', 'Q'),
+    meray_sohnaya : ('meray_sohnaya.mp3', 'S'),
+    mera_imaan_pak : ('mera_imaan_pak.mp3', 'S'),
+    maye_ni_maye : ('maye_ni_maye.mp3', 'F'),
+    kise_da_yaar : ('kise_da_yaar.mp3', 'S'),
     yt_kuchIssAdaSay : ('kuch_iss_ada.mp3', 'Q'),
     yt_veekhanYaarTayParhan : ('veekhan_yaar.mp3', 'Q'),
     yt_aamadaBaQatal : ('aamada_ba_qatal.mp3', 'Q'),
     yt_nerreNerreVass : ('nerre_nerre_vass.mp3', 'Q'),
     yt_ajabAndaazTujhKo : ('ajab_andaz.mp3', 'Q'),
-    meray_sohnaya : ('meray_sohnaya.mp3', 'S'),
-    mera_imaan_pak : ('mera_imaan_pak.mp3', 'S'),
-    maye_ni_maye : ('maye_ni_maye.mp3', 'F'),
-    kise_da_yaar : ('kise_da_yaar.mp3', 'S'),
     ruthi_rut : ('ruthi_rut.mp3', 'S'),
     zikar_parivash_ka : ('zikar_parivash_ka.mp3', 'G'),
     maye_ni_kinnon_akhan : ('maye_ni_kinnon_akhan.mp3', 'F'),
@@ -125,6 +125,8 @@ training_data = {piya_say_naina : ('piya_say_naina.mp3', 'Q'),
     yt_naqsh_khayal : ('naqsh_khayal.mp3', 'G')
 }
 
+#training_data = {piya_say_naina : ('piya_say_naina.mp3', 'Q'),
+#    khawaja : ('khawaja.mp3', 'Q')}
 
 # Songs to be used for testing
 test_data = { yt_rumiQawali : ('rumi.mp3', 'Q'),
@@ -166,13 +168,20 @@ if __name__ == "__main__":
     # Features are pitch energy per Midi/frequency and spectral energy
     # per audio subband, defined within FeatureExtractor module
     N = AudioFeatureExtractor.FreqBins + AudioFeatureExtractor.SubBands
-    qc = QawaliClassifier(N)
+    B = len(training_data)
+    qc = QawaliClassifier(B,N)
     # Loop over training data, extract features, concatenate features
     # instantiate neural network, pass features to network and monitor
     # loss for training sequence
-    for song in training_data:
-        songData = AudioFeatureExtractor(training_data[song][0], song)
-        songFeatures = songData.extract_qawali_features(time_reduce=True)
+
+    #for song in training_data:
+    #    songData = AudioFeatureExtractor(training_data[song][0], song)
+    #    songFeatures = songData.extract_qawali_features()
         # Input parameters are features and genre
-        qc.load(songFeatures, training_data[song][1])
-    qc.train()
+    #    qc.load(songFeatures, training_data[song][1])
+
+    #qc.save_and_plot()
+    qc.reload_from_disk()
+    for epoch in range(2):
+        logger.info("\nTraining for epoch=%d\n", epoch)
+        qc.train()

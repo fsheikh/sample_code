@@ -353,13 +353,17 @@ class AudioFeatureExtractor:
         plt.close(fig)
         logger.info("Qawali related features computed!")
 
-        # Report features based on reduction parameter
+        # Report features based on reduction parameter after normalization
         if time_reduce:
-            qFeatures['PitchEnergy'] = pitchEnergy
-            qFeatures['SpectralContrast'] = aggregateContrast
+            qFeatures['PitchEnergy'] = pitchEnergy / pitchEnergy.max(axis=1, keepdims=True)
+            qFeatures['SpectralContrast'] = aggregateContrast / aggregateContrast.max(axis=1, keepdims=True)
         else:
-            qFeatures['PitchEnergy'] = pitchEstimates
-            qFeatures['SpectralContrast'] = specContrast
+            qFeatures['PitchEnergy'] = pitchEstimates / pitchEstimates.max(axis=1, keepdims=True)
+            qFeatures['SpectralContrast'] = specContrast / specContrast.max(axis=1, keepdims=True)
+
+        # Blindly dividing by max can backfire in case of all zero-values
+        np.nan_to_num(qFeatures['PitchEnergy'], copy=False)
+        np.nan_to_num(qFeatures['SpectralContrast'], copy=False)
         return qFeatures
 """
         specFlatness = rosa.feature.spectral_flatness(percussiveSignal, n_fft=2048, hop_length=self.m_hopLength)
