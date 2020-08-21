@@ -52,7 +52,7 @@ class QawaliClassifier:
     TrainDataFile = 'training.dat'
     def __init__(self, batchSize, numFeatures):
         self.m_model = QawaliNet(numFeatures)
-        self.m_criterion = torch.nn.CrossEntropyLoss(weight= torch.ones([1, 2], dtype=torch.float32), reduction='mean')
+        self.m_criterion = torch.nn.CrossEntropyLoss(weight= torch.Tensor([1.0, 0.1]), reduction='mean')
         self.m_optimizer = torch.optim.Adam(self.m_model.parameters(), lr=1e-2)
         self.m_batch = batchSize
         self.m_N = numFeatures
@@ -107,6 +107,7 @@ class QawaliClassifier:
     # Given input feature tensor x, trains the model
     # to learn it as y (float value)
     def train(self):
+       self.m_model.train()
        logger.info("Starting training!")
        self.m_trainX = self.m_trainX.float()
        timeSamples = self.m_trainX.size()[1]
@@ -132,7 +133,35 @@ class QawaliClassifier:
             loss.backward()
             self.m_optimizer.step()
 
-    # Given input feature tensor x, retuns true if
-    # output of model matched tensor y, otherwise false
-    def classify(self, xTensor, yTensor):
-        logger.info("To be implemented")
+    # Given input features map, uses the trained model to predict
+    # the genre, returns true/false if result of prediction matches
+    # given ground-truth
+    def classify(self, inFeatures, genre):
+        self.m_model.eval()
+        logger.info("Started evaluation mode!")
+
+        # Make tensor out of features
+        pe = torch.from_numpy(inFeatures['PitchEnergy'])
+        sc = torch.from_numpy(inFeatures['SpectralContrast'])
+
+        combined = torch.cat((pe, sc), dim=0)
+        timeAxisSize = combined.size()[1]
+        logger.info("Features=%d x Time instances=%d", combined.size()[0], combined.size()[1])
+        if (combined.size()[0] != self.m_N):
+            logger.error("Unexpected number of features=%d", combined.size()[0])
+            raise RuntimeError
+
+        normalizedEval = abs(combined - combined.mean() / combined.std())
+        normalizedEval = normalizedEval.float()
+        outputPrediction = self.m_model(normalizedEval.reshape(1,timeAxisSize, self.m_N))
+
+        print(outputPrediction)
+        #if genre == 'Q' and torch.eq(outputPrediction, torch.zeros(timeAxisSize).long()):
+        #    logger.info("Qawali Matched!")
+        #    return True
+        #elif genre != 'Q' and tensor.eq(outputPrediction, torch.zeros(timeAxisSize).long()):
+        #    logger.info("Non Qawali predicted")
+        #    return True
+        #else:
+        #    logger.error("Genre mismatch from Qawali learner")
+        #    return False

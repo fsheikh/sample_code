@@ -63,7 +63,7 @@ class AudioFeatureExtractor:
             self.m_observeDurationInSec = 30
         else:
             self.m_songPath = AudioFeatureExtractor.local_directory / song_name
-            self.m_observeDurationInSec = 60
+            self.m_observeDurationInSec = 30
         self.m_output = str(AudioFeatureExtractor.graphs_subdir / Path(song_name).stem)
         # Constants per instance (should probably be parameterized)
         self.m_sampleRate = 22050

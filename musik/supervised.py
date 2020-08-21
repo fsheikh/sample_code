@@ -29,6 +29,7 @@ import os
 import logging
 from classify import DesiGenreDetector
 from featext import AudioFeatureExtractor
+from gtzan import GtzanMap
 from qlearner import QawaliClassifier
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__name__)
@@ -145,6 +146,10 @@ test_data = { yt_rumiQawali : ('rumi.mp3', 'Q'),
             #yt_arabDeyMahi : ('arab_dey_mahi.mp3', 'Q'), # (contains another instrument)
             #yt_lagiValley : ('lagi_valley.mp3', 'Q'),i #(contains bansari at the start shadowing harmonic profile)
             yt_makkiMadni : ('maki_madni.mp3', 'Q'),
+            'gtzan_pop.00005' : ('pop/pop.00005.wav', 'po'),
+            'gtzan_pop.00015' : ('pop/pop.00015.wav', 'po'),
+            'gtzan_pop.00025' : ('pop/pop.00025.wav', 'po'),
+            'gtzan_pop.00035' : ('pop/pop.00035.wav', 'po'),
             yt_sahebTeriBandi : ('saheb_teri_bandi.mp3', 'Q'),
             yt_azDairMughaAyam : ('az_dair_mugha.mp3', 'Q'),
             yt_jalwaDildarDeedam : ('jalwa_dildar_deedam.mp3', 'Q'),
@@ -165,10 +170,17 @@ test_data = { yt_rumiQawali : ('rumi.mp3', 'Q'),
 
 if __name__ == "__main__":
     logger.info("\n\n Supervised Qawali Learning...\n\n")
+    gtzan_train = GtzanMap('/home/fsheikh/musik/genres')
+    for genre in GtzanMap.Genres:
+        g_map = gtzan_train.cmap(genre, 10)
+        training_data.update(g_map)
+
     # Features are pitch energy per Midi/frequency and spectral energy
     # per audio subband, defined within FeatureExtractor module
     N = AudioFeatureExtractor.FreqBins + AudioFeatureExtractor.SubBands
     B = len(training_data)
+
+    logger.info("Training with data elements=%d and features=%d", B, N)
     qc = QawaliClassifier(B,N)
     # Loop over training data, extract features, concatenate features
     # instantiate neural network, pass features to network and monitor
@@ -185,3 +197,11 @@ if __name__ == "__main__":
     for epoch in range(2):
         logger.info("\nTraining for epoch=%d\n", epoch)
         qc.train()
+
+
+    # Time for some action
+    for testItem in test_data:
+        testData = AudioFeatureExtractor(test_data[testItem][0], testItem)
+        testFeatures = testData.extract_qawali_features()
+        logger.info("\n Asking model to classify a song of genre=%s\n", test_data[testItem][1])
+        qc.classify(testFeatures, test_data[testItem][1])
