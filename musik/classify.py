@@ -101,7 +101,7 @@ class DesiGenreDetector:
 
 
     def isQawali(self):
-        for frameIdx in range(0, self.m_obser.vationFrames):
+        for frameIdx in range(0, self.m_observationFrames):
             startFrame = frameIdx * self.m_observationSize
             endFrame = frameIdx * self.m_observationSize + self.m_observationSize
             # Cluster pitch energy into groups, input is a 2-D feature set with first column

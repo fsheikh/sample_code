@@ -302,15 +302,20 @@ class AudioFeatureExtractor:
         logger.info('***Low timber features extracted from %s ***\n', self.m_songName)
 
     # Features directly extracted from Audio, which can help distinguish
-    # Qawalis from other genres, time_reduce by default keeps extracted
-    # features a function of time, reducing time dimension requires a function
-    # to be applied which in this case is energy (L2 norm)
-    def extract_qawali_features(self, time_reduce=False):
+    # Qawalis from other genres, time_reduce is duration in seconds for which
+    # a reduction on time samples is peformed, for now the reduction function
+    # supported in L2 norm. Default no reduction is applied
+    def extract_qawali_features(self, time_reduce=0):
         qFeatures = {"FrameSize": self.m_hopLength,
                         "SampleRate": self.m_sr,
                         "PitchEnergy": np.array(np.zeros(self.m_hopLength)),
                         "SpectralContrast": np.array(np.zeros(self.m_hopLength)),
                         "SpectralFlatness": np.array(np.zeros(self.m_hopLength))}
+
+        if time_reduce > self.m_observeDurationInSec:
+            logger.error("Time reduction=%d invalid duration", time_reduce)
+            raise ValueError
+
         harmonicSignal = rosa.effects.harmonic(self.m_dataSong, margin=10.0)
         percussiveSignal = rosa.effects.percussive(self.m_dataSong, margin=10.0)
         #rosa.output.write_wav(self.m_output + 'percussive-segment.wav', percussiveSignal, self.m_sr)
@@ -354,9 +359,19 @@ class AudioFeatureExtractor:
         logger.info("Qawali related features computed!")
 
         # Report features based on reduction parameter after normalization
-        if time_reduce:
-            qFeatures['PitchEnergy'] = pitchEnergy / pitchEnergy.max(axis=1, keepdims=True)
-            qFeatures['SpectralContrast'] = aggregateContrast / aggregateContrast.max(axis=1, keepdims=True)
+        if time_reduce != 0:
+            # Number of frames in one second
+            framesPerSecond = pitchEstimates.shape[1] / self.m_observeDurationInSec
+            pEnergy = np.empty((pitchEstimates.shape[0], int(self.m_observeDurationInSec / time_reduce)))
+            cEnergy = np.empty((specContrast.shape[0], int(self.m_observeDurationInSec / time_reduce)))
+            for frameIdx in np.arange(0, self.m_observeDurationInSec, time_reduce):
+                startFrame = int(frameIdx * framesPerSecond)
+                endFrame = startFrame + int(time_reduce * framesPerSecond)
+                outIndex = int(frameIdx/time_reduce)
+                pEnergy[:,outIndex] = np.linalg.norm(pitchEstimates[:,startFrame:endFrame], axis=1)
+                cEnergy[:,outIndex] = np.linalg.norm(specContrast[:,startFrame:endFrame], axis=1)
+            qFeatures['PitchEnergy'] = pEnergy / pEnergy.max(axis=1, keepdims=True)
+            qFeatures['SpectralContrast'] = cEnergy / cEnergy.max(axis=1, keepdims=True)
         else:
             qFeatures['PitchEnergy'] = pitchEstimates / pitchEstimates.max(axis=1, keepdims=True)
             qFeatures['SpectralContrast'] = specContrast / specContrast.max(axis=1, keepdims=True)

@@ -52,8 +52,6 @@ class GtzanMap:
         itemCount = 0
         for wavFile in os.listdir(genrePath):
             itemCount = itemCount + 1
-            if itemCount == limit:
-                break
             if not wavFile.endswith(".wav"):
                 logging.warning("File=%s not in wave format, skipping", waveFile)
             else:
@@ -61,5 +59,7 @@ class GtzanMap:
                 relativeSongPath = genre + "/" + wavFile
                 logging.info("Adding %s to map at key = %s with genre=%s", relativeSongPath, mapKey, genre[0:2])
                 genre_map[mapKey] = (relativeSongPath, genre[0:2])
+            if itemCount == limit:
+                break
 
         return genre_map

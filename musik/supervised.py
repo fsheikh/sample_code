@@ -103,7 +103,7 @@ yt_harLehzaBashakal = 'https://www.youtube.com/watch?v=4mJzU3fhJjY'
 # followed by five other samples each by a different qawal group.
 # Non-Qawali items are a mix of pop, folk and Ghazals including some items
 # from NFAK to reduce the bias
-# Training data is then extended with 10 songs each from GZTAN dataset
+# Training data is then extended with 10 songs of each genre from GZTAN dataset
 training_data = {piya_say_naina : ('piya_say_naina.mp3', 'Q'),
     khawaja : ('khawaja.mp3', 'Q'),
     is_karam_ka : ('is_karam_ka.mp3', 'Q'),
@@ -175,14 +175,15 @@ if __name__ == "__main__":
         g_map = gtzan_train.cmap(genre, 10)
         training_data.update(g_map)
 
-    # Features are pitch energy per Midi/frequency and spectral energy
-    # per audio subband, defined within FeatureExtractor module
+    # Feature vectors are a function of time, each vector contains pitch energy per Midi/frequency
+    # and spectral energy per audio subband, averaged over an observation window
+    # parameter in extract feature
     N = AudioFeatureExtractor.FreqBins + AudioFeatureExtractor.SubBands
-    B = len(training_data)
+    T = len(training_data)
 
-    logger.info("Training with data elements=%d and features=%d", B, N)
-    qc = QawaliClassifier(B,N)
-    # Loop over training data, extract features, concatenate features
+    logger.info("Training with data elements=%d and features=%d", T, N)
+    qc = QawaliClassifier(T,N)
+    # Loop over training data, extract features,
     # instantiate neural network, pass features to network and monitor
     # loss for training sequence
 
@@ -193,8 +194,10 @@ if __name__ == "__main__":
     #    qc.load(songFeatures, training_data[song][1])
 
     #qc.save_and_plot()
+
+
     qc.reload_from_disk()
-    for epoch in range(2):
+    for epoch in range(1):
         logger.info("\nTraining for epoch=%d\n", epoch)
         qc.train()
 

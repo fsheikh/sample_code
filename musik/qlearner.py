@@ -26,16 +26,19 @@ import matplotlib.pyplot as plt
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__name__)
 
+
+# Simple linear network to see if a state-less classifer
+# works for genre detection, answer is no, now here for posterity
 class QawaliNet(torch.nn.Module):
     Layer1Out = 32
-    Layer2Out = 8
+    Layer2Out = 16
+    Layer3Out = 2
     def __init__(self, numFeatures):
         super(QawaliNet, self).__init__()
         self.m_layer1 = torch.nn.Linear(numFeatures, QawaliNet.Layer1Out)
         self.m_active = torch.nn.ReLU()
         self.m_layer2 = torch.nn.Linear(QawaliNet.Layer1Out, QawaliNet.Layer2Out)
-        self.m_layer3 = torch.nn.Linear(QawaliNet.Layer2Out, 2)
-        self.m_sig = torch.nn.Sigmoid()
+        self.m_layer3 = torch.nn.Linear(QawaliNet.Layer2Out, QawaliNet.Layer3Out)
 
     def forward(self, xTensor):
         l1 = self.m_layer1(xTensor)
@@ -43,21 +46,43 @@ class QawaliNet(torch.nn.Module):
         l2 = self.m_layer2(l1Out)
         l2Out = self.m_active(l2)
         l3  = self.m_layer3(l2Out)
-        yPredicted = l3
+        l3Out = self.m_active(l3)
+        # If input dimensions are B x M x N (where N is size of feature vector)
+        # l3Out has shape B x M x 2, we are only interested in what comes of
+        # the last dimension since that maps on the two genre we are interested in
+        yPredicted = torch.nn.functional.log_softmax(l3Out[-1], dim=1)
 
         return yPredicted
 
+# Simple one-layer LSTM to apply on time-sequence
+# of audio features suitable for Qawali recognition
+class QawaliLSTM(torch.nn.Module):
+    HiddenDim = 128
+    OutDim = 2 # only interested in classiying two caterogies, Qawali and the rest
+    def __init__(self, numFeatures):
+        super(QawaliLSTM, self).__init__()
+
+        self.m_lstm = torch.nn.LSTM(numFeatures, QawaliLSTM.HiddenDim,2)
+        self.m_linear = torch.nn.Linear(QawaliLSTM.HiddenDim, QawaliLSTM.OutDim)
+
+    def forward(self, input):
+        lstmOut, hiddenOut = self.m_lstm(input)
+        lstmAffine = self.m_linear(lstmOut[-1])
+        estimatedGenres = torch.nn.functional.log_softmax(lstmAffine, dim=1)
+        return estimatedGenres
 
 class QawaliClassifier:
     TrainDataFile = 'training.dat'
-    def __init__(self, batchSize, numFeatures):
-        self.m_model = QawaliNet(numFeatures)
-        self.m_criterion = torch.nn.CrossEntropyLoss(weight= torch.Tensor([1.0, 0.1]), reduction='mean')
+    def __init__(self, trainingSize, numFeatures):
+        self.m_model = QawaliLSTM(numFeatures)
+        self.m_T = trainingSize
+        self.m_criterion = torch.nn.NLLLoss(torch.Tensor([1.0, 0.083]), reduction='mean')
         self.m_optimizer = torch.optim.Adam(self.m_model.parameters(), lr=1e-2)
-        self.m_batch = batchSize
         self.m_N = numFeatures
-        self.m_trainX = torch.empty([self.m_batch, 1, numFeatures], dtype=torch.float32)
-        self.m_trainY = torch.empty([self.m_batch, 1], dtype=torch.float32)
+        self.m_trainX = torch.empty([self.m_T, 1, self.m_N], dtype=torch.float32)
+        # Attempting binary classification, construction is in the form of one-hot vector
+        # First column represents interesting label (Qawali), second column other genre
+        self.m_trainY = torch.zeros([self.m_T, 2], dtype=torch.long)
         self.m_loadCursor = 0
     # Given a dictionary of features, converts them into
     # tensors for later training/evaluation
@@ -73,15 +98,15 @@ class QawaliClassifier:
             raise RuntimeError
         # Normalize/pre-processing
         combinedNorm = abs(combined - combined.mean() / combined.std())
-        # This is the first batch of data being stored
+        # This is the first set of feature vectors (first training sample)
         if self.m_trainX.size()[1] == 1:
             self.m_trainX = combinedNorm.reshape(1, timeAxisSize, self.m_N)
         else:
             self.m_trainX = torch.cat((self.m_trainX, combinedNorm.reshape(1,timeAxisSize,self.m_N)), dim=0)
         if genre == 'Q':
-            self.m_trainY[self.m_loadCursor] = torch.Tensor([2.0])
+            self.m_trainY[self.m_loadCursor, 0] = 1
         else:
-            self.m_trainY[self.m_loadCursor] = torch.Tensor([1.0])
+            self.m_trainY[self.m_loadCursor,1] = 1
         self.m_loadCursor = self.m_loadCursor + 1
 
     def save_and_plot(self):
@@ -91,7 +116,7 @@ class QawaliClassifier:
         with open(QawaliClassifier.TrainDataFile, 'wb+') as trainFile:
             torch.save({"train-in": self.m_trainX, "train-out": self.m_trainY}, trainFile)
         timeFoldingSize = self.m_trainX.size()[1]
-        plt.imshow(self.m_trainX.reshape(timeFoldingSize, self.m_batch * self.m_N).numpy())
+        plt.imshow(self.m_trainX.reshape(timeFoldingSize, self.m_T * self.m_N).numpy())
         plt.colorbar()
         fig.savefig('tensor-training.png')
         plt.close()
@@ -108,24 +133,26 @@ class QawaliClassifier:
     # to learn it as y (float value)
     def train(self):
        self.m_model.train()
+       self.m_model.hidden = torch.zeros(1,1,QawaliLSTM.HiddenDim)
        logger.info("Starting training!")
+       # We expect a double tensor of size TrainingSize x Time x FeatureSize
        self.m_trainX = self.m_trainX.float()
-       timeSamples = self.m_trainX.size()[1]
        # To avoid later automatic broadcasting, in case of using MSE Loss
-       #self.m_trainY = torch.ones([timeSamples, 1], dtype=torch.float32) * self.m_trainY.reshape(1, self.m_batch)
-       for trainIdx in range(self.m_batch):
-            yHat = self.m_model(self.m_trainX[trainIdx,:,:])
+       #timeSamples = self.m_trainX.size()[1]
+       #expY = torch.ones([timeSamples, 1], dtype=torch.float32) * self.m_trainY.reshape(1, self.m_batch)
+       # We process in batches of two
+       for trainIdx in range(int(self.m_T)):
+
+            self.m_model.zero_grad()
+            # Process two training samples in one batch
+            xSlice = self.m_trainX[1 * trainIdx: 1 * (trainIdx + 1),:,:]
+            # Got a slice of training data with dimensions 2 x Time x Features
+            yHat = self.m_model(xSlice.permute(1,0,2))
 
             # Batch to class indices in case of using CrossEntropy loss function
-            if (self.m_trainY[trainIdx].item() == 2.0):
-                logger.info("Target class: Qawali!")
-                yTarget = torch.zeros(timeSamples).long()
-            else:
-                logger.info("Target class: Not-A-Qawali!")
-                yTarget = torch.ones(timeSamples).long()
-
-            # Uncomment below formulation of target output when using MSE loss function
-            #loss = self.m_criterion(yHat, self.m_trainY[:,trainIdx].reshape(timeSamples,1).float())
+            yTarget = torch.max(self.m_trainY[1 * trainIdx: 1 * (trainIdx+1),:],1)[1]
+            # Below formulation is for target output when using MSE loss function
+            #loss = self.m_criterion(yHat, expY[:,trainIdx].reshape(timeSamples,1).float())
             loss = self.m_criterion(yHat, yTarget)
             logger.info("Index=%d Loss=%6.4f", trainIdx, loss.item())
 
@@ -153,9 +180,10 @@ class QawaliClassifier:
 
         normalizedEval = abs(combined - combined.mean() / combined.std())
         normalizedEval = normalizedEval.float()
-        outputPrediction = self.m_model(normalizedEval.reshape(1,timeAxisSize, self.m_N))
+        outputPrediction = self.m_model(normalizedEval.float().reshape(timeAxisSize, 1, self.m_N))
 
         print(outputPrediction)
+        logger.info("\n****\n")
         #if genre == 'Q' and torch.eq(outputPrediction, torch.zeros(timeAxisSize).long()):
         #    logger.info("Qawali Matched!")
         #    return True
