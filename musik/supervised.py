@@ -31,6 +31,7 @@ from classify import DesiGenreDetector
 from featext import AudioFeatureExtractor
 from gtzan import GtzanMap
 from qlearner import QawaliClassifier
+from qlearner import LoadMode
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__name__)
 
@@ -99,12 +100,12 @@ yt_harLehzaBashakal = 'https://www.youtube.com/watch?v=4mJzU3fhJjY'
 # S: Song filmi or non-filmi geet
 # F: Folk including dohay and kafian
 
-# Training data chosed with five performances from NFAK in Qawali genre
+# Training data chosen with five performances from NFAK in Qawali genre
 # followed by five other samples each by a different qawal group.
 # Non-Qawali items are a mix of pop, folk and Ghazals including some items
 # from NFAK to reduce the bias
 # Training data is then extended with 10 songs of each genre from GZTAN dataset
-training_data = {piya_say_naina : ('piya_say_naina.mp3', 'Q'),
+tarbiati_set = {piya_say_naina : ('piya_say_naina.mp3', 'Q'),
     khawaja : ('khawaja.mp3', 'Q'),
     is_karam_ka : ('is_karam_ka.mp3', 'Q'),
     mohay_apnay_rang : ('mohay_apnay_rang.mp3', 'Q'),
@@ -130,7 +131,7 @@ training_data = {piya_say_naina : ('piya_say_naina.mp3', 'Q'),
 #    khawaja : ('khawaja.mp3', 'Q')}
 
 # Songs to be used for testing
-test_data = { yt_rumiQawali : ('rumi.mp3', 'Q'),
+imtayhani_set = { yt_rumiQawali : ('rumi.mp3', 'Q'),
             #yt_yehNaThiMeriQismat : ('yeh_na_thi_hamari.mp3', 'Q'), # (uses other instruments)
             #yt_tajdarHaram : ('tajdar.mp3', 'Q'), # (very little taali, long alap in sample)
             yt_dekhLayShakalMeri : ('dekh_lsm.mp3' , 'Q'),
@@ -170,41 +171,44 @@ test_data = { yt_rumiQawali : ('rumi.mp3', 'Q'),
 
 if __name__ == "__main__":
     logger.info("\n\n Supervised Qawali Learning...\n\n")
-    gtzan_train = GtzanMap('/home/fsheikh/musik/genres')
-    for genre in GtzanMap.Genres:
-        g_map = gtzan_train.cmap(genre, 10)
-        training_data.update(g_map)
+    training_data = {}
+    #gtzan_train = GtzanMap('/home/fsheikh/musik/genres')
+    #for genre in GtzanMap.Genres:
+    #    g_map = gtzan_train.cmap(genre, 10)
+    #    training_data.update(g_map)
 
+    training_data.update(tarbiati_set)
     # Feature vectors are a function of time, each vector contains pitch energy per Midi/frequency
     # and spectral energy per audio subband, averaged over an observation window
     # parameter in extract feature
     N = AudioFeatureExtractor.FreqBins + AudioFeatureExtractor.SubBands
     T = len(training_data)
-
+    E = len(imtayhani_set)
     logger.info("Training with data elements=%d and features=%d", T, N)
-    qc = QawaliClassifier(T,N)
-    # Loop over training data, extract features,
-    # instantiate neural network, pass features to network and monitor
-    # loss for training sequence
+    qc = QawaliClassifier(T,E,N)
 
-    #for song in training_data:
-    #    songData = AudioFeatureExtractor(training_data[song][0], song)
-    #    songFeatures = songData.extract_qawali_features()
-        # Input parameters are features and genre
-    #    qc.load(songFeatures, training_data[song][1])
+    Phase = "Loading"
+    if Phase == "Loading":
+        # Load feature data and save to disk for later processing
+        # avoiding the I/O intensive load proceedure
+        for song in training_data:
+            songData = AudioFeatureExtractor(training_data[song][0], song)
+            songFeatures = songData.extract_qawali_features()
+            # Input parameters are features and genre
+            qc.load(songFeatures, training_data[song][1])
 
-    #qc.save_and_plot()
+        for song in test_data:
+            songData = AudioFeatureExtractor(training_data[song][0], song)
+            songFeatures = songData.extract_qawali_features()
+            # Input parameters are features and genre
+            qc.load(songFeatures, training_data[song][1], LoadMode.EI)
+        qc.save_and_plot()
+    elif Phase == "ReloadAndRun":
+        qc.reload_from_disk()
+        for epoch in range(1):
+            logger.info("\nTraining for epoch=%d\n", epoch)
+            qc.train()
 
-
-    qc.reload_from_disk()
-    for epoch in range(1):
-        logger.info("\nTraining for epoch=%d\n", epoch)
-        qc.train()
-
-
-    # Time for some action
-    for testItem in test_data:
-        testData = AudioFeatureExtractor(test_data[testItem][0], testItem)
-        testFeatures = testData.extract_qawali_features()
-        logger.info("\n Asking model to classify a song of genre=%s\n", test_data[testItem][1])
-        qc.classify(testFeatures, test_data[testItem][1])
+        qc.classify()
+    else:
+        logger.error("Invalid operating phase for Qawali learner")
