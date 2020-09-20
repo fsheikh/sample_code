@@ -29,8 +29,8 @@ logger = logging.getLogger(__name__)
 # Classification labels, only attempt to classify Qawali
 # genre from rest of the world
 class Labels(Enum):
-    Qawali = 1
-    NonQawali = 10
+    Qawali = 0
+    NonQawali = 1
 
 # Mode of feature loading, we can be loading training/validation/evaluation
 # input features and corresponding output expected vectors
@@ -92,8 +92,8 @@ class QawaliClassifier:
         self.m_model = QawaliLSTM(numFeatures)
         self.m_T = trainingSize
         self.m_E = evalSize
-        #self.m_criterion = torch.nn.NLLLoss(torch.Tensor([1.0, 0.083]), reduction='mean')
-        self.m_criterion = torch.nn.NLLLoss(reduction='mean')
+        self.m_criterion = torch.nn.NLLLoss(torch.Tensor([1.0, 0.267]), reduction='mean')
+        #self.m_criterion = torch.nn.NLLLoss(reduction='mean')
         self.m_optimizer = torch.optim.Adam(self.m_model.parameters(), lr=1e-2)
         self.m_N = numFeatures
         self.m_dataMap = {}
@@ -102,21 +102,22 @@ class QawaliClassifier:
         # Attempting binary classification, construction is in the form of one-hot vector
         # First column represents interesting label (Qawali), second column other genre
         self.m_dataMap[LoadMode.TO] = torch.zeros([self.m_T, 2], dtype=torch.long)
-        self.m_dataMap[LoadMode.EO] = torch.zeros([self.m_T, 2], dtype=torch.long)
+        self.m_dataMap[LoadMode.EO] = torch.zeros([self.m_E, 2], dtype=torch.long)
         self.m_loadCursor = 0
 
     # Given a dictionary of features per song, converts them into
     # tensors for later training/validation/evaluation
-    def load(self, featureDict, genre, mode=LoadMode.TI):
+    def load_one(self, featureDict, genre, mode=LoadMode.TI):
 
         if mode != LoadMode.TI and mode != LoadMode.EI:
             logger.error("Only training/evaluation input modes are supported, outputs are deduced from inputs")
             raise ValueError
 
         pe = torch.from_numpy(featureDict['PitchEnergy'])
-        sc = torch.from_numpy(featureDict['SpectralContrast'])
+        #sc = torch.from_numpy(featureDict['SpectralContrast'])
 
-        combined = torch.cat((pe, sc), dim=0)
+        #combined = torch.cat((pe, sc), dim=0)
+        combined = pe
         timeAxisSize = combined.size()[1]
         logger.info("Features=%d x Time instances=%d", combined.size()[0], combined.size()[1])
         if (combined.size()[0] != self.m_N):
@@ -132,18 +133,18 @@ class QawaliClassifier:
         else:
             self.m_dataMap[mode] = torch.cat((self.m_dataMap[mode], combinedNorm.reshape(1,timeAxisSize,self.m_N)), dim=0)
 
-        # Output is a 2D array where first column indicates index of song within training/evaluation data
-        # Second column is the class label, since we have only two classes we can use 0/1.
-        # This means output tensor will have 1 in the 2nd column only if the song represented by first column
-        # is a Qawali. Output Mode is to index into the data map, if we are loading evaluation features, corresponding
-        # output vector should be filled, we already know these are the only two possible combination for now
+        # Output is a 2D array of one-hot vectors with first column for Qawali songs
+        # and second for everything else, this means that first column will contain
+        # a 1.0 value only if the features collected above correspond to a qawali item
         label = Labels.Qawali if (genre == 'Q') else Labels.NonQawali
         outMode = LoadMode.EO if (mode == LoadMode.EI) else LoadMode.TO
-        self.m_dataMap[outMode][self.m_loadCursor, 0] = self.m_loadCursor
-        self.m_dataMap[outMode][self.m_loadCursor, 1] = label.value
+        self.m_dataMap[outMode][self.m_loadCursor, label.value] = 1.0
 
         self.m_loadCursor = self.m_loadCursor + 1
 
+    def load_complete(self):
+        logger.info("Loading of one set completed, reset internal load counter")
+        self.m_loadCursor = 0
     def save_and_plot(self):
         logger.info("Saving loaded feature data to %s", QawaliClassifier.FeatureDataFile)
         with open(QawaliClassifier.FeatureDataFile, 'wb+') as dataFile:
@@ -184,6 +185,10 @@ class QawaliClassifier:
 
             # Expected output is in terms of class indices
             yTarget = torch.max(trainY[m * trainIdx: m * (trainIdx+1),:],1)[1]
+            logger.info("Estimated output while training")
+            print(yHat)
+            logger.info("Expected output while training")
+            print(yTarget)
             # Below formulation is for target output when using MSE loss function
             #loss = self.m_criterion(yHat, expY[:,trainIdx].reshape(timeSamples,1).float())
             loss = self.m_criterion(yHat, yTarget)
@@ -196,27 +201,29 @@ class QawaliClassifier:
     # Given input features map, uses the trained model to predict
     # the genre, returns true/false if result of prediction matches
     # given ground-truth
-    def classify(self, inFeatures, genre):
+    def classify(self):
         self.m_model.eval()
-        logger.info("Started evaluation mode!")
-        evalX = self.m_dataMap[LoadMode.EI].float()
-        evalY = self.m_dataMap[LoadMode.EO].float()
+        with torch.no_grad():
+            logger.info("Started evaluation mode!")
+            evalX = self.m_dataMap[LoadMode.EI].float()
+            evalY = self.m_dataMap[LoadMode.EO].float()
 
-        for evalIdx in range(int(self.m_E)):
-            # single batch processing
-            m = 1
-            xSlice = evalX[m * evalIdx : m * (evalIdx + 1),:,:]
-            outputPrediction = self.m_model(xSlice.permute(1,0,2))
-            logger.info("Song evaluated at index=%d", evalIdx)
-            print(outputPrediction)
-            logger.info("\n****\n")
-        #if genre == 'Q' and torch.eq(outputPrediction, torch.zeros(timeAxisSize).long()):
-        #    logger.info("Qawali Matched!")
-        #    return True
-        #elif genre != 'Q' and tensor.eq(outputPrediction, torch.zeros(timeAxisSize).long()):
-        #    logger.info("Non Qawali predicted")
-        #    return True
-        #else:
-        #    logger.error("Genre mismatch from Qawali learner")
-        #    return False
+            for evalIdx in range(int(self.m_E)):
+                self.m_model.hidden = torch.zeros(1,1,QawaliLSTM.HiddenDim)
+                # single batch processing
+                m = 1
+                xSlice = evalX[m * evalIdx : m * (evalIdx + 1),:,:]
+                outputPrediction = self.m_model(xSlice.permute(1,0,2))
+                logger.info("Song at index=%d expected=%d", evalIdx, self.m_dataMap[LoadMode.EO][evalIdx, 1])
+                print(outputPrediction)
+                logger.info("\n****\n")
+                #if genre == 'Q' and torch.eq(outputPrediction, torch.zeros(timeAxisSize).long()):
+                #    logger.info("Qawali Matched!")
+                #    return True
+                #elif genre != 'Q' and tensor.eq(outputPrediction, torch.zeros(timeAxisSize).long()):
+                #    logger.info("Non Qawali predicted")
+                #    return True
+                #else:
+                #    logger.error("Genre mismatch from Qawali learner")
+                #    return False
 

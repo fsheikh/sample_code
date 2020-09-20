@@ -105,26 +105,59 @@ yt_harLehzaBashakal = 'https://www.youtube.com/watch?v=4mJzU3fhJjY'
 # Non-Qawali items are a mix of pop, folk and Ghazals including some items
 # from NFAK to reduce the bias
 # Training data is then extended with 10 songs of each genre from GZTAN dataset
-tarbiati_set = {piya_say_naina : ('piya_say_naina.mp3', 'Q'),
-    khawaja : ('khawaja.mp3', 'Q'),
-    is_karam_ka : ('is_karam_ka.mp3', 'Q'),
-    mohay_apnay_rang : ('mohay_apnay_rang.mp3', 'Q'),
-    mere_saaqi : ('mere_saaqi.mp3', 'Q'),
-    meray_sohnaya : ('meray_sohnaya.mp3', 'S'),
-    mera_imaan_pak : ('mera_imaan_pak.mp3', 'S'),
-    maye_ni_maye : ('maye_ni_maye.mp3', 'F'),
-    kise_da_yaar : ('kise_da_yaar.mp3', 'S'),
-    yt_kuchIssAdaSay : ('kuch_iss_ada.mp3', 'Q'),
-    yt_veekhanYaarTayParhan : ('veekhan_yaar.mp3', 'Q'),
-    yt_aamadaBaQatal : ('aamada_ba_qatal.mp3', 'Q'),
-    yt_nerreNerreVass : ('nerre_nerre_vass.mp3', 'Q'),
-    yt_ajabAndaazTujhKo : ('ajab_andaz.mp3', 'Q'),
-    ruthi_rut : ('ruthi_rut.mp3', 'S'),
-    zikar_parivash_ka : ('zikar_parivash_ka.mp3', 'G'),
-    maye_ni_kinnon_akhan : ('maye_ni_kinnon_akhan.mp3', 'F'),
-    yaar_dhaadi : ('yaar_dhaadi.mp3', 'F'),
-    nahi_lagay_jiya : ('nahi_lagay_jiya.mp3', 'T'),
-    yt_naqsh_khayal : ('naqsh_khayal.mp3', 'G')
+# Compensation for too little training data for Qawalis, each Qawali in training
+# set is repeated four times with each time feature extraction done via a time
+# offset of 30 seconds
+tarbiati_set = {piya_say_naina : ('piya_say_naina.mp3', 'Q', 0.0),
+    'piya_say_naina_30' : ('piya_say_naina.mp3', 'Q', 30.0),
+    'piya_say_naina_60' : ('piya_say_naina.mp3', 'Q', 60.0),
+    'piya_say_naina_90' : ('piya_say_naina.mp3', 'Q', 90.0),
+    khawaja : ('khawaja.mp3', 'Q', 0.0),
+    'khawaja_30' : ('khawaja.mp3', 'Q', 30.0),
+    'khawaja_60' : ('khawaja.mp3', 'Q', 60.0),
+    'khawaja_90' : ('khawaja.mp3', 'Q', 90.0),
+    is_karam_ka : ('is_karam_ka.mp3', 'Q', 0.0),
+    'is_karam_ka_30' : ('is_karam_ka.mp3', 'Q', 30.0),
+    'is_karam_ka_60' : ('is_karam_ka.mp3', 'Q', 60.0),
+    'is_karam_ka_90' : ('is_karam_ka.mp3', 'Q', 90.0),
+    mohay_apnay_rang : ('mohay_apnay_rang.mp3', 'Q', 0.0),
+    'mohay_apnay_rang_30' : ('mohay_apnay_rang.mp3', 'Q', 30.0),
+    'mohay_apnay_rang_60' : ('mohay_apnay_rang.mp3', 'Q', 60.0),
+    'mohay_apnay_rang_90' : ('mohay_apnay_rang.mp3', 'Q', 90.0),
+    mere_saaqi : ('mere_saaqi.mp3', 'Q', 0.0),
+    'mere_saaqi_30' : ('mere_saaqi.mp3', 'Q', 30.0),
+    'mere_saaqi_60' : ('mere_saaqi.mp3', 'Q', 60.0),
+    'mere_saaqi_90' : ('mere_saaqi.mp3', 'Q', 90.0),
+    meray_sohnaya : ('meray_sohnaya.mp3', 'S', 0.0),
+    mera_imaan_pak : ('mera_imaan_pak.mp3', 'S', 0.0),
+    maye_ni_maye : ('maye_ni_maye.mp3', 'F', 0.0),
+    kise_da_yaar : ('kise_da_yaar.mp3', 'S', 0.0),
+    yt_kuchIssAdaSay : ('kuch_iss_ada.mp3', 'Q', 0.0),
+    'yt_kuchIssAdaSay_30' : ('kuch_iss_ada.mp3', 'Q', 30.0),
+    'yt_kuchIssAdaSay_60' : ('kuch_iss_ada.mp3', 'Q', 60.0),
+    'yt_kuchIssAdaSay_90' : ('kuch_iss_ada.mp3', 'Q', 90.0),
+    yt_veekhanYaarTayParhan : ('veekhan_yaar.mp3', 'Q', 0.0),
+    'yt_veekhanYaarTayParhan_30' : ('veekhan_yaar.mp3', 'Q', 30.0),
+    'yt_veekhanYaarTayParhan_60' : ('veekhan_yaar.mp3', 'Q', 60.0),
+    'yt_veekhanYaarTayParhan_90' : ('veekhan_yaar.mp3', 'Q', 90.0),
+    yt_aamadaBaQatal : ('aamada_ba_qatal.mp3', 'Q', 0.0),
+    'yt_aamadaBaQatal_30' : ('aamada_ba_qatal.mp3', 'Q', 30.0),
+    'yt_aamadaBaQatal_60' : ('aamada_ba_qatal.mp3', 'Q', 60.0),
+    'yt_aamadaBaQatal_90' : ('aamada_ba_qatal.mp3', 'Q', 90.0),
+    yt_nerreNerreVass : ('nerre_nerre_vass.mp3', 'Q', 0.0),
+    'yt_nerreNerreVass_30' : ('nerre_nerre_vass.mp3', 'Q', 30.0),
+    'yt_nerreNerreVass_60' : ('nerre_nerre_vass.mp3', 'Q', 60.0),
+    'yt_nerreNerreVass_90' : ('nerre_nerre_vass.mp3', 'Q', 90.0),
+    yt_ajabAndaazTujhKo : ('ajab_andaz.mp3', 'Q', 0.0),
+    'yt_ajabAndaazTujhKo_30' : ('ajab_andaz.mp3', 'Q', 30.0),
+    'yt_ajabAndaazTujhKo_60' : ('ajab_andaz.mp3', 'Q', 60.0),
+    'yt_ajabAndaazTujhKo_90' : ('ajab_andaz.mp3', 'Q', 90.0),
+    ruthi_rut : ('ruthi_rut.mp3', 'S', 0.0),
+    zikar_parivash_ka : ('zikar_parivash_ka.mp3', 'G', 0.0),
+    maye_ni_kinnon_akhan : ('maye_ni_kinnon_akhan.mp3', 'F', 0.0),
+    yaar_dhaadi : ('yaar_dhaadi.mp3', 'F', 0.0),
+    nahi_lagay_jiya : ('nahi_lagay_jiya.mp3', 'T', 0.0),
+    yt_naqsh_khayal : ('naqsh_khayal.mp3', 'G', 0.0)
 }
 
 #training_data = {piya_say_naina : ('piya_say_naina.mp3', 'Q'),
@@ -147,10 +180,10 @@ imtayhani_set = { yt_rumiQawali : ('rumi.mp3', 'Q'),
             #yt_arabDeyMahi : ('arab_dey_mahi.mp3', 'Q'), # (contains another instrument)
             #yt_lagiValley : ('lagi_valley.mp3', 'Q'),i #(contains bansari at the start shadowing harmonic profile)
             yt_makkiMadni : ('maki_madni.mp3', 'Q'),
-            'gtzan_pop.00005' : ('pop/pop.00005.wav', 'po'),
-            'gtzan_pop.00015' : ('pop/pop.00015.wav', 'po'),
-            'gtzan_pop.00025' : ('pop/pop.00025.wav', 'po'),
-            'gtzan_pop.00035' : ('pop/pop.00035.wav', 'po'),
+            'gtzan_pop.00005' : ('reggae/reggae.00005.au', 'po'),
+            'gtzan_pop.00015' : ('reggae/reggae.00015.au', 'po'),
+            'gtzan_pop.00025' : ('reggae/reggae.00025.au', 'po'),
+            'gtzan_pop.00035' : ('reggae/reggae.00035.au', 'po'),
             yt_sahebTeriBandi : ('saheb_teri_bandi.mp3', 'Q'),
             yt_azDairMughaAyam : ('az_dair_mugha.mp3', 'Q'),
             yt_jalwaDildarDeedam : ('jalwa_dildar_deedam.mp3', 'Q'),
@@ -172,36 +205,40 @@ imtayhani_set = { yt_rumiQawali : ('rumi.mp3', 'Q'),
 if __name__ == "__main__":
     logger.info("\n\n Supervised Qawali Learning...\n\n")
     training_data = {}
-    #gtzan_train = GtzanMap('/home/fsheikh/musik/genres')
-    #for genre in GtzanMap.Genres:
-    #    g_map = gtzan_train.cmap(genre, 10)
-    #    training_data.update(g_map)
+    gtzan_train = GtzanMap('/home/fsheikh/musik/gtzan/genres')
+    for genre in GtzanMap.Genres:
+        g_map = gtzan_train.cmap(genre, 10)
+        training_data.update(g_map)
 
     training_data.update(tarbiati_set)
     # Feature vectors are a function of time, each vector contains pitch energy per Midi/frequency
     # and spectral energy per audio subband, averaged over an observation window
     # parameter in extract feature
-    N = AudioFeatureExtractor.FreqBins + AudioFeatureExtractor.SubBands
+    #N = AudioFeatureExtractor.FreqBins + AudioFeatureExtractor.SubBands
+    N = AudioFeatureExtractor.FreqBins
     T = len(training_data)
     E = len(imtayhani_set)
     logger.info("Training with data elements=%d and features=%d", T, N)
     qc = QawaliClassifier(T,E,N)
 
-    Phase = "Loading"
+    Phase = "ReloadAndRun"
     if Phase == "Loading":
         # Load feature data and save to disk for later processing
         # avoiding the I/O intensive load proceedure
         for song in training_data:
-            songData = AudioFeatureExtractor(training_data[song][0], song)
+            offset = 0.0 if (len(training_data[song]) == 2) else training_data[song][2]
+            songData = AudioFeatureExtractor(training_data[song][0], song, offset)
             songFeatures = songData.extract_qawali_features()
             # Input parameters are features and genre
-            qc.load(songFeatures, training_data[song][1])
+            qc.load_one(songFeatures, training_data[song][1])
 
-        for song in test_data:
-            songData = AudioFeatureExtractor(training_data[song][0], song)
+        qc.load_complete()
+        for song in imtayhani_set:
+            songData = AudioFeatureExtractor(imtayhani_set[song][0], song)
             songFeatures = songData.extract_qawali_features()
             # Input parameters are features and genre
-            qc.load(songFeatures, training_data[song][1], LoadMode.EI)
+            qc.load_one(songFeatures, imtayhani_set[song][1], LoadMode.EI)
+        qc.load_complete()
         qc.save_and_plot()
     elif Phase == "ReloadAndRun":
         qc.reload_from_disk()

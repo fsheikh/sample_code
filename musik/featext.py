@@ -42,7 +42,7 @@ class AudioFeatureExtractor:
     # e.g. on windows local_directory = Path('C:\\personal\\musik\\')
     local_directory = Path('/home/fsheikh/musik')
     graphs_subdir = local_directory / 'graphs'
-    gztan_subdir = local_directory / 'genres'
+    gztan_subdir = local_directory / 'gtzan' / 'genres'
     C1Midi = 24
     C8Midi = 108
     FreqBins = C8Midi - C1Midi
@@ -54,7 +54,7 @@ class AudioFeatureExtractor:
                  'noplaylist' : True
                 }
 
-    def __init__(self, song_name, url='None'):
+    def __init__(self, song_name, url='None', offset=0.0):
         logger.info('Instantiating %s for song=%s with url=%s', self.__class__.__name__, song_name, url)
         self.m_songName = song_name
         self.m_url = url
@@ -84,6 +84,7 @@ class AudioFeatureExtractor:
                 # update the output template in parameters and ask youtube-dl to download
                 # Need to update the download path it seems library appends extenstion based on encoding
                 AudioFeatureExtractor.YdlParams['outtmpl'] = str(AudioFeatureExtractor.local_directory / self.m_songPath.stem)
+                ydl_opts = {'nocheckcertificate':True}
                 with YoutubeDL(AudioFeatureExtractor.YdlParams) as ydl:
                     ydl.download([self.m_url])
             else:
@@ -91,7 +92,7 @@ class AudioFeatureExtractor:
                 gd.download(self.m_url, str(self.m_songPath), quiet=False, proxy=None)
         # Load snippet from song
         self.m_dataSong, self.m_sr = rosa.load(str(self.m_songPath), sr=self.m_sampleRate, mono=True,
-                                        offset=0.0, duration=self.m_observeDurationInSec)
+                                        offset=offset, duration=self.m_observeDurationInSec)
 
         if (self.m_sr != self.m_sampleRate):
             logger.warning("Determined sample rate=%d different from assumed!", self.m_sr)

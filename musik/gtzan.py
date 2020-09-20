@@ -50,13 +50,13 @@ class GtzanMap:
 
         # GTZAN data-set contains wave files
         itemCount = 0
-        for wavFile in os.listdir(genrePath):
+        for sndFile in os.listdir(genrePath):
             itemCount = itemCount + 1
-            if not wavFile.endswith(".wav"):
-                logging.warning("File=%s not in wave format, skipping", waveFile)
+            if not sndFile.endswith(".wav") and not sndFile.endswith(".au"):
+                logging.warning("File=%s not in correct format, skipping", sndFile)
             else:
-                mapKey = "gtzan_"+ os.path.splitext(os.path.basename(wavFile))[0]
-                relativeSongPath = genre + "/" + wavFile
+                mapKey = "gtzan_"+ os.path.splitext(os.path.basename(sndFile))[0]
+                relativeSongPath = genre + "/" + sndFile
                 logging.info("Adding %s to map at key = %s with genre=%s", relativeSongPath, mapKey, genre[0:2])
                 genre_map[mapKey] = (relativeSongPath, genre[0:2])
             if itemCount == limit:
