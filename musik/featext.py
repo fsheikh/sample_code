@@ -64,7 +64,7 @@ class AudioFeatureExtractor:
         else:
             self.m_songPath = AudioFeatureExtractor.local_directory / song_name
             self.m_observeDurationInSec = 30
-        self.m_output = str(AudioFeatureExtractor.graphs_subdir / Path(song_name).stem)
+        self.m_output = str(AudioFeatureExtractor.graphs_subdir / Path(song_name).stem) + '_' + str(offset)
         # Constants per instance (should probably be parameterized)
         self.m_sampleRate = 22050
         # With above sample rate, this length translates to 46ms
@@ -374,12 +374,14 @@ class AudioFeatureExtractor:
             qFeatures['PitchEnergy'] = pEnergy / pEnergy.max(axis=1, keepdims=True)
             qFeatures['SpectralContrast'] = cEnergy / cEnergy.max(axis=1, keepdims=True)
         else:
-            qFeatures['PitchEnergy'] = pitchEstimates / pitchEstimates.max(axis=1, keepdims=True)
-            qFeatures['SpectralContrast'] = specContrast / specContrast.max(axis=1, keepdims=True)
+            #qFeatures['PitchEnergy'] = pitchEstimates / pitchEstimates.max(axis=1, keepdims=True)
+            #qFeatures['SpectralContrast'] = specContrast / specContrast.max(axis=1, keepdims=True)
+            qFeatures['PitchEnergy'] = pitchEstimates
+            qFeatures['SpectralContrast'] = specContrast
 
         # Blindly dividing by max can backfire in case of all zero-values
-        np.nan_to_num(qFeatures['PitchEnergy'], copy=False)
-        np.nan_to_num(qFeatures['SpectralContrast'], copy=False)
+        #np.nan_to_num(qFeatures['PitchEnergy'], copy=False)
+        #np.nan_to_num(qFeatures['SpectralContrast'], copy=False)
         return qFeatures
 """
         specFlatness = rosa.feature.spectral_flatness(percussiveSignal, n_fft=2048, hop_length=self.m_hopLength)

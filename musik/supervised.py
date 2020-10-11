@@ -108,6 +108,10 @@ yt_harLehzaBashakal = 'https://www.youtube.com/watch?v=4mJzU3fhJjY'
 # Compensation for too little training data for Qawalis, each Qawali in training
 # set is repeated four times with each time feature extraction done via a time
 # offset of 30 seconds
+# FIXME: Looking at the graphs produces of CQT by offset versions of same songs,
+# will not be useable to detect the tabla-taali combination since the later on
+# segments look similar to other genere without the characteristic high energy
+# in middle/low pitches.
 tarbiati_set = {piya_say_naina : ('piya_say_naina.mp3', 'Q', 0.0),
     'piya_say_naina_30' : ('piya_say_naina.mp3', 'Q', 30.0),
     'piya_say_naina_60' : ('piya_say_naina.mp3', 'Q', 60.0),
@@ -241,6 +245,8 @@ if __name__ == "__main__":
         qc.load_complete()
         qc.save_and_plot()
     elif Phase == "ReloadAndRun":
+        #tmp_song = AudioFeatureExtractor(tarbiati_set[kise_da_yaar][0], kise_da_yaar)
+        #tmp_features = tmp_song.extract_qawali_features()
         qc.reload_from_disk()
         for epoch in range(1):
             logger.info("\nTraining for epoch=%d\n", epoch)

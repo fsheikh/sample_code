@@ -88,12 +88,13 @@ class QawaliLSTM(torch.nn.Module):
 
 class QawaliClassifier:
     FeatureDataFile = 'features.dat'
+    EnableDebug = True
     def __init__(self, trainingSize, evalSize, numFeatures):
         self.m_model = QawaliLSTM(numFeatures)
         self.m_T = trainingSize
         self.m_E = evalSize
-        self.m_criterion = torch.nn.NLLLoss(torch.Tensor([1.0, 0.267]), reduction='mean')
-        #self.m_criterion = torch.nn.NLLLoss(reduction='mean')
+        #self.m_criterion = torch.nn.NLLLoss(torch.Tensor([1.0, 0.267]), reduction='mean')
+        self.m_criterion = torch.nn.NLLLoss(reduction='mean')
         self.m_optimizer = torch.optim.Adam(self.m_model.parameters(), lr=1e-2)
         self.m_N = numFeatures
         self.m_dataMap = {}
@@ -124,8 +125,30 @@ class QawaliClassifier:
             logger.error("Unexpected number of features=%d", combined.size()[0])
             raise RuntimeError
         # Normalize/pre-processing
-        combinedNorm = abs(combined - combined.mean() / combined.std())
-
+        #combinedNorm = abs(combined - combined.mean()) / combined.std()
+        combinedNorm = combined
+        # FIXME: There is no real need of reshaping feature vectors, reshape here
+        # and then subsequent pemutation change will probably return wrong results
+        # Consider toy example below:
+        # >>> catData = torch.cat((tData,tData),dim=0)
+        #    >>> catData
+        #   tensor([[[-3., -7.,  2.],
+        #            [-4.,  6.,  9.]],
+        #
+        #            [[-3., -7.,  2.],
+        #            [-4.,  6.,  9.]]])
+        #    >>> catData.shape
+        #    torch.Size([2, 2, 3])
+        #    >>> catNorm=torch.norm(catData[0,:,:],None,1)
+        #    >>> catNorm
+        #    tensor([ 7.8740, 11.5326])
+        #    >>> npNorm
+        #    array([ 7.87400787, 11.53256259])
+        #    >>> data
+        #    array([[-3., -7.,  2.],
+        #        [-4.,  6.,  9.]])
+        # It might be better to fix the neural network than adapt the input dimensions which
+        # made it kind of work but no meaningful results were produced.
         # This is the first set of feature vectors (features for first training/eval sample)
         # Reason for re-assignment instead of just assigning is to do a check on dimensions
         if self.m_dataMap[mode].size()[1] == 1:
@@ -176,19 +199,36 @@ class QawaliClassifier:
        # In order to process in batches of size M, one can divide the range parameter by M
        # As long as the training data-set is not huge, training with a single batch is okay
        for trainIdx in range(int(self.m_T)):
-
-            # For batch process change the scalar multiplier accordingly
+            # For batch processing change the scalar multiplier accordingly
             m = 1
+            # Expected output is in terms of class indices
+            yTarget = torch.max(trainY[m * trainIdx: m * (trainIdx+1),:],1)[1]
+            if (yTarget.item() == 0):
+                logger.info("Song under training is Qawali")
+            else:
+                logger.info("Song under training is Non-Qawali")
+
             xSlice = trainX[m * trainIdx: m * (trainIdx + 1),:,:]
+            if QawaliClassifier.EnableDebug:
+                # Data inspection, mean, variance, l2-norm, along the time-axis
+                xSliceMean = torch.mean(xSlice,1)
+                xSliceVar = torch.var(xSlice,1)
+                xSliceNorm = torch.norm(xSlice,None,1)
+                (maxMean, maxMIdx) = torch.max(xSliceMean,1)
+                (minMean, minMIdx) = torch.min(xSliceMean,1)
+                (maxNorm, maxNIdx) = torch.max(xSliceNorm,1)
+                (minNorm, minNIdx) = torch.min(xSliceNorm,1)
+                (maxVar, maxVIdx) = torch.max(xSliceVar,1)
+                (minVar, minVIdx) = torch.min(xSliceVar,1)
+                logger.info("Training--->Mean: max(%6.4f, %6.4f) min(%6.4f, %6.4f) Variance: max(%6.4f, %6.4f) min (%6.4f, %6.4f)\
+                            Norm: max(%6.4f, %6.4f) min(%6.4f, %6.4f)", maxMean, maxMIdx, minMean, minMIdx, maxVar, maxVIdx,
+                            minVar, minVIdx, maxNorm, maxNIdx, minNorm, minNIdx)
             # Got a slice of training data with dimensions m x Time x Features
             yHat = self.m_model(xSlice.permute(1,0,2))
 
-            # Expected output is in terms of class indices
-            yTarget = torch.max(trainY[m * trainIdx: m * (trainIdx+1),:],1)[1]
             logger.info("Estimated output while training")
             print(yHat)
-            logger.info("Expected output while training")
-            print(yTarget)
+
             # Below formulation is for target output when using MSE loss function
             #loss = self.m_criterion(yHat, expY[:,trainIdx].reshape(timeSamples,1).float())
             loss = self.m_criterion(yHat, yTarget)
@@ -197,6 +237,7 @@ class QawaliClassifier:
             self.m_optimizer.zero_grad()
             loss.backward()
             self.m_optimizer.step()
+            logger.info("\nTraining iteration=%d ending\n", trainIdx)
 
     # Given input features map, uses the trained model to predict
     # the genre, returns true/false if result of prediction matches
@@ -210,13 +251,39 @@ class QawaliClassifier:
 
             for evalIdx in range(int(self.m_E)):
                 self.m_model.hidden = torch.zeros(1,1,QawaliLSTM.HiddenDim)
+                songIsQawali = False
+                if self.m_dataMap[LoadMode.EO][evalIdx,0] == 1:
+                    logger.info("Ground Truth for song[%d] is Qawali", evalIdx)
+                    songIsQawali = True
+                else:
+                    logger.info("Ground Truth for song[%d] is Non-Qawali", evalIdx)
+
                 # single batch processing
                 m = 1
                 xSlice = evalX[m * evalIdx : m * (evalIdx + 1),:,:]
+                if QawaliClassifier.EnableDebug:
+                    xSliceMean = torch.mean(xSlice,1)
+                    xSliceVar = torch.var(xSlice,1)
+                    xSliceNorm = torch.norm(xSlice,None,1)
+                    (maxMean, maxMIdx) = torch.max(xSliceMean,1)
+                    (minMean, minMIdx) = torch.min(xSliceMean,1)
+                    (maxNorm, maxNIdx) = torch.max(xSliceNorm,1)
+                    (minNorm, minNIdx) = torch.min(xSliceNorm,1)
+                    (maxVar, maxVIdx) = torch.max(xSliceVar,1)
+                    (minVar, minVIdx) = torch.min(xSliceVar,1)
+                    logger.info("Evaluation-->Mean: max(%6.4f, %6.4f) min(%6.4f, %6.4f) Variance: max(%6.4f, %6.4f) min (%6.4f, %6.4f)\
+                            Norm: max(%6.4f, %6.4f) min(%6.4f, %6.4f)", maxMean, maxMIdx, minMean, minMIdx, maxVar, maxVIdx,
+                            minVar, minVIdx, maxNorm, maxNIdx, minNorm, minNIdx)
                 outputPrediction = self.m_model(xSlice.permute(1,0,2))
-                logger.info("Song at index=%d expected=%d", evalIdx, self.m_dataMap[LoadMode.EO][evalIdx, 1])
                 print(outputPrediction)
-                logger.info("\n****\n")
+                (decision, descIdx) = torch.max(outputPrediction,1)
+                if (songIsQawali and descIdx == 0.0):
+                    logger.info("Qawali correctly classified")
+                elif (not songIsQawali and descIdx == 1.0):
+                    logger.info("Non-Qawali correctly classified")
+                else:
+                    logger.info("Error in classification")
+                logger.info("\nEvaluation iteration ending\n")
                 #if genre == 'Q' and torch.eq(outputPrediction, torch.zeros(timeAxisSize).long()):
                 #    logger.info("Qawali Matched!")
                 #    return True
