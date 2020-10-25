@@ -113,49 +113,49 @@ yt_harLehzaBashakal = 'https://www.youtube.com/watch?v=4mJzU3fhJjY'
 # segments look similar to other genere without the characteristic high energy
 # in middle/low pitches.
 tarbiati_set = {piya_say_naina : ('piya_say_naina.mp3', 'Q', 0.0),
-    'piya_say_naina_30' : ('piya_say_naina.mp3', 'Q', 30.0),
-    'piya_say_naina_60' : ('piya_say_naina.mp3', 'Q', 60.0),
-    'piya_say_naina_90' : ('piya_say_naina.mp3', 'Q', 90.0),
+    #'piya_say_naina_30' : ('piya_say_naina.mp3', 'Q', 30.0),
+    #'piya_say_naina_60' : ('piya_say_naina.mp3', 'Q', 60.0),
+    #'piya_say_naina_90' : ('piya_say_naina.mp3', 'Q', 90.0),
     khawaja : ('khawaja.mp3', 'Q', 0.0),
-    'khawaja_30' : ('khawaja.mp3', 'Q', 30.0),
-    'khawaja_60' : ('khawaja.mp3', 'Q', 60.0),
-    'khawaja_90' : ('khawaja.mp3', 'Q', 90.0),
+    #'khawaja_30' : ('khawaja.mp3', 'Q', 30.0),
+    #'khawaja_60' : ('khawaja.mp3', 'Q', 60.0),
+    #'khawaja_90' : ('khawaja.mp3', 'Q', 90.0),
     is_karam_ka : ('is_karam_ka.mp3', 'Q', 0.0),
-    'is_karam_ka_30' : ('is_karam_ka.mp3', 'Q', 30.0),
-    'is_karam_ka_60' : ('is_karam_ka.mp3', 'Q', 60.0),
-    'is_karam_ka_90' : ('is_karam_ka.mp3', 'Q', 90.0),
+    #'is_karam_ka_30' : ('is_karam_ka.mp3', 'Q', 30.0),
+    #'is_karam_ka_60' : ('is_karam_ka.mp3', 'Q', 60.0),
+    #'is_karam_ka_90' : ('is_karam_ka.mp3', 'Q', 90.0),
     mohay_apnay_rang : ('mohay_apnay_rang.mp3', 'Q', 0.0),
-    'mohay_apnay_rang_30' : ('mohay_apnay_rang.mp3', 'Q', 30.0),
-    'mohay_apnay_rang_60' : ('mohay_apnay_rang.mp3', 'Q', 60.0),
-    'mohay_apnay_rang_90' : ('mohay_apnay_rang.mp3', 'Q', 90.0),
+    #'mohay_apnay_rang_30' : ('mohay_apnay_rang.mp3', 'Q', 30.0),
+    #'mohay_apnay_rang_60' : ('mohay_apnay_rang.mp3', 'Q', 60.0),
+    #'mohay_apnay_rang_90' : ('mohay_apnay_rang.mp3', 'Q', 90.0),
     mere_saaqi : ('mere_saaqi.mp3', 'Q', 0.0),
-    'mere_saaqi_30' : ('mere_saaqi.mp3', 'Q', 30.0),
-    'mere_saaqi_60' : ('mere_saaqi.mp3', 'Q', 60.0),
-    'mere_saaqi_90' : ('mere_saaqi.mp3', 'Q', 90.0),
+    #'mere_saaqi_30' : ('mere_saaqi.mp3', 'Q', 30.0),
+    #'mere_saaqi_60' : ('mere_saaqi.mp3', 'Q', 60.0),
+    #'mere_saaqi_90' : ('mere_saaqi.mp3', 'Q', 90.0),
     meray_sohnaya : ('meray_sohnaya.mp3', 'S', 0.0),
     mera_imaan_pak : ('mera_imaan_pak.mp3', 'S', 0.0),
     maye_ni_maye : ('maye_ni_maye.mp3', 'F', 0.0),
     kise_da_yaar : ('kise_da_yaar.mp3', 'S', 0.0),
     yt_kuchIssAdaSay : ('kuch_iss_ada.mp3', 'Q', 0.0),
-    'yt_kuchIssAdaSay_30' : ('kuch_iss_ada.mp3', 'Q', 30.0),
-    'yt_kuchIssAdaSay_60' : ('kuch_iss_ada.mp3', 'Q', 60.0),
-    'yt_kuchIssAdaSay_90' : ('kuch_iss_ada.mp3', 'Q', 90.0),
+    #'yt_kuchIssAdaSay_30' : ('kuch_iss_ada.mp3', 'Q', 30.0),
+    #'yt_kuchIssAdaSay_60' : ('kuch_iss_ada.mp3', 'Q', 60.0),
+    #'yt_kuchIssAdaSay_90' : ('kuch_iss_ada.mp3', 'Q', 90.0),
     yt_veekhanYaarTayParhan : ('veekhan_yaar.mp3', 'Q', 0.0),
-    'yt_veekhanYaarTayParhan_30' : ('veekhan_yaar.mp3', 'Q', 30.0),
-    'yt_veekhanYaarTayParhan_60' : ('veekhan_yaar.mp3', 'Q', 60.0),
-    'yt_veekhanYaarTayParhan_90' : ('veekhan_yaar.mp3', 'Q', 90.0),
+    #'yt_veekhanYaarTayParhan_30' : ('veekhan_yaar.mp3', 'Q', 30.0),
+    #'yt_veekhanYaarTayParhan_60' : ('veekhan_yaar.mp3', 'Q', 60.0),
+    #'yt_veekhanYaarTayParhan_90' : ('veekhan_yaar.mp3', 'Q', 90.0),
     yt_aamadaBaQatal : ('aamada_ba_qatal.mp3', 'Q', 0.0),
-    'yt_aamadaBaQatal_30' : ('aamada_ba_qatal.mp3', 'Q', 30.0),
-    'yt_aamadaBaQatal_60' : ('aamada_ba_qatal.mp3', 'Q', 60.0),
-    'yt_aamadaBaQatal_90' : ('aamada_ba_qatal.mp3', 'Q', 90.0),
+    #'yt_aamadaBaQatal_30' : ('aamada_ba_qatal.mp3', 'Q', 30.0),
+    #'yt_aamadaBaQatal_60' : ('aamada_ba_qatal.mp3', 'Q', 60.0),
+    #'yt_aamadaBaQatal_90' : ('aamada_ba_qatal.mp3', 'Q', 90.0),
     yt_nerreNerreVass : ('nerre_nerre_vass.mp3', 'Q', 0.0),
-    'yt_nerreNerreVass_30' : ('nerre_nerre_vass.mp3', 'Q', 30.0),
-    'yt_nerreNerreVass_60' : ('nerre_nerre_vass.mp3', 'Q', 60.0),
-    'yt_nerreNerreVass_90' : ('nerre_nerre_vass.mp3', 'Q', 90.0),
+    #'yt_nerreNerreVass_30' : ('nerre_nerre_vass.mp3', 'Q', 30.0),
+    #'yt_nerreNerreVass_60' : ('nerre_nerre_vass.mp3', 'Q', 60.0),
+    #'yt_nerreNerreVass_90' : ('nerre_nerre_vass.mp3', 'Q', 90.0),
     yt_ajabAndaazTujhKo : ('ajab_andaz.mp3', 'Q', 0.0),
-    'yt_ajabAndaazTujhKo_30' : ('ajab_andaz.mp3', 'Q', 30.0),
-    'yt_ajabAndaazTujhKo_60' : ('ajab_andaz.mp3', 'Q', 60.0),
-    'yt_ajabAndaazTujhKo_90' : ('ajab_andaz.mp3', 'Q', 90.0),
+    #'yt_ajabAndaazTujhKo_30' : ('ajab_andaz.mp3', 'Q', 30.0),
+    #'yt_ajabAndaazTujhKo_60' : ('ajab_andaz.mp3', 'Q', 60.0),
+    #'yt_ajabAndaazTujhKo_90' : ('ajab_andaz.mp3', 'Q', 90.0),
     ruthi_rut : ('ruthi_rut.mp3', 'S', 0.0),
     zikar_parivash_ka : ('zikar_parivash_ka.mp3', 'G', 0.0),
     maye_ni_kinnon_akhan : ('maye_ni_kinnon_akhan.mp3', 'F', 0.0),
@@ -236,13 +236,13 @@ if __name__ == "__main__":
             # Input parameters are features and genre
             qc.load_one(songFeatures, training_data[song][1])
 
-        qc.load_complete()
+        qc.load_complete(LoadMode.TI)
         for song in imtayhani_set:
             songData = AudioFeatureExtractor(imtayhani_set[song][0], song)
             songFeatures = songData.extract_qawali_features()
             # Input parameters are features and genre
             qc.load_one(songFeatures, imtayhani_set[song][1], LoadMode.EI)
-        qc.load_complete()
+        qc.load_complete(LoadMode.EI)
         qc.save_and_plot()
     elif Phase == "ReloadAndRun":
         #tmp_song = AudioFeatureExtractor(tarbiati_set[kise_da_yaar][0], kise_da_yaar)
