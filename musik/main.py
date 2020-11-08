@@ -85,6 +85,7 @@ yt_aamadaBaQatal = 'https://www.youtube.com/watch?v=Vfs0_cPcOtg'
 yt_guftamKayRoshan = 'https://www.youtube.com/watch?v=NB6ZS6US-hc'
 yt_tuKareemiMun = 'https://www.youtube.com/watch?v=EAzXFx_9dGc'
 yt_harLehzaBashakal = 'https://www.youtube.com/watch?v=4mJzU3fhJjY'
+yt_shalaSukhanDiyan = 'https://www.youtube.com/watch?v=FYvQRAvl6wg'
 # Map with song URLs and self-labelled genre-ground-truth (ggt)
 # Second element of tuple is the Genre with following legend
 # Q: Qawali
