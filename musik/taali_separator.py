@@ -18,17 +18,22 @@
 
 import librosa as rosa
 import librosa.display as disp
+from lmfit import Model
+from lmfit.models import GaussianModel, LorentzianModel
 import numpy as np
 import nussl
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import os
+import sys
 from pathlib import Path
 import logging
 
 
-logging.basicConfig(level=logging.INFO, format='%(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(message)s')
 logger = logging.getLogger(__name__)
+stdoutHandler = logging.StreamHandler(sys.stdout)
+logger.addHandler(stdoutHandler)
 
 class TaaliSeparator:
     def __init__(self, songList=[], songDir=None):
@@ -45,22 +50,29 @@ class TaaliSeparator:
         self.m_songDir = songDir
         self.m_songList = songList
         if not songList:
-            logger.info("Song list empty, all mp3 songs in directory %s will be added", songDir)
+            logger.info("Song list empty, all mp3/au songs in directory %s will be added", songDir)
             for root, dirname, songs in os.walk(songDir):
-                self.m_songList += [s.rstrip('.mp3') for s in songs if s.endswith('.mp3')]
+                self.m_songList += [os.path.splitext(s)[0] for s in songs if s.endswith('.mp3')]
+                self.m_songList += [os.path.splitext(s)[0] for s in songs if s.endswith('.au')]
         logger.info("Following songs will be evaluated...")
         print(self.m_songList)
 
         self.m_separationMap = {}
         for song in self.m_songList:
             songPath = os.path.join(songDir, song+'.mp3')
+            songPathA = os.path.join(songDir, song+'.au')
             if os.path.isfile(songPath):
                 self.m_separationMap[song] = nussl.AudioSignal(path_to_input_file=songPath,
                                                                 sample_rate=44100, offset=0.0, duration=60.0)
                 self.m_separationMap[song].to_mono(overwrite=True)
                 logger.info("Song=%s SampleRate=%d", song, self.m_separationMap[song].sample_rate)
+            elif os.path.isfile(songPathA):
+                self.m_separationMap[song] = nussl.AudioSignal(path_to_input_file=songPathA,
+                                                                sample_rate=44100, offset=0.0, duration=30.0)
+                logger.info("Song=%s SampleRate=%d", song, self.m_separationMap[song].sample_rate)
+
             else:
-                logger.error("Song path=%s not found", songPath)
+                logger.error("Song paths={%s, %s} not found", songPath, songPathA)
 
         print(self.m_separationMap)
 
@@ -140,7 +152,7 @@ class TaaliSeparator:
             logger.info("Processing song=%s...", song)
             sampleRate = self.m_separationMap[song].sample_rate
             overallCqt = np.abs(rosa.cqt(self.m_separationMap[song].audio_data[0,:], sr=sampleRate, hop_length=1024, n_bins=84))
-            cqtMed = rosa.decompose.nn_filter(overallCqt, aggregate=np.median, axis=0)
+            cqtMed = rosa.decompose.nn_filter(overallCqt, aggregate=np.median, axis=-1)
             fig, ax = plt.subplots(nrows=2, sharex=True, sharey=True, figsize=(10,10))
             disp.specshow(rosa.amplitude_to_db(overallCqt, ref=np.max),
                 sr=sampleRate, x_axis='time', y_axis='cqt_hz', hop_length=1024, ax=ax[0])
@@ -152,7 +164,7 @@ class TaaliSeparator:
             anFig, anAx = plt.subplots(nrows=1, ncols=2, figsize=(10,10))
             comps, acts = rosa.decompose.decompose(cqtMed, n_components=4, sort=True)
             disp.specshow(rosa.amplitude_to_db(comps, ref=np.max),
-                sr=sampleRate, y_axis='log', hop_length=1024, ax=anAx[0])
+                sr=sampleRate, y_axis='linear', hop_length=1024, ax=anAx[0])
             anAx[0].set_title('NMF Components')
             disp.specshow(acts, x_axis='time', ax=anAx[1])
             anAx[1].set_title('NMF activations')
@@ -163,6 +175,68 @@ class TaaliSeparator:
             plt.close(fig)
             plt.close(anFig)
 
+    def cqt_model_fitting(self):
+        # Minimum frequence for CQT, middle frequency and highest frequency used
+        # all notated with midi notes
+        C1 = 24
+        C4 = 60
+        C8 = 108
+        # Corresponds to 7 octaves from C1 to C8
+        FreqBins = C8 - C1
+        localDir = os.path.join(self.m_songDir, 'model-fitting')
+        if not os.path.isdir(localDir):
+            os.mkdir(localDir)
+        for song in self.m_separationMap:
+            logger.info("\nProcessing song=%s...", song)
+            sampleRate = self.m_separationMap[song].sample_rate
+            overallCqt = np.abs(rosa.cqt(self.m_separationMap[song].audio_data[0,:], sr=sampleRate, hop_length=1024, n_bins=FreqBins))
+            cqtMed = rosa.decompose.nn_filter(overallCqt, aggregate=np.median, axis=-1)
+            fig, ax = plt.subplots(nrows=2, ncols=2, sharex=True, sharey=True, figsize=(10,10))
+            plt.subplot(2,2,1)
+            disp.specshow(rosa.amplitude_to_db(cqtMed, ref=np.max),
+                sr=sampleRate, x_axis='time', y_axis='cqt_hz', hop_length=1024)
+            plt.title('Median filtered CQT')
+            plt.subplot(2,2,2)
+            pitchPower  = np.linalg.norm(cqtMed, axis=1)
+            plt.title('Median CQT power estimate')
+            # CQT starts with midi number 24 as minimum
+            fullMidiRange = np.arange(C1, C8)
+            plt.bar(fullMidiRange, pitchPower)
+
+            # Divide up CQT power in two unequal ranges which will serve as independent variable
+            # for model fitting
+            # From C1 to C4
+            pxLower = pitchPower[C1-C1 : C4-C1-1]
+            mLower = fullMidiRange[C1-C1 : C4-C1-1]
+            # Every thing above C4
+            pxHigher = pitchPower[C4-C1:C8-C1-1]
+            mHigher = fullMidiRange[C4-C1: C8-C1-1]
+
+            # TODO: Use Gaussian functions for both, but experiment with different models
+            lowerModel = GaussianModel()
+            lInitParams = lowerModel.guess(pxLower, x=mLower)
+            resultLower = lowerModel.fit(pxLower, lInitParams, x=mLower)
+            logger.info("Printing lower model results...")
+            print(resultLower.fit_report())
+
+            higherModel = LorentzianModel()
+            hInitParams = higherModel.guess(pxHigher, x=mHigher)
+            resultHigher = higherModel.fit(pxHigher, hInitParams, x=mHigher)
+            logger.info("Printing higher model results...")
+            print(resultHigher.fit_report())
+            plt.subplot(2,2,3)
+            plt.plot(mLower, resultLower.init_fit, 'k--', label='initial fit')
+            plt.plot(mLower, resultLower.best_fit, 'r-', label='best fit')
+            plt.grid()
+            plt.legend(loc='best')
+            plt.subplot(2,2,4)
+            plt.plot(mHigher, resultHigher.init_fit, 'k--', label='initial fit')
+            plt.plot(mHigher, resultHigher.best_fit, 'r-', label='best fit')
+            plt.legend(loc='best')
+            plt.grid()
+            fig.savefig(os.path.join(localDir, song + '-model-fit.png'))
+            plt.close(fig)
+
     def __del__(self):
         logger.info("%s Destructor called", __name__)
 
@@ -170,8 +244,17 @@ class TaaliSeparator:
 
 if __name__ == '__main__':
     # Initialize TaaliSeparator Object
-    # ts = TaaliSeparator(['khawaja', 'piya_say_naina'], '/home/fsheikh/musik')
-    ts = TaaliSeparator([], '/home/fsheikh/musik')
+    #ts = TaaliSeparator([], '/home/fsheikh/musik/desi-mix')
+    #ts = TaaliSeparator([], '/home/fsheikh/musik/gtzan/genres/pop')
+    #ts = TaaliSeparator([], '/home/fsheikh/musik/gtzan/genres/blues')
+    #ts = TaaliSeparator([], '/home/fsheikh/musik/gtzan/genres/classical')
+    ts = TaaliSeparator([], '/home/fsheikh/musik/gtzan/genres/country')
+    #ts = TaaliSeparator([], '/home/fsheikh/musik/gtzan/genres/disco')
+    #ts = TaaliSeparator([], '/home/fsheikh/musik/gtzan/genres/hiphop')
+    #ts = TaaliSeparator([], '/home/fsheikh/musik/gtzan/genres/jazz')
+    #ts = TaaliSeparator([], '/home/fsheikh/musik/gtzan/genres/metal')
+    #ts = TaaliSeparator([], '/home/fsheikh/musik/gtzan/genres/reggae')
+    #ts = TaaliSeparator([], '/home/fsheikh/musik/gtzan/genres/rock')
     # Call various source separation algorithms
     # ts.nussl_timbre()
-    ts.rosa_decompose()
+    ts.cqt_model_fitting()
