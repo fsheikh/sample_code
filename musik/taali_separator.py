@@ -47,15 +47,16 @@ class TaaliSeparator:
         # Contains audio data as read from songs indexed by song names in given directory
         self.m_sourceMap = {}
         # Dictionary contained tabla-taali source separated audio-data as numpy arrray
-        #  indexed by song name
+        # indexed by song name
         self.m_separatedMap = {}
         # reconstructed audio data from above dictionary will be stored in a file named:
         self.m_ttFile = 'tt-map.npy'
-        self.m_taaliRef = '/home/fsheikh/musik/taali-ref/taali_recorded.wav'
+        self.m_audioFile = 'song-map.npy'
+        self.m_taaliRef = np.array([])
 
         self.m_songList = []
         if songDir is None and not songList:
-            logger.error("Song list and directory not give, empty object constructed!")
+            logger.error("Song list and directory not given, empty object constructed!")
             return
         elif not os.path.isdir(songDir):
             logger.error("Directory %s not found", songDir)
@@ -63,6 +64,13 @@ class TaaliSeparator:
 
         self.m_songDir = songDir
         self.m_songList = songList
+        audioMapPath = os.path.join(self.m_songDir, self.m_audioFile)
+        if os.path.isfile(audioMapPath):
+            logger.info("Audio map %s already exist, loading data...\n\n", audioMapPath)
+            self.m_sourceMap = np.load(audioMapPath, allow_pickle=True).item()
+            print(self.m_sourceMap)
+            return
+
         if not songList:
             logger.info("Song list empty, all mp3/au songs in directory %s will be added", songDir)
             for root, dirname, songs in os.walk(songDir):
@@ -88,74 +96,7 @@ class TaaliSeparator:
                 logger.error("Song paths={%s, %s} not found", songPath, songPathA)
 
         print(self.m_sourceMap)
-
-    def nussl_repet(self):
-
-        localDir = os.path.join(self.m_songDir, 'nussl-repet')
-        if not os.path.isdir(localDir):
-            os.mkdir(localDir)
-        for song in self.m_sourceMap:
-            #separator = nussl.separation.primitive.Repet(self.m_sourceMap[song], min_period=0.5, max_period=2.0,
-            #    high_pass_cutoff=500.0, mask_type='binary')
-            separator = nussl.separation.primitive.RepetSim(self.m_sourceMap[song], high_pass_cutoff=400.0,
-                mask_type='binary')
-            estimates = separator()
-            # we want to take CQT of foreground/background estimates, plot them, save the plots
-            # and write estimates to a file
-            fig, (ax1, ax2) = plt.subplots(2,1)
-            sampleRate = self.m_sourceMap[song].sample_rate
-            fg_cqt = np.abs(rosa.cqt(estimates[0].audio_data[0,:], sr=sampleRate, hop_length=1024, n_bins=84))
-            bg_cqt = np.abs(rosa.cqt(estimates[1].audio_data[0,:], sr=sampleRate, hop_length=1024, n_bins=84))
-            disp.specshow(rosa.amplitude_to_db(fg_cqt, ref=np.max),
-                sr=sampleRate, x_axis='time', y_axis='cqt_hz', hop_length=1024, ax=ax1)
-            ax1.set_title('NUSSL REPET Foreground: CQT')
-
-            disp.specshow(rosa.amplitude_to_db(bg_cqt, ref=np.max),
-                sr=sampleRate, x_axis='time', y_axis='cqt_hz', hop_length=1024, ax=ax2)
-            ax2.set_title('NUSSL REPET Background: CQT')
-            fig.tight_layout()
-            fig.savefig(os.path.join(localDir, song + '-cqt.png'))
-            plt.close(fig)
-            logger.info("REPET plots generated, now writing estimates to audio file")
-            estimates[0].write_audio_to_file(os.path.join(localDir, song + '-fg.wav'))
-            estimates[1].write_audio_to_file(os.path.join(localDir, song + '-bg.wav'))
-
-    def nussl_timbre(self):
-
-        localDir = os.path.join(self.m_songDir, 'nussl-timbre')
-        if not os.path.isdir(localDir):
-            os.mkdir(localDir)
-        for song in self.m_sourceMap:
-            separator = nussl.separation.primitive.TimbreClustering(self.m_sourceMap[song], num_sources=3, n_components=16, mask_type='binary')
-            estimates = separator()
-            # we want to take CQT of each component, expectation is that taali is high frequency, harmonium/
-            # singer voice in the middle and tabla in the lower band. TODO: Need to check NUSSL implementation to find
-            # in which order the components are returned, labelling is based on the hope that higher frequency bands
-            # are represented first in the sources
-            fig, (ax1, ax2, ax3) = plt.subplots(3,1)
-            sampleRate = self.m_sourceMap[song].sample_rate
-            print("NMF returned estimates=", len(estimates))
-            taali_cqt = np.abs(rosa.cqt(estimates[0].audio_data[0,:], sr=sampleRate, hop_length=1024, n_bins=84))
-            baja_cqt = np.abs(rosa.cqt(estimates[1].audio_data[0,:], sr=sampleRate, hop_length=1024, n_bins=84))
-            tabla_cqt = np.abs(rosa.cqt(estimates[2].audio_data[0,:], sr=sampleRate, hop_length=1024, n_bins=84))
-            disp.specshow(rosa.amplitude_to_db(tabla_cqt, ref=np.max),
-                sr=sampleRate, x_axis='time', y_axis='cqt_hz', hop_length=1024, ax=ax1)
-            ax1.set_title('NUSSL Timbre Taali?: CQT')
-
-            disp.specshow(rosa.amplitude_to_db(baja_cqt, ref=np.max),
-                sr=sampleRate, x_axis='time', y_axis='cqt_hz', hop_length=1024, ax=ax2)
-            ax2.set_title('NUSSL Timbre Voice/Harmonium: CQT')
-
-            disp.specshow(rosa.amplitude_to_db(taali_cqt, ref=np.max),
-                sr=sampleRate, x_axis='time', y_axis='cqt_hz', hop_length=1024, ax=ax3)
-            ax3.set_title('NUSSL Timbre Tabla?: CQT')
-            fig.tight_layout()
-            fig.savefig(os.path.join(localDir, song + '-cqt.png'))
-            plt.close(fig)
-            logger.info("NMF tibmre plots generated, now writing estimates to audio file")
-            estimates[0].write_audio_to_file(os.path.join(localDir, song + '-taali.wav'))
-            estimates[1].write_audio_to_file(os.path.join(localDir, song + '-baja.wav'))
-            estimates[2].write_audio_to_file(os.path.join(localDir, song + '-tabla.wav'))
+        np.save(audioMapPath, self.m_sourceMap)
 
     @staticmethod
     def e2_c3_c5_b5(freqIndex, sampleRate, fftPoints):
@@ -180,7 +121,7 @@ class TaaliSeparator:
             return True
         return False
 
-    def rosa_decompose(self, writeSeparatedAudio=False, generatePlots=False):
+    def rosa_decompose(self, generatePlots=False):
         localDir = os.path.join(self.m_songDir, 'rosa-decompose')
         if not os.path.isdir(localDir):
             os.mkdir(localDir)
@@ -189,153 +130,53 @@ class TaaliSeparator:
             if sampleRate != 44100:
                 logger.warn("Processing song=%s with sample rate=%d...\n", song, sampleRate)
             magSpectrum = np.abs(rosa.stft(self.m_sourceMap[song].audio_data[0,:], n_fft=1024))
-            comps, acts = rosa.decompose.decompose(magSpectrum, n_components=32, sort=True)
-            # Failed list comprehension :-()
-            #tbBasis = [np.where(comps == x, comps) for x in np.argmax(comps, axis=0) if TaaliSeparator.e2_c3_c5_b5(x, sampleRate, 1024)]
-            nmfMax = np.argmax(comps, axis=0)
-            #tbBasis = np.array([2,3,4,5,28,29,30,31])
-            tbBasis = np.linspace(24, 31, 8, dtype=int)
-            '''for x in nmfMax:
-                if TaaliSeparator.tablaTaaliRange(x, sampleRate, 1024):
-                    # np.where returns a tuple, where latest documentation
-                    # reports dArray?
-                    tbBasis = np.append(tbBasis, np.where(nmfMax == x)[0])
-            '''
-            logger.info("Suspected NVM basis w.r.t voice/baja")
+            comps, acts = rosa.decompose.decompose(magSpectrum, n_components=4, sort=True)
+            taaliBasis = np.array([1,3])
+            tablaBasis = np.array([0,1])
+            logger.info("Separating tabla taali sources for %s", song)
             # Create placeholders for selected components and activations
-            ttComponents = np.take(comps, tbBasis, axis=1)
-            #ttCompsLowFreq = np.zeros(ttComponents.shape)
-            #ttCompsLowFreq[32:128,:] = ttComponents[32:128,:]
-            ttActivations = np.take(acts, tbBasis, axis=0)
+            taaliComponents = np.take(comps, taaliBasis, axis=1)
+            taaliActivations = np.take(acts, taaliBasis, axis=0)
+            tablaComponents = np.take(comps, tablaBasis, axis=1)
+            tablaActivations = np.take(acts, tablaBasis, axis=0)
 
             # Construct tabla-taali spectrum
-            ttSpectrum = ttComponents.dot(ttActivations)
-            ttAudio = rosa.istft(ttSpectrum)
+            taaliSpectrum = taaliComponents.dot(taaliActivations)
+            taaliMel = rosa.feature.melspectrogram(S=taaliSpectrum, sr=sampleRate, hop_length=1024, n_fft=1024)
+            tablaSpectrum = tablaComponents.dot(tablaActivations)
+            tablaAudio = rosa.istft(tablaSpectrum)
             if generatePlots:
-                ttMfcc = rosa.feature.mfcc(ttAudio, sr=sampleRate, n_mfcc=20)
+                taaliMfcc = rosa.feature.mfcc(S=rosa.power_to_db(taaliMel), sr=sampleRate, n_mfcc=13)
+                mfccEnergy = np.linalg.norm(taaliMfcc, axis=1, keepdims=True)
+                normalizedMfcc = taaliMfcc / (mfccEnergy + 1e-8)
+                medianEnergy = np.median(normalizedMfcc, axis=1)
+                logger.info("Mfcc median energy=%12.6g for song=%s", medianEnergy.mean(), song)
                 fig = plt.figure(figsize=(10,10))
-                plt.subplot(2,1,1)
-                disp.specshow(rosa.amplitude_to_db(ttSpectrum, ref=np.max),
-                    sr=sampleRate, x_axis='time', y_axis='log', hop_length=1024)
-                plt.title('Reconstructed voice-baja spectrum')
-                plt.subplot(2,1,2)
-                disp.specshow(ttMfcc, x_axis='time')
-                plt.title('MFCC of voice-baja extracted audio')
+                plt.subplot(2,2,1)
+                plt.bar(np.arange(0, 13), medianEnergy)
+                plt.xlabel('MFCC number')
+                plt.subplot(2,2,2)
+                disp.specshow(normalizedMfcc, x_axis='time', y_axis='time')
+                plt.title('MFCC of Taali extracted audio')
                 plt.colorbar()
                 fig.tight_layout()
-                anFig, anAx = plt.subplots(nrows=1, ncols=2, figsize=(10,10))
-                disp.specshow(rosa.amplitude_to_db(comps, ref=np.max),
-                    sr=sampleRate, y_axis='log', hop_length=1024, ax=anAx[0])
-                anAx[0].set_title('NMF Components')
-                disp.specshow(rosa.amplitude_to_db(ttCompsLowFreq, ref=np.max),
-                    sr=sampleRate, y_axis='log', hop_length=1024, ax=anAx[1])
-                #disp.specshow(acts, x_axis='time', ax=anAx[1])
-                anAx[1].set_title('Selected NMF components')
-                anFig.tight_layout()
-                fig.savefig(os.path.join(localDir, song + '-vb-spec.png'))
-                anFig.savefig(os.path.join(localDir, song + '-nmf.png'))
+                plt.subplot(2,2,3)
+                tablaCqt = np.abs(rosa.cqt(tablaAudio, sr=sampleRate, hop_length=1024, n_bins=84))
+                disp.specshow(rosa.amplitude_to_db(tablaCqt, ref=np.max),
+                    sr=sampleRate, x_axis = 'time', y_axis='cqt_hz', hop_length=1024)
+                plt.title('Tabla Separated CQT')
+                pitchEnergy = np.linalg.norm(tablaCqt, axis=1)
+                plt.subplot(2,2,4)
+                plt.title('Table separated audio pitch energy profile')
+                plt.bar(np.arange(0, pitchEnergy.size), pitchEnergy)
+                plt.xlabel('Pitch Number')
+                fig.savefig(os.path.join(localDir, song + '-tabla-taali-features.png'))
                 plt.close(fig)
-                plt.close(anFig)
-
-            if writeSeparatedAudio:
-                rosa.output.write_wav(os.path.join(localDir, song + '-vb.wav'), ttAudio, sr=sampleRate)
-            else:
-                self.m_separatedMap[song] = ttAudio
+                self.m_separatedMap[(song, 'tabla')] = tablaCqt
+                self.m_separatedMap[(song, 'taali')] = normalizedMfcc
 
         # Save separated source audio data on disk for later processing
         np.save(os.path.join(localDir, self.m_ttFile), self.m_separatedMap)
-
-    def cqt_model_fitting(self):
-        # Minimum frequence for CQT, middle frequency and highest frequency used
-        # all notated with midi notes
-        C1 = 24
-        C4 = 60
-        C5 = 72
-        C6 = 84
-        C8 = 108
-        # Corresponds to 7 octaves from C1 to C8
-        FreqBins = C8 - C1
-        localDir = os.path.join(self.m_songDir, 'model-fitting')
-        if not os.path.isdir(localDir):
-            os.mkdir(localDir)
-        for song in self.m_sourceMap:
-            logger.info("\nProcessing song=%s...", song)
-            sampleRate = self.m_sourceMap[song].sample_rate
-            overallCqt = np.abs(rosa.cqt(self.m_sourceMap[song].audio_data[0,:], sr=sampleRate, hop_length=1024, n_bins=FreqBins))
-            cqtMed = rosa.decompose.nn_filter(overallCqt, aggregate=np.median, axis=-1)
-            fig, ax = plt.subplots(nrows=2, ncols=2, sharex=True, sharey=True, figsize=(10,10))
-            #plt.subplot(2,2,1)
-            #disp.specshow(rosa.amplitude_to_db(cqtMed, ref=np.max),
-            #    sr=sampleRate, x_axis='time', y_axis='cqt_hz', hop_length=1024)
-            #plt.title('Median filtered CQT')
-            plt.subplot(2,2,1)
-            pitchPower  = np.linalg.norm(cqtMed, axis=1)
-            plt.title('Median CQT power estimate')
-            # CQT starts with midi number 24 as minimum
-            fullMidiRange = np.arange(C1, C8)
-            plt.bar(fullMidiRange, pitchPower)
-
-            # Divide up CQT power in three unequal ranges which will serve as independent variable
-            # for model fitting
-            # For tabla taali *mostly* the impact will overtake the other instruments in terms of
-            # cqt power, so notes till C4 are considered. For harmonium and voice we focus on C4 to
-            # C6 excluding the lower ocatves in order to save us from tabla/taali impact. The last
-            # remaing range is then for higher pitches which we don't typically expect in the prelude
-            # duration of Qawali presentation
-            pxLower = pitchPower[C1-C1:C4-C1]
-            mLower = fullMidiRange[C1-C1:C4-C1]
-            pxMiddle = pitchPower[C4-C1 : C8-C1]
-            mMiddle = fullMidiRange[C4-C1 : C8-C1]
-            pxHigher = pitchPower[C4-C1:C8-C1]
-            mHigher = fullMidiRange[C4-C1: C8-C1]
-
-            # TODO: Tabla taali is the distinguishing feature, we expect power from these
-            # sources to be a well-centered peak function, use Gaussian for fitting there.
-            lowerModel = GaussianModel()
-            lInitParams = lowerModel.guess(pxLower, x=mLower)
-            resultLower = lowerModel.fit(pxLower, lInitParams, x=mLower)
-            logger.info("Printing lower model results...")
-            print(resultLower.fit_report(min_correl=0.5))
-
-
-            # For middle and high octave models we are not sure of the distribution
-            # hence relyin on central limit theorem
-            middleModel = LorentzianModel()
-            mInitParams = middleModel.make_params()
-            mInitParams['center'].set(value=75, min=C5, max=C6)
-            resultMiddle = middleModel.fit(pxMiddle, mInitParams, x=mMiddle)
-            logger.info("Printing middle model results...")
-            print(resultMiddle.fit_report(min_correl=0.5))
-
-            highVModel = LorentzianModel(prefix='hvm_')
-            highHModel = LorentzianModel(prefix='hhm_')
-            hParams = highVModel.make_params()
-            hParams['hvm_center'].set(value=70, min=66, max=76)
-            hParams.update(highHModel.make_params())
-            hParams['hhm_center'].set(value=76, min=82, max=86)
-            highModel = highVModel + highHModel
-            resultHigh = highModel.fit(pxHigher, hParams, x=mHigher)
-            #logger.info("Printing high model results...")
-            #print(resultHigh.fit_report(min_correl=0.5))
-            plt.subplot(2,2,2)
-            plt.plot(mLower, resultLower.init_fit, 'k--', label='initial fit')
-            plt.plot(mLower, resultLower.best_fit, 'r-', label='best fit')
-            plt.title('Tabla/Taali Fit')
-            plt.grid()
-            plt.legend(loc='best')
-            plt.subplot(2,2,4)
-            plt.plot(mMiddle, resultMiddle.init_fit, 'k--', label='initial fit')
-            plt.plot(mMiddle, resultMiddle.best_fit, 'r-', label='best fit')
-            plt.grid()
-            plt.title('Voice/Harmonium Fit')
-            plt.legend(loc='best')
-            plt.subplot(2,2,3)
-            plt.plot(mHigher, resultHigh.init_fit, 'k--', label='initial fit')
-            plt.plot(mHigher, resultHigh.best_fit, 'r-', label='best fit')
-            plt.legend(loc='best')
-            plt.grid()
-            fig.savefig(os.path.join(localDir, song + '-model-fit.png'))
-            plt.close(fig)
 
     @staticmethod
     # Limit array to indices less than value
@@ -353,54 +194,38 @@ class TaaliSeparator:
             return False
 
     @staticmethod
-    def fit_distribution(featureName, featureData, songName, frame):
-        logger.info("Curve fitting for feature=%s song=%s and Frame=%d", featureName, songName, frame)
+    def detect_tabla(featureData):
+        # https://www.inspiredacoustics.com/en/MIDI_note_numbers_and_center_frequencies
         C1 =  24
         C8 = 108
+        A2Sharp = 46
         C3 = 48
-        C4 = 60
-        C5 = 72
-        # Ignore first two co-efficients that seem to mark overall energy
-        # compared to timbre properties
-        startingCoeff = 2
-        spreadB = 5
-        spreadS = 2
-        mfccRange = [3,7]
-        cqtXRange = np.arange(C1, C8)
-        mfccXRange = np.arange(startingCoeff, 20)
-        # non-zero value indicates this frame matched distribution fittness criteria for given feature
-        result = 0.0
-        # TODO: After first run of results define model constraints
-        if featureName == 'cqt':
-            cqtModel = GaussianModel()
-            cqtParams = cqtModel.guess(featureData, x=cqtXRange)
-            mFit = cqtModel.fit(featureData, cqtParams, x=cqtXRange)
-            # For a peak in C3 band we allow some spread, high probability coming from tabla/taali
-            # for a peak in C4 only allow narrow peaks, since it can a mixture with harmonium/voice
-            center = mFit.params['center'].value
-            var = mFit.params['sigma'].value
-            if TaaliSeparator.in_interval(C3, C4, center) and TaaliSeparator.in_interval(0, spreadB, var):
-                result = 1.0
-            elif TaaliSeparator.in_interval(C4, C5, center) and TaaliSeparator.in_interval(0, spreadS, var):
-                result = 1.0
-            else:
-                logger.warning("%s does not fit with center=%6.8f sigma=%6.8f", featureName, center, var)
+        F3 = 53
+        B3 = 59
+        logger.info("Starting tabla detection")
+        if featureData.size != (C8-C1):
+            logger.error("CQT energy data missing octaves? bins=%d", featureData.size)
 
-        elif featureName == 'mfcc':
-            mfccModel = LorentzianModel()
-            mfccParams = mfccModel.guess(featureData, x=mfccXRange)
-            mFit = mfccModel.fit(featureData, mfccParams, x=mfccXRange)
-            # We expect 5th/6th coefficient indicated tabla/taali
-            center = mFit.params['center'].value
-            var = mFit.params['sigma'].value
-            if TaaliSeparator.in_interval(mfccRange[0] - startingCoeff, mfccRange[1] - startingCoeff, center)\
-                and TaaliSeparator.in_interval(0, spreadS, var):
-                result = 1.0
-            else:
-                logger.warning("%s does not fit with center=%6.8f sigma=%6.8f", featureName, center, var )
+        spreadS = 4
+        spreadB = 18
+        cqtXRange = np.arange(C1, C8)
+        cqtModel = GaussianModel()
+        cqtParams = cqtModel.guess(featureData, x=cqtXRange)
+        mFit = cqtModel.fit(featureData, cqtParams, x=cqtXRange)
+        result = "No"
+        # Tabla source in a song is characterized by a peak in pitch power
+        # at the start of third ocatve. Allow first half of octave as range
+        # and some tolerance for energy spread. Maybe decision is made if the peak appears
+        # shifted in the C3 octave OR if the variance higher but the peak location is still
+        # in the same half octave band
+        center = mFit.params['center'].value
+        var = mFit.params['sigma'].value
+        if TaaliSeparator.in_interval(C3, F3, center) and TaaliSeparator.in_interval(0, spreadS, var):
+            result = "Yes"
+        elif TaaliSeparator.in_interval(A2Sharp, B3, center) and TaaliSeparator.in_interval(0, spreadB, var):
+            result = "Maybe"
         else:
-            logger.error("Feature not supported in curve fitting")
-            raise RuntimeError
+            logger.warning("tabla not detected with pitch power centered=%6.8f with variance=%6.8f", center, var)
 
         print('Parameter    Value       Stderr')
         for name, param in mFit.params.items():
@@ -416,100 +241,70 @@ class TaaliSeparator:
         print('-------------------------------')
 
         return result
-    # Directory containing source separated map should be given as input
-    def tt_classify(self, ssDir=None):
-        if ssDir is None:
+
+    @staticmethod
+    def detect_taali(featureData):
+        MfccCount = 13
+        M5 = 5
+        M6 = 6
+        M7 = 7
+        result = "No"
+        logger.info("Starting taali detection")
+        if featureData.size != MfccCount:
+            logger.error("Missing Mfcc's called with size=%d", featureData.size)
+        # We look for an alternating cycle +,-,+ between 5-7 Mfcc
+        # Exception being reverse -, +, -
+        # and the case where 7th coefficient did not raise enough
+        if featureData[M5] > 0 and featureData[M6] < 0 and featureData[M7] > 0:
+            result = "Yes"
+        elif featureData[M5] < 0 and featureData[M6] > 0 and featureData[M7] < 0:
+            result = "Yes"
+        elif featureData[M5] > 0 and featureData[M6] < 0 and featureData[M7] > featureData[M6]:
+            result = "Maybe"
+        elif featureData[M5] < 0 and featureData[M6] < 0 and featureData[M7] < 0:
+            result = "Maybe"
+        else:
+            logger.info("Taali not detected with m5=%6.8f m6=%6.8f m7=%6.8f", featureData[M5], featureData[M6], featureData[M7])
+        return result
+
+    # Directory containing feature map is given as input
+    def tt_classify(self, fmDir=None):
+        if fmDir is None:
             raise RuntimeError
         else:
-            # Load reconstructed audio only containing tabla/taali sources
-            ttMap = np.load(os.path.join(ssDir, self.m_ttFile), allow_pickle=True).item()
+            # Load feature map containing CQT and MFCC features useful for detecting
+            # tabla and taali sources
+            ttMap = np.load(os.path.join(fmDir, self.m_ttFile), allow_pickle=True).item()
             print(ttMap)
-        sampleRate = 44100
-        frameSize = 1024
-        observeDurtation = 5
-        observeWindow = sampleRate * observeDurtation // frameSize
-        # Ignore first two co-efficients that seem to mark overall energy
-        # compared to timbre properties
-        startingCoeff = 2
-        for song in ttMap:
-            logger.info("Classification Loop for %s...", song)
-            # Two main features, cqt power and mean mfcc evaluated over observe duration
-            overallCqt = np.abs(rosa.cqt(ttMap[song], sr=sampleRate, hop_length=1024, n_bins=84))
-            overallMfcc = rosa.feature.mfcc(ttMap[song], sr=sampleRate, n_mfcc=20)
-
-            if overallCqt.shape[-1] != overallMfcc.shape[-1] // 2:
-                logger.error("Cqt and MFCC features are not time aligned")
-                raise RuntimeError
-
-            # Additional median filtering on CQT to smooth rough areas
-            cqtMed = rosa.decompose.nn_filter(overallCqt, aggregate=np.median, axis=-1)
-
-            totalFrames = overallCqt.shape[-1] // observeWindow
-            logger.info("Total frames to be considered for classification =%6.4f", totalFrames)
-
-            # Prepare for per-frame decision
-            mfccDecisions = np.empty(totalFrames)
-            cqtDecisions = np.empty(totalFrames)
-            for frameIdx in np.arange(0, totalFrames):
-                startFrame = frameIdx * observeWindow
-                endFrame = (frameIdx + 1) * observeWindow
-                pitchPower = np.linalg.norm(cqtMed[:,startFrame:endFrame], axis=1)
-                cqtDecisions[frameIdx] = TaaliSeparator.fit_distribution('cqt', pitchPower, song, frameIdx)
-                # We can't take power here since mfcc might have low negative values, squaring
-                # which invert power measure
-                mfccSum = np.sum(overallMfcc[startingCoeff:,2 * startFrame: 2 * endFrame], axis=1)
-                print(mfccSum)
-                # TODO: until we have chi-squared distribution for mfcc, rely on max value
-                mfccPeak = np.argmax(mfccSum)
-                print(mfccPeak)
-                #mfccDecisions[frameIdx] = TaaliSeparator.fit_distribution('mfcc', mfccPower, song, frameIdx)
-                mfccDecisions[frameIdx] = 1.0 if (mfccPeak == 1 or mfccPeak == 2) else 0.0
-            # Outside the observation loop, comeup with a heuristic for overall decision
-            # from the results of individual frames
-            combinedDecisions = cqtDecisions + mfccDecisions
-            positiveCqt = np.count_nonzero(cqtDecisions)
-            positiveMfcc = np.count_nonzero(mfccDecisions)
-            positives = np.count_nonzero(combinedDecisions==2.0)
-            if (np.count_nonzero(combinedDecisions==2.0) > 0.6 * totalFrames) or (positiveCqt == totalFrames):
-                logger.info("Qawali detected")
+        noQawali = 0
+        songName = ""
+        # Features are stored against a tuple containing song-name, feature name
+        for songFeature in ttMap:
+            # Each song has two associated tuples, we skip the if its the same song
+            # since in that case it has already been processed.
+            if songName == songFeature[0]:
+                continue
+            songName = songFeature[0]
+            logger.info("\r\nClassification Loop for %s...\r\n", songName)
+            # Two main features, cqt for detecting Tabla and Mfcc for detecting taali
+            cqtPower = np.linalg.norm(ttMap[(songName, 'tabla')], axis=1)
+            mfccMedian = np.median(ttMap[(songName, 'taali')], axis=1)
+            # Get classification decisions for tabla and taali source separately
+            tablaD = TaaliSeparator.detect_tabla(cqtPower)
+            taaliD = TaaliSeparator.detect_taali(mfccMedian)
+            if (tablaD == "Yes" and taaliD == "Yes"):
+                logger.info("Qawali detected after detecting both tabla and taali")
+            elif (tablaD == "Maybe" and taaliD == "Yes"):
+                logger.info("Qawali detected due to taali and suspicison of tabla")
+            elif (tablaD == "Yes" and taaliD == "Maybe"):
+                logger.info("Qawali detected due to tabla and suspicison of taali")
             else:
-                logger.info("No Cigar cqtP=%d mfccP=%d", positiveCqt, positiveMfcc)
+                logger.info("No Cigar tabla=%s taali=%s", tablaD, taaliD)
+                noQawali= noQawali + 1
 
-            #fig = plt.figure(figsize=(10,10))
-            #plt.subplot(2,1,1)
-            #plt.bar(np.arange(24,108), pitchPower)
-            #plt.grid()
-            #plt.title('CQT power profile')
-            #plt.subplot(2,1,2)
-            #disp.specshow(overallMfcc, x_axis='time', sr=sampleRate)
-            #plt.title('MFCC of tabla-taali extracted audio')
-            #plt.grid()
-            #fig.savefig(os.path.join(ssDir, song + '-test-classify.png'))
-            #plt.close(fig)
 
-    def load_reference(self):
-        logger.info("Extracing features from refence recorded taali=%s", self.m_taaliRef)
-        yRef, srRef = rosa.load(self.m_taaliRef, sr=22050, mono=True, offset=0.0, duration=60)
-
-        if srRef != 22050:
-            logger.warning("Actual sample rate %d does not match default", srRef)
-
-        mfccRef = rosa.feature.mfcc(yRef, sr=srRef, n_mfcc=20)
-        cqtRef = np.abs(rosa.cqt(yRef, sr=srRef, hop_length=1024, n_bins=84))
-
-        fig = plt.figure(figsize=(10,10))
-        plt.subplot(2,1,1)
-        disp.specshow(rosa.amplitude_to_db(cqtRef, ref=np.max),
-            sr=srRef, x_axis='time', y_axis='log', hop_length=1024)
-        plt.title('CQT for reference recorded taali')
-        plt.subplot(2,1,2)
-        disp.specshow(mfccRef, x_axis='time', sr=srRef)
-        plt.title('MFCC for reference recorded taali')
-        plt.colorbar()
-        fig.tight_layout()
-        fig.savefig(os.path.join(os.path.dirname(self.m_taaliRef), 'ref_taali.png'))
-        plt.close(fig)
-
+        logger.info("\r\n----------Results------------------\r\n")
+        logger.info("Songs processed=%d Non-Qawalis=%d", len(ttMap)/2, noQawali)
 
     def __del__(self):
         logger.info("%s Destructor called", __name__)
@@ -518,8 +313,7 @@ class TaaliSeparator:
 
 if __name__ == '__main__':
     # Initialize TaaliSeparator Object
-    #ts = TaaliSeparator([], '/home/fsheikh/musik/desi-mix')
-    ts = TaaliSeparator([], '/home/fsheikh/musik/qawali')
+    #ts = TaaliSeparator([], '/home/fsheikh/musik/qawali')
     #ts = TaaliSeparator([], '/home/fsheikh/musik/gtzan/genres/pop')
     #ts = TaaliSeparator([], '/home/fsheikh/musik/gtzan/genres/blues')
     #ts = TaaliSeparator([], '/home/fsheikh/musik/gtzan/genres/classical')
@@ -530,9 +324,16 @@ if __name__ == '__main__':
     #ts = TaaliSeparator([], '/home/fsheikh/musik/gtzan/genres/metal')
     #ts = TaaliSeparator([], '/home/fsheikh/musik/gtzan/genres/reggae')
     #ts = TaaliSeparator([], '/home/fsheikh/musik/gtzan/genres/rock')
+    ts = TaaliSeparator()
     # Call various source separation algorithms
-    ts.rosa_decompose(True,True)
-    #ts = TaaliSeparator()
-    ts.load_reference()
-    #ts.tt_classify('/home/fsheikh/musik/gtzan/genres/jazz/rosa-decompose')
-    #ts.tt_classify('/home/fsheikh/musik/qawali/rosa-decompose')
+    #ts.rosa_decompose(True)
+    ts.tt_classify('/home/fsheikh/musik/qawali/rosa-decompose')
+    ts.tt_classify('/home/fsheikh/musik/gtzan/genres/jazz/rosa-decompose')
+    ts.tt_classify('/home/fsheikh/musik/gtzan/genres/pop/rosa-decompose')
+    ts.tt_classify('/home/fsheikh/musik/gtzan/genres/blues/rosa-decompose')
+    ts.tt_classify('/home/fsheikh/musik/gtzan/genres/classical/rosa-decompose')
+    ts.tt_classify('/home/fsheikh/musik/gtzan/genres/country/rosa-decompose')
+    ts.tt_classify('/home/fsheikh/musik/gtzan/genres/hiphop/rosa-decompose')
+    ts.tt_classify('/home/fsheikh/musik/gtzan/genres/metal/rosa-decompose')
+    ts.tt_classify('/home/fsheikh/musik/gtzan/genres/reggae/rosa-decompose')
+    ts.tt_classify('/home/fsheikh/musik/gtzan/genres/rock/rosa-decompose')
