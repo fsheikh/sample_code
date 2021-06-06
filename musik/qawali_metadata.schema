@@ -1,0 +1,52 @@
+{
+   "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/fsheikh/sample_code/blob/master/music/qawali_metada.schema",
+    "title": "QawaliMetadata",
+    "description": " Json schema defining metadata for Qawali dataset",
+    "type": "object",
+    "properties": {
+        "qawalian" : {
+            "description": "Array of metadata associated with Qawal dataset",
+            "additionalProperties": false,
+            "minItems": 1,
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "fid": {
+                        "type": "string",
+                        "description": "Unique file-id of this qawali within data folder",
+                        "pattern": "[A-Za-z0-9]*"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Short song name",
+                        "pattern": "[A-Za-z]*"
+                    },
+                    "artist": {
+                        "type": "string",
+                        "description": " Artist/performer name",
+                        "pattern": "[A-Za-z]*"
+                    },
+                    "start": {
+                        "type": "integer",
+                        "description": " Starting time-point for tabla/taali sources in seconds",
+                        "minimum": 0,
+                        "maximum": 180
+                    },
+                    "url": {
+                        "type": "string",
+                        "description": " Source link from which song is downloaded",
+                        "pattern": "https:\/\/(drive.google|www.youtube).*$"
+                    },
+                    "download" : {
+                        "type": "boolean",
+                        "description": "Whether this song should be downloaded"
+                    }
+                },
+                "required": ["fid", "name", "url"]
+            }
+        }
+    },
+    "required": [ "qawalian" ]
+}
