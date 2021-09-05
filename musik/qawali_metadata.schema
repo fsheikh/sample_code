@@ -34,6 +34,12 @@
                         "minimum": 0,
                         "maximum": 180
                     },
+                    "duration": {
+                        "type": "integer",
+                        "description": " Song duration in seconds used for feature extraction",
+                        "minimum": 0,
+                        "maximum": 120
+                    },
                     "url": {
                         "type": "string",
                         "description": " Source link from which song is downloaded",

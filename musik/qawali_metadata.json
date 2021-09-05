@@ -1,14 +1,420 @@
 {
   "qawalian" : [
     {
-     "fid": "q001",
-      "name": "piya_say_naina",
-      "url": "https://drive.google.com/uc?id=1oB3wFoZgHGE5gnP88KV505AcFrnEHfz_"
+      "fid": "q001",
+      "name": "amada_ba_qatal",
+      "url": "https://www.youtube.com/watch?v=Vfs0_cPcOtg",
+      "download": false,
+      "start": 0,
+      "duration": 60
     },
     {
       "fid": "q002",
-      "name": "khwaja",
-      "url": "https://drive.google.com/uc?id=165I1Uf8LqaAiBm750NOxLbeDy8isJf3R"
+      "name": "ae_mairay_hamnasheen",
+      "url": "https://www.youtube.com/watch?v=Vfs0_cPcOtg",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q003",
+      "name": "ae_wadah_shikan",
+      "url": "https://www.youtube.com/watch?v=aVEVQ_xVJyo",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q004",
+      "name": "aik_muddat_hui",
+      "url": "https://www.youtube.com/watch?v=d839t2Tj8Ks",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q005",
+      "name": "ajab_andaz",
+      "url": "https://www.youtube.com/watch?v=eXB7cYJtgOs",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q006",
+      "name": "awayen_tay_tenu_dasan",
+      "url": "https://www.youtube.com/watch?v=P-Qe5yYLusU",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q007",
+      "name": "az_dair_mugha",
+      "url": "https://www.youtube.com/watch?v=-R3OxAAlOx8",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q008",
+      "name": "balaghal_sabri",
+      "url": "https://www.youtube.com/watch?v=oWahjPdjop4",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q009",
+      "name": "dekh_lsm",
+      "url": "https://www.youtube.com/watch?v=fG9tnmnQ7SM",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q010",
+      "name": "ghonghat_chak_sajna",
+      "url": "https://www.youtube.com/watch?v=Ywa7cszhAUQ",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q011",
+      "name": "guftam_kay_roshan",
+      "url": "https://www.youtube.com/watch?v=NB6ZS6US-hc",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q012",
+      "name": "hairat_e_ishq",
+      "url": "https://www.youtube.com/watch?v=VVbIWErk2jM",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q013",
+      "name": "haqeeqat_ka_agar",
+      "url": "https://www.youtube.com/watch?v=mjH8v6UFt5w",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q014",
+      "name": "har_lehza_bashakal",
+      "url": "https://www.youtube.com/watch?v=4mJzU3fhJjY",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q015",
+      "name": "inj_vichray_murr",
+      "url": "https://www.youtube.com/watch?v=r8mIeP3aRQs",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q016",
+      "name": "is_karam_ka",
+      "url": "https://drive.google.com/uc?id=121UBXqQS0iwU5ZsznKyK4zWBEMcTf4FV",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q017",
+      "name": "jab_karam",
+      "url": "https://www.youtube.com/watch?v=7Q9dgU28N-I",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q018",
+      "name": "jalwa_dildar_deedam",
+      "url": "https://www.youtube.com/watch?v=Iz9hU6JjZXk",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q019",
+      "name": "jay_tu_rab",
+      "url": "https://drive.google.com/uc?id=1_1-bO2RtZBNu39zsWBtjtCsJozU-hX1u",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q020",
+      "name": "kaan_roz_ke_rooh",
+      "url": "https://www.youtube.com/watch?v=CK1Ypt3dOUs",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q021",
+      "name": "kesa_nach",
+      "url": "https://www.youtube.com/watch?v=Zr_cWLY5PTc",
+      "download": true,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q022",
+      "name": "khawaja",
+      "url": "https://drive.google.com/uc?id=165I1Uf8LqaAiBm750NOxLbeDy8isJf3R",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q023",
+      "name": "kuch_iss_ada",
+      "url": "https://www.youtube.com/watch?v=CKZhSNJn9vA",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q024",
+      "name": "laal_meri_pat",
+      "url": "https://www.youtube.com/watch?v=SihdsEzawaU",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q025",
+      "name": "mahfil_main_barbar",
+      "url": "https://www.youtube.com/watch?v=toVCWBN1Ovk",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q026",
+      "name": "main_neewan_maira_murshad",
+      "url": "https://www.youtube.com/watch?v=fstEpVLs7Y8",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q027",
+      "name": "main_sharabi",
+      "url": "https://www.youtube.com/watch?v=8N9ZDsZZp58",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q028",
+      "name": "maki_madni",
+      "url": "https://www.youtube.com/watch?v=pXdrBMoE8q0",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q029",
+      "name": "man_kun_tow_maula",
+      "url": "https://www.youtube.com/watch?v=Z5OWke4L-fE",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q030",
+      "name": "mera_ae_charkha",
+      "url": "https://drive.google.com/uc?id=1O4x0mWVZm5RdaZ59__T3IrvSsyeJf8Z7",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q031",
+      "name": "mere_saaqi",
+      "url": "https://drive.google.com/uc?id=17NTxevTz827ClaR1ZISjzbMn9RZBYxoi",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q032",
+      "name": "milan_bahana_soch",
+      "url": "https://www.youtube.com/watch?v=idNGyGVdQ2A",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q033",
+      "name": "mohay_apnay_rang",
+      "url": "https://drive.google.com/uc?id=1rrx6KSKnLzqy7095Wkac4doLdJ8r06H-",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q034",
+      "name": "mujh_ko_teri_qasam",
+      "url": "https://drive.google.com/uc?id=1R3QmRolu1mD4p_rYvNVsK8FflQlV01FA",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q035",
+      "name": "na_rukte_hain",
+      "url": "https://www.youtube.com/watch?v=K4oxuSqWk5s",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q036",
+      "name": "nerre_nerre_vass",
+      "url": "https://www.youtube.com/watch?v=WnPYEjOOc0A",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q037",
+      "name": "piya_say_naina",
+      "url": "https://drive.google.com/uc?id=1oB3wFoZgHGE5gnP88KV505AcFrnEHfz_",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q038",
+      "name": "pyar_akhyan_de",
+      "url": "https://drive.google.com/uc?id=1yBAY-NcxDPXQ__YPDDfAA7qPLza-zV8o",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q039",
+      "name": "rumi",
+      "url": "https://www.youtube.com/watch?v=FjggJH45RRE",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q040",
+      "name": "saheb_teri_bandi",
+      "url": "https://www.youtube.com/watch?v=1KQCcdFhA4k",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q041",
+      "name": "sare_lamakan",
+      "url": "https://www.youtube.com/watch?v=KOoZPh-GVo0",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q042",
+      "name": "shab_e_hijar",
+      "url": "https://www.youtube.com/watch?v=aa8onCQryfQ",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q043",
+      "name": "shala_shukan",
+      "url": "https://www.youtube.com/watch?v=FYvQRAvl6wg",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q044",
+      "name": "shikwa",
+      "url": "https://drive.google.com/uc?id=16GVaIjXHwHWNHhPhGo4y6O5TwTxVJefx",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q045",
+      "name": "surkh_aankhon",
+      "url": "https://www.youtube.com/watch?v=0WN-taiMD0Q",
+      "download": true,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q046",
+      "name": "tu_kareemi_man",
+      "url": "https://www.youtube.com/watch?v=EAzXFx_9dGc",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q047",
+      "name": "tumhe_dil_lagi",
+      "url": "https://www.youtube.com/watch?v=K9kAI20osxc",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q048",
+      "name": "veekhan_yaar",
+      "url": "https://www.youtube.com/watch?v=s_a4E-ywKmE",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q049",
+      "name": "wo_bhi_apnay",
+      "url": "https://www.youtube.com/watch?v=B3P4zGY6llw",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q050",
+      "name": "yaad_ne_tei",
+      "url": "https://www.youtube.com/watch?v=OzANk4Ilh6o",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q051",
+      "name": "yaar_nu_manawan",
+      "url": "https://www.youtube.com/watch?v=NwnrwrGbPWs",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q052",
+      "name": "yeh_deewany_tere",
+      "url": "https://www.youtube.com/watch?v=UCED8PMkBzs",
+      "download": false,
+      "start": 0,
+      "duration": 60
     }
   ]
 }
