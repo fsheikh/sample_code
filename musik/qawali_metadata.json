@@ -356,7 +356,7 @@
       "fid": "q045",
       "name": "surkh_aankhon",
       "url": "https://www.youtube.com/watch?v=0WN-taiMD0Q",
-      "download": true,
+      "download": false,
       "start": 0,
       "duration": 60
     },
@@ -413,6 +413,84 @@
       "name": "yeh_deewany_tere",
       "url": "https://www.youtube.com/watch?v=UCED8PMkBzs",
       "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q053",
+      "name": "ve_ik_tera_pyar",
+      "url": "https://www.youtube.com/watch?v=NC457lq3LYU",
+      "download": true,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q054",
+      "name": "aj_karam_karo",
+      "url": "https://drive.google.com/uc?id=1hhM8xFNGXdRxF7wDrpetSyzzufTtrK3k",
+      "download": true,
+      "start": 0,
+      "duration": 60
+
+    },
+    {
+      "fid": "q055",
+      "name": "ya_muhammad_sa",
+      "url": "https://drive.google.com/uc?id=1-an15Q_knA0ijAvqHlkCylHby21GzViH",
+      "download": true,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q056",
+      "name": "ya_hayyo_ya_qayyum",
+      "url": "https://drive.google.com/uc?id=1Kz9Cs3NhLYwm6WYkLAQLQi3f6_ZK558i",
+      "download": true,
+      "start": 0,
+      "duration": 60
+
+    },
+    {
+      "fid": "q057",
+      "name": "vichar_jaavey_je_yaar",
+      "url": "https://drive.google.com/uc?id=18vNIoOj2FZZqBaQdEriKLFs1mbNlt2lA",
+      "download": true,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q058",
+      "name": "ishq_nabi_day_andar.mp3",
+      "url": "https://drive.google.com/uc?id=1UkGu85M0kyJ7Oy_MjMCJbEiQ2bhZfkFV",
+      "download": true,
+      "start": 0,
+      "duration": 60
+
+    },
+    {
+
+      "fid": "q059",
+      "name": "shahbaz_qalandar",
+      "url": "https://drive.google.com/uc?id=1FEGHK1dNd-Ozv6gfbu3U5hIcCNY4_0oP",
+      "download": true,
+      "start": 0,
+      "duration": 60
+    },
+    {
+
+      "fid": "q060",
+      "name": "nami_da_nam",
+      "url": "https://drive.google.com/uc?id=1qWKI4NyyiWI7UIW3KgwZO1O2MaFQ20B0",
+      "download": true,
+      "start": 0,
+      "duration": 60
+    },
+    {
+
+      "fid": "q061",
+      "name": "thor_ve_na_raye",
+      "url": "https://drive.google.com/uc?id=1LeF2y6oS0GtwwW-BSwpuHmN_7hehyVWG",
+      "download": true,
       "start": 0,
       "duration": 60
     }

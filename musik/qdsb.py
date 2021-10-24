@@ -88,7 +88,7 @@ class QawaliDataSet:
                             return
                 elif "google" in song['url']:
                     try:
-                        out_name = gd.download(song['url'], out_song.with_suffix('.tmp'), quiet=True, proxy=None)
+                        out_name = gd.download(song['url'], str(tmp_song.with_suffix(QawaliDataSet.InFormat)), quiet=True, proxy=None)
                         logger.info("Song {} downloaded from google-drive".format(out_name))
                     except Exception as e:
                         logger.error("Failed to download from google-drive with error: {}".format(e))
@@ -109,7 +109,7 @@ class QawaliDataSet:
             except Exception as e:
                 logger.error("Failed to trim downloaded song {} with error: {}".format(str(tmp_song), e))
             # remove full downloaded file afterwards
-            #os.remove(str(tmp_song.with_suffix(QawaliDataSet.InFormat)))
+            os.remove(str(tmp_song.with_suffix(QawaliDataSet.InFormat)))
 
     # Reads a local song, extracts given duration, writes it in an intermediate format
     # before converting it into a compressed form
@@ -117,6 +117,9 @@ class QawaliDataSet:
         # full path to offline location of song
         song_location = Path(self.m_local) / song['name']
         in_song = song_location.with_suffix(QawaliDataSet.InFormat)
+        if not in_song.exists():
+            logger.error("{} not found on local file system, cannot write to dataset".format(in_song))
+            return
         out_song = Path(self.m_target / song['fid'])
         if out_song.with_suffix(QawaliDataSet.InFormat).exists():
             logger.warning("{} already exists skipping...".format(out_song))
@@ -137,7 +140,7 @@ class QawaliDataSet:
         except Exception as e:
             logger.error("Failed to compress {} with error {}".format(str(out_song), e))
         # delete intermediate file
-        #os.remove(str(out_song.with_suffix(QawaliDataSet.InterFormat)))
+        os.remove(str(out_song.with_suffix(QawaliDataSet.InterFormat)))
 
     # Makes the data-set according to supplied metadata
     def make(self):
