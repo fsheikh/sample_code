@@ -18,6 +18,7 @@
 import argparse
 import os
 import sys
+from enum import Enum
 from pathlib import Path
 import logging
 import numpy as np
@@ -32,8 +33,15 @@ from lmfit.models import GaussianModel
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(message)s')
 logger = logging.getLogger(__name__)
-stdoutHandler = logging.StreamHandler(sys.stdout)
-logger.addHandler(stdoutHandler)
+#stdoutHandler = logging.StreamHandler(sys.stdout)
+#logger.addHandler(stdoutHandler)
+
+
+# Tri-state decision enum
+class Decision(Enum):
+    YES = 0
+    NO = 1
+    MAYBE = 2
 
 # Objects of this class contain raw-data and features extracted from the songs
 # Supports member processing functions implementing heuristics for Qawali categorization
@@ -42,6 +50,8 @@ class QDetect:
     RAW_DATA_FILE = 'songs-data.npy'
     EX_FEATURES_FILE = 'tt-features.npy'
     FEATURE_DIR = 'features'
+    TABLA_SUFFIX = 'tabla'
+    TAALI_SUFFIX = 'taali'
     SUPPORTED_SAMPLE_RATE = 44100
     FRAME_LENGTH = 1024
     CQT_BINS = 84
@@ -67,15 +77,16 @@ class QDetect:
             logger.info("Audio map {} does not exist, need to reload data?\n".format(audioMapPath))
             raise RuntimeError
 
+        # Walk through songs directory to collect names of all supported format songs
+        for root, dirname, songs in os.walk(songDir):
+            self.m_songList += [os.path.splitext(s)[0] for s in songs if s.endswith('.mp3')]
+            self.m_songList += [os.path.splitext(s)[0] for s in songs if s.endswith('.au')]
+
+        logger.info("Following songs will used for evaluation {}...".format(self.m_songList))
+
         # When reload option is used, existing data is simply overwritten
         if reload:
-            logger.info("Data reload requested, all mp3/au songs in directory %s will be processed", songDir)
-            for root, dirname, songs in os.walk(songDir):
-                self.m_songList += [os.path.splitext(s)[0] for s in songs if s.endswith('.mp3')]
-                self.m_songList += [os.path.splitext(s)[0] for s in songs if s.endswith('.au')]
-
-            logger.info("Following songs will used for evaluation {}...".format(self.m_songList))
-
+            logger.info("Data reload requested, all supported songs in directory %s will be processed", songDir)
             for song in self.m_songList:
                 songPath = Path(songDir) / Path(song+'.mp3')
                 songPathA = Path(songDir) / Path(song+'.au')
@@ -87,13 +98,12 @@ class QDetect:
                     logger.warning("Unexpected sample rate {} for {}".format(sr, song)) if sr != QDetect.SUPPORTED_SAMPLE_RATE else None
                 else:
                     logger.warning("Song paths={%s, %s} not found", songPath, songPathA)
-        else:
-            # load from existing audio data map
-            self.m_rawData = np.load(audioMapPath, allow_pickle=True).item()
-        if reload:
             # delete existing file
             audioMapPath.unlink() if audioMapPath.exists() else None
             np.save(audioMapPath, self.m_rawData)
+        else:
+            # load from existing audio data map
+            self.m_rawData = np.load(audioMapPath, allow_pickle=True).item()
         
     # Extracts features from separated rhythm sources of a qawali song
     # extracted features are tabla CQT and taali-mfcc
@@ -122,9 +132,9 @@ class QDetect:
 
             # Collect individual components for tabla/taali sources
             taaliComponents = np.take(comp, taaliBasis, axis=1)
-            taaliActivations = np.take(comp, taaliBasis, axis=0)
+            taaliActivations = np.take(act, taaliBasis, axis=0)
             tablaComponents = np.take(comp, tablaBasis, axis=1)
-            tablaActivations = np.take(comp, tablaBasis, axis=0)
+            tablaActivations = np.take(act, tablaBasis, axis=0)
 
             # Reconstruct tabla/taali spectrum based on separated elements
             taaliSpec = taaliComponents.dot(taaliActivations)
@@ -146,8 +156,8 @@ class QDetect:
             normalizedTaaliMfcc = taaliMfcc / (mfccEnergy + 1e-8) # avoid divide by zero
 
             # features calculated, save in feature-map to be used for classification later
-            self.m_featuresEx[(song, 'tabla')] = tablaCQT
-            self.m_featuresEx[(song, 'taali')] = normalizedTaaliMfcc
+            self.m_featuresEx[song + '.' + QDetect.TABLA_SUFFIX] = tablaCQT
+            self.m_featuresEx[song + '.' + QDetect.TAALI_SUFFIX] = normalizedTaaliMfcc
 
             if generatePlots:
                 fig = plt.figure(10,10)
@@ -167,19 +177,157 @@ class QDetect:
 
             np.save(featureExFile, self.m_featuresEx)
 
+    @staticmethod
+    def in_interval(r_low, r_high, x_val):
+        """
+        [r_low, r_high) interval in which the value is be checked.
+        x_val value checked for falling inside the given interval
+        """
+        retVal = True if r_low <= x_val < r_high else False
+        return retVal
+
+    @staticmethod
+    def isTabla(cqtPower, mb1=46, mb2=59, mbSpread=18):
+        """
+        cqtPower: CQT power in each octave, orgnized by midi-notes
+        https://www.inspiredacoustics.com/en/MIDI_note_numbers_and_center_frequenciesganized
+        [mb1, mb2]: Midi-notes internal for may-be decision
+        mbSpread: variance of CQT power allowed for may-be decision
+        """
+        # C midi-note in first and last octave
+        C1 = 24
+        C8 = 108
+        # First half of third octave
+        C3 = 48
+        F3 = 53
+        if cqtPower.size != (C8-C1):
+            logger.error("Unexpected tabla CQT-power size: {}".format(cqtPower.size))
+            raise ValueError
+
+        # TODO: peak-power spread/variance allowed for positive decision
+        # Should this be parameterized
+        tightDev = 4
+
+        # Model for detect peak CQT power for tabla instrument
+        cqtRange = np.arange(C1, C8)
+        tablaD = Decision.NO
+
+        # Tabla used in most Qawali renditions has a characteristic timber with its
+        # making different to classical table (drone versus melody), its repeatitve,
+        # follows only a handful of taals (sequence of tabla Bols). All of this means
+        # that tabla is highly detectable simply by looking at spectrum power, with the
+        # expectation that tabla's main frequency component lies within third Octave. This
+        # is captured by modeling CQT power of tabla source in upper-half of third octave
+        # with energy spread within tight bounds
+        # Of-course with performances containing vocals, other instruments, taali and
+        # gaps where tabla is not playing at all, it is possible for tabla frequency spectrum
+        # to diverge from this hard pattern, we attempt to catch it by defining a bigger range
+        # of frequecies to find peak power and also allow for a variable energy spread.
+        tablaModel = GaussianModel()
+        cqtParams = tablaModel.guess(cqtPower, x=cqtRange)
+        mFit = tablaModel.fit(cqtPower, cqtParams, x=cqtRange)
+        modelCenter = mFit.params['center'].value
+        modelDeviation = mFit.params['sigma'].value
+
+        # Ideal case, tabla pitch power centered in expected midi-range and is well-centered
+        if QDetect.in_interval(C3, F3, modelCenter) and QDetect.in_interval(0, tightDev, modelDeviation):
+            tablaD = Decision.YES
+        elif QDetect.in_interval(mb1, mb2, modelCenter) and QDetect.in_interval(0, mbSpread, modelDeviation):
+            tablaD = Decision.MAYBE
+        else:
+            logger.info("Tabla not detected, model calculated pitch-power mean={} and std-dev {}".format(modelCenter, modelDeviation))
+
+        return tablaD
+
+    @staticmethod
+    def isTaali(mfccTaali, allNeg=True):
+        MfccCount = 13
+        M5 = 5
+        M6 = 6
+        M7 = 7
+        taaliD = Decision.NO
+        if mfccTaali.size != MfccCount:
+            logger.error("Unexpected number {} of Mfcc given to taali detector".format(mfccTaali.size))
+            raise ValueError()
+
+
+        # We look for an oscillating pattern between 5-7 Mfcc's either +, -, +, or -, +, -
+        # Two exceptions are allowed:
+        #   Mfcc7 is negative but still higher than Mfcc6
+        #   all three interesting Mfcc are lower than zero
+        # in both these cases we return indeterminate decision from taali feature, so that
+        # qawali genre decision is deferred to tabla feature
+        if mfccTaali[M5] > 0 and mfccTaali[M7] > 0 and mfccTaali[M6] < 0:
+            taaliD = Decision.YES
+        elif mfccTaali[M5] < 0 and mfccTaali[M7] < 0 and mfccTaali[M6] > 0:
+            taaliD = Decision.YES
+        elif mfccTaali[M5] > 0 and mfccTaali[M6] < 0 and mfccTaali[M7] > mfccTaali[M6]:
+            taaliD = Decision.MAYBE
+        elif allNeg and mfccTaali[M5] < 0 and mfccTaali[M6] < 0 and mfccTaali[M7] < 0:
+            taaliD = Decision.MAYBE
+        else:
+            logger.info("Taali not detected with m5={} m6={} m7={}".format(mfccTaali[M5], mfccTaali[M6], mfccTaali[M7]))
+
+        return taaliD
+
     # Classifies a song as a Qawali based on extracted tabla-taali features
     def classify(self):
-        logger.info("Placeholder for classification of song as Qawali/Non-Qawali based on extracted features")
+        # Feature map should be available for classification to work
+        featureMapPath = Path(self.m_songDir) / QDetect.FEATURE_DIR / QDetect.EX_FEATURES_FILE
+        if not featureMapPath.exists():
+            logger.error("No features map exist, were features extracted with decomopse?")
+            raise RuntimeError
+
+        ttMap = np.load(featureMapPath, allow_pickle=True).item()
+
+
+        counters = {}
+        counters['noQ'] = 0
+        counters['both'] = 0
+        counters[QDetect.TABLA_SUFFIX] = 0
+        counters[QDetect.TAALI_SUFFIX] = 0
+        for song in self.m_songList:
+            logger.info("Classification starting for song: {}".format(song))
+
+            # Get the featues, pass them to internal heuristic based function to
+            # detect tabla and taali music sources, combine individual decisions to
+            # classify given song as Qawali genre or otherwise
+            cqtTablaPower = np.linalg.norm(ttMap[song + '.' + QDetect.TABLA_SUFFIX], axis=1)
+            mfccTaali = np.median(ttMap[song + '.' + QDetect.TAALI_SUFFIX], axis=1)
+            tablaD = QDetect.isTabla(cqtTablaPower)
+            taaliD = QDetect.isTaali(mfccTaali)
+            if tablaD == Decision.YES and taaliD == Decision.YES:
+                counters['both'] = counters['both'] + 1
+                logger.info("{} categorized as Qawali after detecting tabla and taali".format(song))
+            elif tablaD == Decision.YES and taaliD == Decision.MAYBE:
+                counters[QDetect.TABLA_SUFFIX] = counters[QDetect.TABLA_SUFFIX] + 1
+                logger.info("{} categorized as Qawali after detecting table and suspecting taali".format(song))
+            elif taaliD == Decision.YES and tablaD == Decision.MAYBE:
+                counters[QDetect.TAALI_SUFFIX] = counters[QDetect.TAALI_SUFFIX] + 1
+                logger.info("{} categorized as Qawali after detecting taali and suspecting tabla".format(song))
+            else:
+                counters['noQ'] = counters['noQ'] + 1
+                logger.info("{} is not a Qawali tabla {} taali {}".format(song, tablaD, taaliD))
+
+
+        total = len(self.m_songList)
+        if (total - counters['noQ']) != counters['both'] + counters[QDetect.TABLA_SUFFIX] + counters[QDetect.TAALI_SUFFIX]:
+            logger.info("Discrepancy in classification results?")
+            raise ValueError
+
+        logger.info("\r\n--------------------Classification Results----------------------------\r\n")
+        logger.info("Total={} non-Qawalis={} TablaTaali={} Tabla={} Taali{}".format(total,
+                    counters['noQ'], counters['both'], counters[QDetect.TABLA_SUFFIX], counters[QDetect.TAALI_SUFFIX]))
 
 if __name__ == '__main__':
     qParser = argparse.ArgumentParser(description="Qawali genre detection program")
-    qParser.add_argument("sdir", type=str, help="folder/directory containing songs to be evaluated")
+    qParser.add_argument("songs_dir", type=str, help="folder/directory containing songs to be evaluated")
     qParser.add_argument("--reload", action='store_true', help="reload data from songs (required at least once per songs directory)")
     qParser.add_argument("--extract", action='store_true', help="extract suitable audio features from raw data (required at least once)")
 
     qArgs = qParser.parse_args()
 
-    qGenre = QDetect(qArgs.sdir, qArgs.reload)
+    qGenre = QDetect(qArgs.songs_dir, qArgs.reload)
 
     if qArgs.extract:
         qGenre.decompose()
