@@ -234,8 +234,8 @@
     },
     {
       "fid": "q030",
-      "name": "mera_ae_charkha",
-      "url": "https://drive.google.com/uc?id=1O4x0mWVZm5RdaZ59__T3IrvSsyeJf8Z7",
+      "name": "kithe_ishq_da_rog",
+      "url": "https://drive.google.com/uc?id=1UltS9yBlH-6d2h9WLvJr7hXaztgD1Lhp",
       "download": false,
       "start": 0,
       "duration": 60
@@ -473,7 +473,7 @@
       "name": "shahbaz_qalandar",
       "url": "https://drive.google.com/uc?id=1FEGHK1dNd-Ozv6gfbu3U5hIcCNY4_0oP",
       "download": true,
-      "start": 0,
+      "start": 60,
       "duration": 60
     },
     {
@@ -491,6 +491,14 @@
       "name": "thor_ve_na_raye",
       "url": "https://drive.google.com/uc?id=1LeF2y6oS0GtwwW-BSwpuHmN_7hehyVWG",
       "download": true,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q062",
+      "name": "mast_nazron_say",
+      "url": "https://drive.google.com/uc?id=14uKXY_DTpVY5vx88HhBAz33azJofYXMd",
+      "download": false,
       "start": 0,
       "duration": 60
     }

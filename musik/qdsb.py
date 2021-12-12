@@ -37,10 +37,10 @@ class QawaliDataSet:
     # These constants may be converted to params at some later point
     # Ensure all songs are sampled at CD-quality
     SampleRate = 44100
+    # Source/Input format is mp3 supported by most sources, whether disks or online
+    InFormat = '.mp3'
     # Intermediate format is wav, since most audio libraries support IO in this format
     InterFormat = '.wav'
-    # mp3 is supported by most sources, whether disks or online
-    InFormat = '.mp3'
     def  __init__(self, target_path, metadata_file, offline_location=None):
         logger.info("Qawali dataset construction started")
         self.m_qmap = {}

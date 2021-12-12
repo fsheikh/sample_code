@@ -52,10 +52,10 @@ class QDetect:
     FEATURE_DIR = 'features'
     TABLA_SUFFIX = 'tabla'
     TAALI_SUFFIX = 'taali'
-    SUPPORTED_SAMPLE_RATE = 44100
+    SUPPORTED_SAMPLE_RATES = [44100, 22050]
     FRAME_LENGTH = 1024
     CQT_BINS = 84
-    def __init__(self, songDir, reload=False):
+    def __init__(self, songDir, reload=False, sampleRate=44100):
         # Raw data extracted from songs represented in a map with
         # song name (without extension) as key
         self.m_rawData = {}
@@ -64,6 +64,8 @@ class QDetect:
         self.m_featuresEx = {}
 
         self.m_songList = []
+        self.m_sr = 0
+
         if songDir is None:
             logger.error("Song directory not given, no data to process!")
             raise RuntimeError
@@ -92,19 +94,30 @@ class QDetect:
                 songPathA = Path(songDir) / Path(song+'.au')
                 if songPath.exists():
                     self.m_rawData[song], sr = rosa.load(path=songPath, sr=None, mono=True, offset=0.0, dtype='float32')
-                    logger.warning("Unexpected sample rate {} for {}".format(sr, song)) if sr != QDetect.SUPPORTED_SAMPLE_RATE else None
+                    if sr not in QDetect.SUPPORTED_SAMPLE_RATES:
+                        logger.error("Unexpected sample rate {} for {}, cannot continue".format(sr, song))
+                        raise RuntimeError
+                    else:
+                        self.m_sr = sr
                 elif songPathA.exists():
                     self.m_rawData[song], sr = rosa.load(path=songPathA, sr=None, offset=0.0, dtype='float32')
-                    logger.warning("Unexpected sample rate {} for {}".format(sr, song)) if sr != QDetect.SUPPORTED_SAMPLE_RATE else None
+                    if sr not in QDetect.SUPPORTED_SAMPLE_RATES:
+                        logger.error("Unexpected sample rate {} for {}, cannot continue".format(sr, song))
+                        raise RuntimeError
+                    else:
+                        self.m_sr = sr
                 else:
                     logger.warning("Song paths={%s, %s} not found", songPath, songPathA)
             # delete existing file
             audioMapPath.unlink() if audioMapPath.exists() else None
+            self.m_rawData['rate'] = self.m_sr
             np.save(audioMapPath, self.m_rawData)
         else:
             # load from existing audio data map
             self.m_rawData = np.load(audioMapPath, allow_pickle=True).item()
-        
+            self.m_sr = self.m_rawData['rate']
+            logger.info("Dataset loaded from {} with sample-rate {}".format(audioMapPath, self.m_sr))
+
     # Extracts features from separated rhythm sources of a qawali song
     # extracted features are tabla CQT and taali-mfcc
     def decompose(self, generatePlots=False):
@@ -121,6 +134,9 @@ class QDetect:
         # and taali (periodic hand-clapping) source from the given file with 
         # NVM factorization
         for song in self.m_rawData:
+            # Ignore entry for sample-rate
+            if song == 'rate':
+                continue
             logger.info("Separating {} into tabla/taali sources".format(song))
             magSpectrum = np.abs(rosa.stft(self.m_rawData[song], n_fft=QDetect.FRAME_LENGTH))
             comp, act = rosa.decompose.decompose(magSpectrum, n_components=4, sort=True)
@@ -144,14 +160,14 @@ class QDetect:
             # for former, we convert to audio and then compute CQT
             # for later librosa is able to compute MFCC from spectrogram directly
             tablaAudio = rosa.istft(tablaSpec)
-            tablaCQT = np.abs(rosa.cqt(tablaAudio, sr=QDetect.SUPPORTED_SAMPLE_RATE,
+            tablaCQT = np.abs(rosa.cqt(tablaAudio, sr=self.m_sr,
                                 hop_length=QDetect.FRAME_LENGTH, n_bins=QDetect.CQT_BINS))
 
-            taaliMel = rosa.feature.melspectrogram(S=taaliSpec, sr=QDetect.SUPPORTED_SAMPLE_RATE,
+            taaliMel = rosa.feature.melspectrogram(S=taaliSpec, sr=self.m_sr,
                                                     hop_length=QDetect.FRAME_LENGTH, n_fft=QDetect.FRAME_LENGTH)
 
             # mel-to-normalized mfcc conversion
-            taaliMfcc = rosa.feature.mfcc(S=rosa.power_to_db(taaliMel), sr=QDetect.SUPPORTED_SAMPLE_RATE, n_mfcc=13)
+            taaliMfcc = rosa.feature.mfcc(S=rosa.power_to_db(taaliMel), sr=self.m_sr, n_mfcc=13)
             mfccEnergy = np.linalg.norm(taaliMfcc, axis=1, keepdims=True)
             normalizedTaaliMfcc = taaliMfcc / (mfccEnergy + 1e-8) # avoid divide by zero
 
@@ -167,7 +183,7 @@ class QDetect:
                 plt.colorbar()
                 plt.tight_layout()
                 plt.subplot(2,1,2)
-                rosa.display.specshow(rosa.amplitude_to_db(tablaCQT, ref=np.max), sr=QDetect.SUPPORTED_SAMPLE_RATE,
+                rosa.display.specshow(rosa.amplitude_to_db(tablaCQT, ref=np.max), sr=self.m_sr,
                                         x_axis='time', y_axis='cqt_hz', hop_length=QDetect.FRAME_LENGTH)
                 plt.title('CQT of tabla separated source')
                 pltFile = featureDir / song + '-tt.png'
@@ -187,10 +203,10 @@ class QDetect:
         return retVal
 
     @staticmethod
-    def isTabla(cqtPower, mb1=46, mb2=59, mbSpread=18):
+    def isTabla(cqtPower, mb1=53, mb2=60, mbSpread=20):
         """
         cqtPower: CQT power in each octave, orgnized by midi-notes
-        https://www.inspiredacoustics.com/en/MIDI_note_numbers_and_center_frequenciesganized
+        https://musicinformationretrieval.com/midi_conversion_table.html
         [mb1, mb2]: Midi-notes internal for may-be decision
         mbSpread: variance of CQT power allowed for may-be decision
         """
@@ -200,6 +216,7 @@ class QDetect:
         # First half of third octave
         C3 = 48
         F3 = 53
+
         if cqtPower.size != (C8-C1):
             logger.error("Unexpected tabla CQT-power size: {}".format(cqtPower.size))
             raise ValueError
@@ -287,7 +304,7 @@ class QDetect:
         counters[QDetect.TABLA_SUFFIX] = 0
         counters[QDetect.TAALI_SUFFIX] = 0
         for song in self.m_songList:
-            logger.info("Classification starting for song: {}".format(song))
+            logger.info("\r\nClassification starting for song: {}".format(song))
 
             # Get the featues, pass them to internal heuristic based function to
             # detect tabla and taali music sources, combine individual decisions to
@@ -301,7 +318,7 @@ class QDetect:
                 logger.info("{} categorized as Qawali after detecting tabla and taali".format(song))
             elif tablaD == Decision.YES and taaliD == Decision.MAYBE:
                 counters[QDetect.TABLA_SUFFIX] = counters[QDetect.TABLA_SUFFIX] + 1
-                logger.info("{} categorized as Qawali after detecting table and suspecting taali".format(song))
+                logger.info("{} categorized as Qawali after detecting tabla and suspecting taali".format(song))
             elif taaliD == Decision.YES and tablaD == Decision.MAYBE:
                 counters[QDetect.TAALI_SUFFIX] = counters[QDetect.TAALI_SUFFIX] + 1
                 logger.info("{} categorized as Qawali after detecting taali and suspecting tabla".format(song))
@@ -316,7 +333,7 @@ class QDetect:
             raise ValueError
 
         logger.info("\r\n--------------------Classification Results----------------------------\r\n")
-        logger.info("Total={} non-Qawalis={} TablaTaali={} Tabla={} Taali{}".format(total,
+        logger.info("Total={} non-Qawalis={} TablaTaali={} Tabla={} Taali={}".format(total,
                     counters['noQ'], counters['both'], counters[QDetect.TABLA_SUFFIX], counters[QDetect.TAALI_SUFFIX]))
 
 if __name__ == '__main__':
