@@ -501,6 +501,78 @@
       "download": false,
       "start": 0,
       "duration": 60
+    },
+    {
+      "fid": "q063",
+      "name": "bar_sabil_e_dil",
+      "url": "https://drive.google.com/uc?id=1Q3qGt3MQFp1o_Ke8-xLcLm23lJpRIkLH",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q064",
+      "name": "dil_bole_sabir_sabir",
+      "url": "https://drive.google.com/uc?id=1VXUMr4_Ikn9C2lz3Zmp33IK2uVJtVFPC",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q065",
+      "name": "hum_faquiron_ko_madinay",
+      "url": "https://drive.google.com/uc?id=1FLqAASixCKSHX6u6OgWo2sBtX8PJtoue",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q066",
+      "name": "mahi_bhaj_kali_an",
+      "url": "https://drive.google.com/uc?id=1CGRkxHKuF8bpiiLjRNxW0nVqXwQwNJq3",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q067",
+      "name": "aaqa_saleem_chishti",
+      "url": "https://drive.google.com/uc?id=1Y2QV9yc3VVZnWKRpNPoetqbkjzoK5d8t",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q068",
+      "name": "bakhs_deta_tow_baat_hoti",
+      "url": "https://drive.google.com/uc?id=17h8lfu-2J16Ouofj0t3qrIrLE4-Am1vI",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q069",
+      "name": "hussan_waley_wafa_nahin",
+      "url": "https://drive.google.com/uc?id=1jU7eNsjOAr4bPy3wEzLnOPD9lwWePmSq",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q070",
+      "name": "mere_sarkar",
+      "url": "https://drive.google.com/uc?id=1nd73kHxPPtZH_9VCbuXHPY5Nj0Iic6PG",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q071",
+      "name": "tasawar_badar",
+      "url": "https://drive.google.com/uc?id=1OPN22TsoylHtN2zAx0Iug1ByRumdXgGo",
+      "download": false,
+      "start": 0,
+      "duration": 60
     }
   ]
 }

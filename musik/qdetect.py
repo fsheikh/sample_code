@@ -203,7 +203,7 @@ class QDetect:
         return retVal
 
     @staticmethod
-    def isTabla(cqtPower, mb1=53, mb2=60, mbSpread=20):
+    def isTabla(cqtPower, mb1=53, mb2=67, mbSpread=20):
         """
         cqtPower: CQT power in each octave, orgnized by midi-notes
         https://musicinformationretrieval.com/midi_conversion_table.html
@@ -274,14 +274,27 @@ class QDetect:
         #   all three interesting Mfcc are lower than zero
         # in both these cases we return indeterminate decision from taali feature, so that
         # qawali genre decision is deferred to tabla feature
+
+        # 2nd attempt expressing above
+        # 6th mfcc is a local extreme (max/min)
+        local_max = max([mfccTaali[M5], mfccTaali[M6], mfccTaali[M7]])
+        local_min = min([mfccTaali[M5], mfccTaali[M6], mfccTaali[M7]])
+        """
         if mfccTaali[M5] > 0 and mfccTaali[M7] > 0 and mfccTaali[M6] < 0:
             taaliD = Decision.YES
         elif mfccTaali[M5] < 0 and mfccTaali[M7] < 0 and mfccTaali[M6] > 0:
             taaliD = Decision.YES
         elif mfccTaali[M5] > 0 and mfccTaali[M6] < 0 and mfccTaali[M7] > mfccTaali[M6]:
             taaliD = Decision.MAYBE
-        elif allNeg and mfccTaali[M5] < 0 and mfccTaali[M6] < 0 and mfccTaali[M7] < 0:
+        #elif allNeg and mfccTaali[M5] < 0 and mfccTaali[M6] < 0 and mfccTaali[M7] < 0:
+        #    taaliD = Decision.MAYBE
+        elif mfccTaali[M5] > 0 and mfccTaali[M6] > 0 and mfccTaali[M7] < 0:
             taaliD = Decision.MAYBE
+        """
+        if local_max == mfccTaali[M6] or local_min == mfccTaali[M6]:
+            taaliD = Decision.YES
+        #elif local_max == mfccTaali[M5]:
+        #    taaliD = Decision.MAYBE
         else:
             logger.info("Taali not detected with m5={} m6={} m7={}".format(mfccTaali[M5], mfccTaali[M6], mfccTaali[M7]))
 
