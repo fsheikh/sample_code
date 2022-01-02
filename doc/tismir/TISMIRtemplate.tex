@@ -1,0 +1,248 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Template for TISMIR Papers
+% 2017 version, based on previous ISMIR conference template
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Sample Document LaTeX packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[utf8]{inputenc}
+\usepackage{tismir}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{lipsum}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title and Author information
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{QawalRang: A dataset for genre classification of Qawalis}
+%
+\author{%
+Faheem Sheikh}%
+
+\date{}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Additional Paper Information
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Article Type - Uncomment and modify, if necessary.
+% Accepted values: research, overview, and dataset
+\type{dataset}
+
+% Citation in First Page
+%
+% "Mandatory" (if missing will print the complete list of authors,
+% including the \thanks symbols)
+\authorref{Sheikh,~F.}
+%
+% (Optional)
+% \journalyear{2017}
+% \journalvolume{V}
+% \journalissue{N}
+% \journalpages{xx--xx}
+% \doi{xx.xxxx/xxxx.xx}
+
+% Remaining Pages (Optional)
+%
+\authorshort{Sheikh, ~F.} %or, e.g., \authorshort{Author1 et al}
+% \titleshort{Template for TISMIR}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document Content
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Abstract
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\twocolumn[{%
+%
+\maketitleblock
+%
+\today
+%
+
+\begin{abstract}
+A new dataset containing 64 Qawali songs of one-minute duration along with tagged metadata is presented. This dataset is used for genre detection of Qawali songs against popular western music genres. The unsupervised genre classification algorithm is based on source separation of two major components typical of Qawali performances namely tabla and taali. The algorithm shows a detection rate of almost 80\% with average false positive across other genres to be around 8\%. \end{abstract}
+%
+\begin{keywords}
+genre, classification, qawali, dataset, tabla, taali
+\end{keywords}
+}]
+\saythanks{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Main Content Start
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}\label{sec:intro}
+Qawalis have a long and historic tradition, by some accounts they go back to at least 13th century. They have been used to recite devotional songs, have been sung by groups in shrines. Even today they are popular in Indian subcontinent with performances given on happy occassions, part of songs  in films as well as religious commemorations. 
+
+Qawalis incorporate both classical and modern musical elements, but almost all performance are characteristed by two fold beat elements a tabla which is the primary rythym elemnet and periodic clapping by backing vocals called "taali".
+
+
+\subsection{Level intro 2}
+
+probably not needed
+
+\subsubsection{Level intro 3}
+
+probably not needed
+
+\section{Dataset}\label{sec:data}
+
+Description of dataset, how was it created, associated metadata file, information extraction from dataset (explaination of individual metadata fields), how can user extend the dataset and rebuild it. Rationale behind song selection, think about visually representing dataset. TODO: sections?
+
+\section{Qawali Genre Detector}\label{sec:detector}
+
+The proposed Qawali genre detector works on the principle that most performances include segments with rythym driven by tabla and beat controled by periodic clapping. The detector aims to separate tabla and taali components from the raw audio data, extracts CQT and MFCC from the tabla/taali sources respectively. It then uses heuristics for pitch energy and local mfcc extrema points to reach a binary classification decision for qawali
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[scale=1.5, width=0.95\columnwidth]{qawali_detector}
+  \caption{Qawali genre detector.}
+\label{fig:figure}
+\end{figure}
+
+\subsection{Feature extraction}
+Tabla taali source separation and selection of appropriate features
+
+\subsection{Binary Classification}
+We aim to make a classifier which can decide if the song represented by the features extracted from tabla and taali components represents a qawali
+This section should explain the gaussian curve fitting on tabla pitch energy and local extrema detection on taali MFCCs
+
+
+
+\section{Results}\label{sec:result}
+
+Tables must be created using a word processor's table function,
+not tabbed text.
+Tables should be included in the manuscript.
+The final layout will place the tables as close to their first
+citation as possible.
+
+All tables must be cited within the main text, numbered with Arabic
+numerals in consecutive order (e.g. Table 1, Table 2, etc.).
+
+Each table must have an accompanying descriptive title.
+This should clearly and concisely summarise the content and/or
+use of the table.
+A short additional table legend is optional to offer a further
+description of the table.
+
+\subsection{Tables should not include}
+
+\begin{itemize}
+  \item Rotated text
+  \item Colour to denote meaning (it will not display the same on all devices)
+  \item Images
+  \item Vertical or diagonal lines
+  \item Multiple parts (e.g. ``Table 1a'' and ``Table 1b'').
+  These should either be merged into one table,
+  or separated into ``Table 1'' and ``Table 2''.
+\end{itemize}
+
+\begin{table}[htpb]
+\centering
+  \begin{tabular}{ll}
+  \toprule
+  \bfseries String Value & \bfseries Numeric Value \\ \midrule
+  Hello ISMIR  & 2017          \\
+  \bottomrule
+  \end{tabular}
+  \caption{Table captions should be placed below the table.}
+\label{tab:table}
+\end{table}
+
+\section{Equations}\label{sec:equations}
+
+Equations should be placed on separate lines and numbered.
+The number should be on the right side, in parentheses,
+as in Eqn.~(\ref{eq:eq}).
+
+\begin{align}\label{eq:eq}
+E = mc^2
+\end{align}
+
+\section{Reproducibility (if applicable)}
+
+If the content of your submission relates to data or software
+that has been deposited in a code or preservation repository,
+please provide summary information here, along with a DOI that
+links to the deposited code/data.
+
+
+
+\section{References}
+
+All citations must be listed at the end of the text file,
+in alphabetical order of authors' surnames.
+References should not be listed if they are not cited in
+the main text.
+This journal uses the APA system.
+Please visit the journal's website
+for examples of referencing format.\endnote{Link to citation examples: \\
+\url{http://transactions.ismir.net/about/submissions/\#References}}
+
+In this template, you can use \verb=\citep{}= to include references
+surrounded by parentheses, such as~\citep{KneesS16_MusicSimilarityRetrieval_SPRINGER}, and \verb=\cite{}=
+for references embedded in the text,
+such as~\cite{WeihsJVR16_MusicDataAnalysis_CRC},
+\cite{SerraEtAl13_RoadmapMIR_CreativeCommon},
+\cite{Lerch15_AudioContentAnalysis_WILEY},
+or~\cite{Mueller15_FMP_SPRINGER}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Please do not touch.
+% Print Endnotes
+\IfFileExists{\jobname.ent}{
+   \theendnotes
+}{
+   %no endnotes
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Acknowledgements}
+
+Any acknowledgements must be headed and in a separate paragraph,
+placed after the main text but before the reference list.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibliography
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% For bibtex users:
+\bibliography{TISMIRtemplate}
+
+% For non bibtex users:
+%\begin{thebibliography}{citations}
+%
+%\bibitem {Author:00}
+%E. Author.
+%``The Title of the Conference Paper,''
+%{\it Proceedings of the International Symposium
+%on Music Information Retrieval}, pp.~000--111, 2000.
+%
+%\bibitem{Someone:10}
+%A. Someone, B. Someone, and C. Someone.
+%``The Title of the Journal Paper,''
+%{\it Journal of New Music Research},
+%Vol.~A, No.~B, pp.~111--222, 2010.
+%
+%\bibitem{Someone:04} X. Someone and Y. Someone. {\it Title of the Book},
+%    Editorial Acme, Porto, 2012.
+%
+%\end{thebibliography}
+
+\end{document}
