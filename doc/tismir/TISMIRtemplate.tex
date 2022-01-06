@@ -74,7 +74,7 @@ Faheem Sheikh}%
 %
 
 \begin{abstract}
-A new dataset containing 64 Qawali songs of one-minute duration along with tagged metadata is presented. This dataset is used for genre detection of Qawali songs against popular western music genres. The unsupervised genre classification algorithm is based on source separation of two major components typical of Qawali performances namely tabla and taali. The algorithm shows a detection rate of almost 80\% with average false positive across other genres to be around 8\%. \end{abstract}
+A new dataset containing 64 Qawali songs of one-minute duration along with tagged metadata is presented. This dataset is used for genre detection of Qawali songs against popular western music genres. The unsupervised genre classification algorithm is based on source separation of two major components typical of Qawali performances namely tabla and taali. The algorithm shows a detection rate of almost 80\% with average false positive across other genres to be around 8\%. Dataset is accompanined with python programs used to construct and extend the dataset as well as repdrocuing the results presented in this study. \end{abstract}
 %
 \begin{keywords}
 genre, classification, qawali, dataset, tabla, taali
@@ -91,17 +91,28 @@ Qawalis have a long and historic tradition, by some accounts they go back to at 
 
 Qawalis incorporate both classical and modern musical elements, but almost all performance are characteristed by two fold beat elements a tabla which is the primary rythym elemnet and periodic clapping by backing vocals called "taali".
 
+Introudce genre detection as a problem, reference to MIREX tasks and literature survery of genre classification of non-western music
 
-\subsection{Level intro 2}
-
-probably not needed
-
-\subsubsection{Level intro 3}
-
-probably not needed
+Review of organization of rest of the paper.
 
 \section{Dataset}\label{sec:data}
+Songs in QawalRang dataset have been source from personal collection, web-crawling and popular music streaming online platforms like youtube. The selection criterion behind including a song was based on following points.
+\begin{itemize}
+\item Song is performed by well-known/renowed Qawal parties/groups. This is to remove any doubts about labeleling. Ofcourse this has to traded-off against diversity of performers.
+\item Songs start with a introductory section including both tabla and taali components. In a very small minority of cases where songs start with a vocal improvisation but does contains segments with tabla and taali components at a later timepoint, that snippet is included.
+\item Songs performed in classical/semi-classical pattern have been preferred, this makes QawalRang dataset unique and reduces overlapp with other common genre like pop and rock. For this reason songs that follow a modern mixture of qawali with mainstream music are avoided.
+\end{itemize}
 
+All songs included in the dataset are described by a metadata file of key-value pairs. The key-values are governed by a json schema which defines the following keys:
+\begin{enumerate}
+\item ID: unique identifier of the song in the data-set
+\item name: song's original/descriptive name
+\item artist: performer's or Qawal party's name
+\item location: URL for the full song
+\item start: Timestamp in seconds within origianl song from where snippet was taken
+\item duration: Duration of song snippet in seconds
+\end{enumerate}
+Above metadata description allows easy experimentation and even extension of the dataset. Accompying the dataset is a python program which can (re)construct QawalRang dataset or a section of it by reading the metadata file on the fly. The program supports both offline and oneline modes with the former meaning that songs are not downloaded upon building 
 Description of dataset, how was it created, associated metadata file, information extraction from dataset (explaination of individual metadata fields), how can user extend the dataset and rebuild it. Rationale behind song selection, think about visually representing dataset. TODO: sections?
 
 \section{Qawali Genre Detector}\label{sec:detector}

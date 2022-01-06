@@ -4,6 +4,7 @@
       "fid": "q001",
       "name": "amada_ba_qatal",
       "url": "https://www.youtube.com/watch?v=Vfs0_cPcOtg",
+      "artist" : "maulvi haider hassan",
       "download": false,
       "start": 0,
       "duration": 60
@@ -12,6 +13,7 @@
       "fid": "q002",
       "name": "ae_mairay_hamnasheen",
       "url": "https://www.youtube.com/watch?v=2g7ZpqscYZA",
+      "artist": "maulvi haider hassan",
       "download": false,
       "start": 0,
       "duration": 60
@@ -20,6 +22,7 @@
       "fid": "q003",
       "name": "ae_wadah_shikan",
       "url": "https://www.youtube.com/watch?v=aVEVQ_xVJyo",
+      "artist" : "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -28,6 +31,7 @@
       "fid": "q004",
       "name": "aik_muddat_hui",
       "url": "https://www.youtube.com/watch?v=d839t2Tj8Ks",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -36,6 +40,7 @@
       "fid": "q005",
       "name": "ajab_andaz",
       "url": "https://www.youtube.com/watch?v=eXB7cYJtgOs",
+      "artist": "maulvi haider hassan",
       "download": false,
       "start": 0,
       "duration": 60
@@ -44,6 +49,7 @@
       "fid": "q006",
       "name": "awayen_tay_tenu_dasan",
       "url": "https://www.youtube.com/watch?v=P-Qe5yYLusU",
+      "artist": "dildar abrar hussain",
       "download": false,
       "start": 0,
       "duration": 60
@@ -52,6 +58,7 @@
       "fid": "q007",
       "name": "az_dair_mugha",
       "url": "https://www.youtube.com/watch?v=-R3OxAAlOx8",
+      "artist": "munshi raziuddin",
       "download": false,
       "start": 0,
       "duration": 60
@@ -60,6 +67,7 @@
       "fid": "q008",
       "name": "balaghal_sabri",
       "url": "https://www.youtube.com/watch?v=oWahjPdjop4",
+      "artist": "sabri brothers",
       "download": false,
       "start": 0,
       "duration": 60
@@ -68,6 +76,7 @@
       "fid": "q009",
       "name": "dekh_lsm",
       "url": "https://www.youtube.com/watch?v=fG9tnmnQ7SM",
+      "artist": "maulvi haider hassan",
       "download": false,
       "start": 0,
       "duration": 60
@@ -76,6 +85,7 @@
       "fid": "q010",
       "name": "ghonghat_chak_sajna",
       "url": "https://www.youtube.com/watch?v=Ywa7cszhAUQ",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -84,6 +94,7 @@
       "fid": "q011",
       "name": "guftam_kay_roshan",
       "url": "https://www.youtube.com/watch?v=NB6ZS6US-hc",
+      "artist" : "bahauddin khan",
       "download": false,
       "start": 0,
       "duration": 60
@@ -92,6 +103,7 @@
       "fid": "q012",
       "name": "hairat_e_ishq",
       "url": "https://www.youtube.com/watch?v=VVbIWErk2jM",
+      "artist": "bahauddin khan",
       "download": false,
       "start": 0,
       "duration": 60
@@ -100,6 +112,7 @@
       "fid": "q013",
       "name": "haqeeqat_ka_agar",
       "url": "https://www.youtube.com/watch?v=mjH8v6UFt5w",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -108,6 +121,7 @@
       "fid": "q014",
       "name": "har_lehza_bashakal",
       "url": "https://www.youtube.com/watch?v=4mJzU3fhJjY",
+      "artist" : "farid ayaz abu-muhammad",
       "download": false,
       "start": 0,
       "duration": 60
@@ -116,6 +130,7 @@
       "fid": "q015",
       "name": "inj_vichray_murr",
       "url": "https://www.youtube.com/watch?v=r8mIeP3aRQs",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -124,6 +139,7 @@
       "fid": "q016",
       "name": "is_karam_ka",
       "url": "https://drive.google.com/uc?id=121UBXqQS0iwU5ZsznKyK4zWBEMcTf4FV",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -132,6 +148,7 @@
       "fid": "q017",
       "name": "jab_karam",
       "url": "https://www.youtube.com/watch?v=7Q9dgU28N-I",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -140,6 +157,7 @@
       "fid": "q018",
       "name": "jalwa_dildar_deedam",
       "url": "https://www.youtube.com/watch?v=Iz9hU6JjZXk",
+      "artist": "munshi raziuddin",
       "download": false,
       "start": 0,
       "duration": 60
@@ -148,6 +166,7 @@
       "fid": "q019",
       "name": "jay_tu_rab",
       "url": "https://drive.google.com/uc?id=1_1-bO2RtZBNu39zsWBtjtCsJozU-hX1u",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -156,6 +175,7 @@
       "fid": "q020",
       "name": "kaan_roz_ke_rooh",
       "url": "https://www.youtube.com/watch?v=CK1Ypt3dOUs",
+      "artist": "farid ayaz abu-muhammad",
       "download": false,
       "start": 0,
       "duration": 60
@@ -164,6 +184,7 @@
       "fid": "q021",
       "name": "kesa_nach",
       "url": "https://www.youtube.com/watch?v=Zr_cWLY5PTc",
+      "artist": "bahauddin khan",
       "download": true,
       "start": 0,
       "duration": 60
@@ -172,6 +193,7 @@
       "fid": "q022",
       "name": "khawaja",
       "url": "https://drive.google.com/uc?id=165I1Uf8LqaAiBm750NOxLbeDy8isJf3R",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -180,6 +202,7 @@
       "fid": "q023",
       "name": "kuch_iss_ada",
       "url": "https://www.youtube.com/watch?v=CKZhSNJn9vA",
+      "artist": "ameer ali khan",
       "download": false,
       "start": 0,
       "duration": 60
@@ -188,6 +211,7 @@
       "fid": "q024",
       "name": "laal_meri_pat",
       "url": "https://www.youtube.com/watch?v=SihdsEzawaU",
+      "artist": "fanna fi-allah",
       "download": false,
       "start": 0,
       "duration": 60
@@ -196,6 +220,7 @@
       "fid": "q025",
       "name": "mahfil_main_barbar",
       "url": "https://www.youtube.com/watch?v=toVCWBN1Ovk",
+      "artist": "bakhshi salamat khan",
       "download": false,
       "start": 0,
       "duration": 60
@@ -204,6 +229,7 @@
       "fid": "q026",
       "name": "main_neewan_maira_murshad",
       "url": "https://www.youtube.com/watch?v=fstEpVLs7Y8",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -212,6 +238,7 @@
       "fid": "q027",
       "name": "main_sharabi",
       "url": "https://www.youtube.com/watch?v=8N9ZDsZZp58",
+      "artist": "aziz mian qawal",
       "download": false,
       "start": 0,
       "duration": 60
@@ -220,6 +247,7 @@
       "fid": "q028",
       "name": "maki_madni",
       "url": "https://www.youtube.com/watch?v=pXdrBMoE8q0",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -228,6 +256,7 @@
       "fid": "q029",
       "name": "man_kun_tow_maula",
       "url": "https://www.youtube.com/watch?v=Z5OWke4L-fE",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -236,6 +265,7 @@
       "fid": "q030",
       "name": "kithe_ishq_da_rog",
       "url": "https://drive.google.com/uc?id=1UltS9yBlH-6d2h9WLvJr7hXaztgD1Lhp",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -244,6 +274,7 @@
       "fid": "q031",
       "name": "mere_saaqi",
       "url": "https://drive.google.com/uc?id=17NTxevTz827ClaR1ZISjzbMn9RZBYxoi",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -252,6 +283,7 @@
       "fid": "q032",
       "name": "milan_bahana_soch",
       "url": "https://www.youtube.com/watch?v=idNGyGVdQ2A",
+      "artist": "ahmad hassan akhtar",
       "download": false,
       "start": 0,
       "duration": 60
@@ -260,6 +292,7 @@
       "fid": "q033",
       "name": "mohay_apnay_rang",
       "url": "https://drive.google.com/uc?id=1rrx6KSKnLzqy7095Wkac4doLdJ8r06H-",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -268,6 +301,7 @@
       "fid": "q034",
       "name": "mujh_ko_teri_qasam",
       "url": "https://drive.google.com/uc?id=1R3QmRolu1mD4p_rYvNVsK8FflQlV01FA",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -276,6 +310,7 @@
       "fid": "q035",
       "name": "na_rukte_hain",
       "url": "https://www.youtube.com/watch?v=K4oxuSqWk5s",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -284,6 +319,7 @@
       "fid": "q036",
       "name": "nerre_nerre_vass",
       "url": "https://www.youtube.com/watch?v=WnPYEjOOc0A",
+      "artist": "tauqeer khurram ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -292,6 +328,7 @@
       "fid": "q037",
       "name": "piya_say_naina",
       "url": "https://drive.google.com/uc?id=1oB3wFoZgHGE5gnP88KV505AcFrnEHfz_",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -300,6 +337,7 @@
       "fid": "q038",
       "name": "pyar_akhyan_de",
       "url": "https://drive.google.com/uc?id=1yBAY-NcxDPXQ__YPDDfAA7qPLza-zV8o",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -308,6 +346,7 @@
       "fid": "q039",
       "name": "rumi",
       "url": "https://www.youtube.com/watch?v=FjggJH45RRE",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -316,6 +355,7 @@
       "fid": "q040",
       "name": "saheb_teri_bandi",
       "url": "https://www.youtube.com/watch?v=1KQCcdFhA4k",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -324,6 +364,7 @@
       "fid": "q041",
       "name": "sare_lamakan",
       "url": "https://www.youtube.com/watch?v=KOoZPh-GVo0",
+      "artist": "amjad sabri",
       "download": false,
       "start": 0,
       "duration": 60
@@ -332,6 +373,7 @@
       "fid": "q042",
       "name": "shab_e_hijar",
       "url": "https://www.youtube.com/watch?v=aa8onCQryfQ",
+      "artist": "farid ayaz abu-muhammad",
       "download": false,
       "start": 0,
       "duration": 60
@@ -340,6 +382,7 @@
       "fid": "q043",
       "name": "shala_shukan",
       "url": "https://www.youtube.com/watch?v=FYvQRAvl6wg",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -348,6 +391,7 @@
       "fid": "q044",
       "name": "shikwa",
       "url": "https://drive.google.com/uc?id=16GVaIjXHwHWNHhPhGo4y6O5TwTxVJefx",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -356,6 +400,7 @@
       "fid": "q045",
       "name": "surkh_aankhon",
       "url": "https://www.youtube.com/watch?v=0WN-taiMD0Q",
+      "artist": "ameer ali khan",
       "download": false,
       "start": 0,
       "duration": 60
@@ -364,6 +409,7 @@
       "fid": "q046",
       "name": "tu_kareemi_man",
       "url": "https://www.youtube.com/watch?v=EAzXFx_9dGc",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -372,6 +418,7 @@
       "fid": "q047",
       "name": "tumhe_dil_lagi",
       "url": "https://www.youtube.com/watch?v=K9kAI20osxc",
+      "artist": "fanna fi-allah",
       "download": false,
       "start": 0,
       "duration": 60
@@ -379,7 +426,8 @@
     {
       "fid": "q048",
       "name": "veekhan_yaar",
-      "url": "https://www.youtube.com/watch?v=s_a4E-ywKmE",
+      "url": "https://www.youtube.com/watch?v=Kp5hN8jbcXQ",
+      "artist": "ahmed hassan akhtar",
       "download": false,
       "start": 0,
       "duration": 60
@@ -387,7 +435,8 @@
     {
       "fid": "q049",
       "name": "wo_bhi_apnay",
-      "url": "https://www.youtube.com/watch?v=B3P4zGY6llw",
+      "url": "https://www.youtube.com/watch?v=HjcbluHzdYY",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -396,6 +445,7 @@
       "fid": "q050",
       "name": "yaad_ne_teri",
       "url": "https://www.youtube.com/watch?v=OzANk4Ilh6o",
+      "artist": "ameer ali khan",
       "download": false,
       "start": 0,
       "duration": 60
@@ -404,6 +454,7 @@
       "fid": "q051",
       "name": "yaar_nu_manawan",
       "url": "https://www.youtube.com/watch?v=NwnrwrGbPWs",
+      "artist": "akhtar shareef",
       "download": false,
       "start": 0,
       "duration": 60
@@ -412,6 +463,7 @@
       "fid": "q052",
       "name": "yeh_deewany_tere",
       "url": "https://www.youtube.com/watch?v=UCED8PMkBzs",
+      "artist": "akhtar shareef",
       "download": false,
       "start": 0,
       "duration": 60
@@ -420,6 +472,7 @@
       "fid": "q053",
       "name": "ve_ik_tera_pyar",
       "url": "https://www.youtube.com/watch?v=NC457lq3LYU",
+      "artist": "faiz ali faiz",
       "download": true,
       "start": 0,
       "duration": 60
@@ -428,6 +481,7 @@
       "fid": "q054",
       "name": "aj_karam_karo",
       "url": "https://drive.google.com/uc?id=1hhM8xFNGXdRxF7wDrpetSyzzufTtrK3k",
+      "artist": "maulvi haider hassan",
       "download": true,
       "start": 0,
       "duration": 60
@@ -437,6 +491,7 @@
       "fid": "q055",
       "name": "ya_muhammad_sa",
       "url": "https://drive.google.com/uc?id=1-an15Q_knA0ijAvqHlkCylHby21GzViH",
+      "artist": "badar miandad khan",
       "download": true,
       "start": 0,
       "duration": 60
@@ -445,6 +500,7 @@
       "fid": "q056",
       "name": "ya_hayyo_ya_qayyum",
       "url": "https://drive.google.com/uc?id=1Kz9Cs3NhLYwm6WYkLAQLQi3f6_ZK558i",
+      "artist": "badar miandad khan",
       "download": true,
       "start": 0,
       "duration": 60
@@ -454,6 +510,7 @@
       "fid": "q057",
       "name": "vichar_jaavey_je_yaar",
       "url": "https://drive.google.com/uc?id=18vNIoOj2FZZqBaQdEriKLFs1mbNlt2lA",
+      "artist": "sher miandad khan",
       "download": true,
       "start": 0,
       "duration": 60
@@ -462,6 +519,7 @@
       "fid": "q058",
       "name": "ishq_nabi_day_andar.mp3",
       "url": "https://drive.google.com/uc?id=1UkGu85M0kyJ7Oy_MjMCJbEiQ2bhZfkFV",
+      "artist": "faiz ali faiz",
       "download": true,
       "start": 0,
       "duration": 60
@@ -472,6 +530,7 @@
       "fid": "q059",
       "name": "shahbaz_qalandar",
       "url": "https://drive.google.com/uc?id=1FEGHK1dNd-Ozv6gfbu3U5hIcCNY4_0oP",
+      "artist": "aziz mian qawal",
       "download": true,
       "start": 60,
       "duration": 60
@@ -481,6 +540,7 @@
       "fid": "q060",
       "name": "nami_da_nam",
       "url": "https://drive.google.com/uc?id=1qWKI4NyyiWI7UIW3KgwZO1O2MaFQ20B0",
+      "artist": "badar miandad khan",
       "download": true,
       "start": 0,
       "duration": 60
@@ -490,6 +550,7 @@
       "fid": "q061",
       "name": "thor_ve_na_raye",
       "url": "https://drive.google.com/uc?id=1LeF2y6oS0GtwwW-BSwpuHmN_7hehyVWG",
+      "artist": "badar minadad khan",
       "download": true,
       "start": 0,
       "duration": 60
@@ -498,6 +559,7 @@
       "fid": "q062",
       "name": "mast_nazron_say",
       "url": "https://drive.google.com/uc?id=14uKXY_DTpVY5vx88HhBAz33azJofYXMd",
+      "artist": "nusrat fateh ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -506,6 +568,7 @@
       "fid": "q063",
       "name": "bar_sabil_e_dil",
       "url": "https://drive.google.com/uc?id=1Q3qGt3MQFp1o_Ke8-xLcLm23lJpRIkLH",
+      "artist": "amjad sabri",
       "download": false,
       "start": 0,
       "duration": 60
@@ -514,6 +577,7 @@
       "fid": "q064",
       "name": "dil_bole_sabir_sabir",
       "url": "https://drive.google.com/uc?id=1VXUMr4_Ikn9C2lz3Zmp33IK2uVJtVFPC",
+      "artist": "sher mehar ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -522,6 +586,7 @@
       "fid": "q065",
       "name": "hum_faquiron_ko_madinay",
       "url": "https://drive.google.com/uc?id=1FLqAASixCKSHX6u6OgWo2sBtX8PJtoue",
+      "artist": "sher mehar ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -530,6 +595,7 @@
       "fid": "q066",
       "name": "mahi_bhaj_kali_an",
       "url": "https://drive.google.com/uc?id=1CGRkxHKuF8bpiiLjRNxW0nVqXwQwNJq3",
+      "artist": "sher mehar ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -538,6 +604,7 @@
       "fid": "q067",
       "name": "aaqa_saleem_chishti",
       "url": "https://drive.google.com/uc?id=1Y2QV9yc3VVZnWKRpNPoetqbkjzoK5d8t",
+      "artist": "aziz ahmad warsi",
       "download": false,
       "start": 0,
       "duration": 60
@@ -546,6 +613,7 @@
       "fid": "q068",
       "name": "bakhs_deta_tow_baat_hoti",
       "url": "https://drive.google.com/uc?id=17h8lfu-2J16Ouofj0t3qrIrLE4-Am1vI",
+      "artist": "aziz mian qawal",
       "download": false,
       "start": 0,
       "duration": 60
@@ -554,6 +622,7 @@
       "fid": "q069",
       "name": "hussan_waley_wafa_nahin",
       "url": "https://drive.google.com/uc?id=1jU7eNsjOAr4bPy3wEzLnOPD9lwWePmSq",
+      "artist": "tabrez aziz mian",
       "download": false,
       "start": 0,
       "duration": 60
@@ -562,6 +631,7 @@
       "fid": "q070",
       "name": "mere_sarkar",
       "url": "https://drive.google.com/uc?id=1nd73kHxPPtZH_9VCbuXHPY5Nj0Iic6PG",
+      "artist": "badar bahadar ali",
       "download": false,
       "start": 0,
       "duration": 60
@@ -570,6 +640,7 @@
       "fid": "q071",
       "name": "tasawar_badar",
       "url": "https://drive.google.com/uc?id=1OPN22TsoylHtN2zAx0Iug1ByRumdXgGo",
+      "artist": "badar bahadar ali",
       "download": false,
       "start": 0,
       "duration": 60
