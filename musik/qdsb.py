@@ -27,20 +27,31 @@ from pathlib import Path
 import os
 import subprocess
 from youtube_dl import YoutubeDL
+import matplotlib.pyplot as plt
+import numpy as np
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Utility class to load json metadata and construct a dataset according to supplied schema
-class QawaliDataSet:
+# Loads json metadata describing QawalRang dataset, constructs dataset
+# and reports statistics from it.
+class QawalRang:
 
     # These constants may be converted to params at some later point
     # Ensure all songs are sampled at CD-quality
     SampleRate = 44100
     # Source/Input format is mp3 supported by most sources, whether disks or online
+    # Dataset entries will also be produces in this format
     InFormat = '.mp3'
-    # Intermediate format is wav, since most audio libraries support IO in this format
+    # Intermediate format is wav used for processing since most audio libraries support
+    # IO in this format
     InterFormat = '.wav'
+    # Sources chart
+    QawalRangSources = 'sources.png'
+    # Artist chart
+    QawalRangArtists = 'artist.png'
+    # Number of songs sourced from web (TODO code into metadata, not expected to change though)
+    WebSize = 6
     def  __init__(self, target_path, metadata_file, offline_location=None):
         logger.info("Qawali dataset construction started")
         self.m_qmap = {}
@@ -61,13 +72,13 @@ class QawaliDataSet:
             logger.info("Download requested for {} from {}".format(song['name'], song['url']))
             out_song = Path(self.m_target) / song['fid']
             tmp_song = Path(self.m_target) / song['name']
-            if out_song.with_suffix(QawaliDataSet.InFormat).exists():
+            if out_song.with_suffix(QawalRang.InFormat).exists():
                 logger.info("song {} already exists, skipping...".format(str(tmp_song), str(out_song)))
                 return
             # Two online sources supported for now
             # youtube for publically available qawali performances
             # google-drive uploaded from personal collections
-            if not tmp_song.with_suffix(QawaliDataSet.InFormat).exists():
+            if not tmp_song.with_suffix(QawalRang.InFormat).exists():
                 if "youtube" in song['url']:
                     ydl_params = {
                     'format': 'bestaudio/best',
@@ -76,9 +87,9 @@ class QawaliDataSet:
                     }],
                     'logger' : logger,
                     'noplaylist' : True,
-                    'progress_hooks' : [QawaliDataSet.download_progress]
+                    'progress_hooks' : [QawalRang.download_progress]
                     }
-                    ydl_params['outtmpl'] = str(tmp_song.with_suffix(QawaliDataSet.InFormat))
+                    ydl_params['outtmpl'] = str(tmp_song.with_suffix(QawalRang.InFormat))
                     ydl_opts = {'nocheckcertificate':True}
                     with YoutubeDL(ydl_params) as ydl:
                         try:
@@ -88,7 +99,7 @@ class QawaliDataSet:
                             return
                 elif "google" in song['url']:
                     try:
-                        out_name = gd.download(song['url'], str(tmp_song.with_suffix(QawaliDataSet.InFormat)), quiet=True, proxy=None)
+                        out_name = gd.download(song['url'], str(tmp_song.with_suffix(QawalRang.InFormat)), quiet=True, proxy=None)
                         logger.info("Song {} downloaded from google-drive".format(out_name))
                     except Exception as e:
                         logger.error("Failed to download from google-drive with error: {}".format(e))
@@ -101,46 +112,46 @@ class QawaliDataSet:
             try:
                 arg_start = str(song['start'])
                 arg_duration = str(song['duration'])
-                trimmer = ffm(inputs={str(tmp_song.with_suffix(QawaliDataSet.InFormat)): [ '-ss', arg_start]},
-                            outputs={str(out_song.with_suffix(QawaliDataSet.InFormat)): ['-t', arg_duration]}
+                trimmer = ffm(inputs={str(tmp_song.with_suffix(QawalRang.InFormat)): [ '-ss', arg_start]},
+                            outputs={str(out_song.with_suffix(QawalRang.InFormat)): ['-t', arg_duration]}
                             )
                 print(trimmer.cmd)
                 t_stdout, t_stderr = trimmer.run(input_data=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             except Exception as e:
                 logger.error("Failed to trim downloaded song {} with error: {}".format(str(tmp_song), e))
             # remove full downloaded file afterwards
-            os.remove(str(tmp_song.with_suffix(QawaliDataSet.InFormat)))
+            os.remove(str(tmp_song.with_suffix(QawalRang.InFormat)))
 
     # Reads a local song, extracts given duration, writes it in an intermediate format
     # before converting it into a compressed form
     def __write(self, song):
         # full path to offline location of song
         song_location = Path(self.m_local) / song['name']
-        in_song = song_location.with_suffix(QawaliDataSet.InFormat)
+        in_song = song_location.with_suffix(QawalRang.InFormat)
         if not in_song.exists():
             logger.error("{} not found on local file system, cannot write to dataset".format(in_song))
             return
         out_song = Path(self.m_target / song['fid'])
-        if out_song.with_suffix(QawaliDataSet.InFormat).exists():
+        if out_song.with_suffix(QawalRang.InFormat).exists():
             logger.warning("{} already exists skipping...".format(out_song))
             return
         logger.info("Loading local file {}".format(str(in_song)))
-        song_data, sr = rosa.load(path=in_song, sr= QawaliDataSet.SampleRate, mono=True, offset=float(song['start']),
+        song_data, sr = rosa.load(path=in_song, sr= QawalRang.SampleRate, mono=True, offset=float(song['start']),
                               duration=float(song['duration']), dtype='float32')
-        if sr != QawaliDataSet.SampleRate:
-            logger.error("extracted song has different sample rate {}".format(sr))
+        if sr != QawalRang.SampleRate:
+            logger.error("Extracted song has different sample rate {}".format(sr))
             return
-        rosa.output.write_wav(str(out_song.with_suffix(QawaliDataSet.InterFormat)), y=song_data, sr=QawaliDataSet.SampleRate)
+        rosa.output.write_wav(str(out_song.with_suffix(QawalRang.InterFormat)), y=song_data, sr=QawalRang.SampleRate)
         try:
-            compressor = ffm(inputs={str(out_song.with_suffix(QawaliDataSet.InterFormat)): None},
-                            outputs={str(out_song.with_suffix(QawaliDataSet.InFormat)): None}
+            compressor = ffm(inputs={str(out_song.with_suffix(QawalRang.InterFormat)): None},
+                            outputs={str(out_song.with_suffix(QawalRang.InFormat)): None}
                             )
             # TODO: Redirect stderr/stdout to logger
             c_out, c_err = compressor.run(input_data=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except Exception as e:
             logger.error("Failed to compress {} with error {}".format(str(out_song), e))
         # delete intermediate file
-        os.remove(str(out_song.with_suffix(QawaliDataSet.InterFormat)))
+        os.remove(str(out_song.with_suffix(QawalRang.InterFormat)))
 
     # Makes the data-set according to supplied metadata
     def make(self):
@@ -157,9 +168,58 @@ class QawaliDataSet:
     def clean(self):
         logger.info("Deleting all songs from location {}".format(self.m_target))
 
-    # returns infomration from extracted json fields
+    # Reports statistics from data-set
     def info(self):
-        logger.info("Extracting information for song {}".format(self.m_qmap['name']))
+        logger.info("Extracting information from dataset {}".format(self.m_target))
+        # songs sourced from youtube, personal collection and web
+        sourceLabels = ['youtube', 'personal', 'web']
+        qawaliSizes = [0, -QawalRang.WebSize, QawalRang.WebSize]
+        sourceColors = plt.get_cmap('magma')(np.linspace(0.25, 0.75, len(sourceLabels)))
+        songsAnalysed = 0
+        # map to chart arstit distribution
+        artistMap = {}
+        for qawali in self.m_qmap['qawalian']:
+            qPath = self.m_target / qawali['fid']
+            if not qPath.with_suffix(QawalRang.InFormat).exists():
+                logger.info("Song {} not part of dataset? will NOT be included in statistics".format(qawali['id']))
+            else:
+                songsAnalysed = songsAnalysed + 1
+                if 'youtube' in qawali['url']:
+                    qawaliSizes[0] = qawaliSizes[0] + 1
+                if 'google' in qawali['url']:
+                    qawaliSizes[1] = qawaliSizes[1] + 1
+                if qawali['artist'] in artistMap:
+                    artistMap[qawali['artist']] = artistMap[qawali['artist']] + 1
+                else:
+                    artistMap[qawali['artist']] = 1
+
+        qawaliSizes = [ qs * 100 / songsAnalysed for qs in qawaliSizes if songsAnalysed != 0 ]
+        print(qawaliSizes)
+
+        # all songs with one artists are added to 'others' category
+        artistMap['others'] = 0
+        for artist in artistMap:
+            if artistMap[artist] == 1:
+                artistMap['others'] = artistMap['others'] + 1
+
+        # copy dictionary while removing artist with single song to their credit
+        filteredArtistMap = {key:val for key, val in artistMap.items() if key is 'others' or val != 1}
+        artistNames = filteredArtistMap.keys()
+        artistCount = filteredArtistMap.values()
+        print(artistNames)
+        print(artistCount)
+        artistCount = [ac * 100 / sum(artistCount) for ac in artistCount]
+        artistColors = plt.get_cmap('plasma')(np.linspace(0.1, 0.9), len(artistNames))
+        fig, axes = plt.subplots()
+        axes.pie(qawaliSizes, labels=sourceLabels, colors=sourceColors, autopct="%1.00f%%", startangle=90)
+        axes.axis('equal')
+        plt.savefig(QawalRang.QawalRangSources)
+
+
+        fig2, axes2 = plt.subplots()
+        axes2.pie(artistCount, labels=artistNames, colors=artistColors, autopct="%1.00f%%", startangle=90)
+        axes2.axis('equal')
+        plt.savefig(QawalRang.QawalRangArtists)
 
     @staticmethod
     def download_progress(prog):
@@ -173,6 +233,8 @@ if __name__ == "__main__":
     prog_parser.add_argument("metadata", type=str, help="Json metadata file describing reference qawali dataset")
     prog_parser.add_argument("--opath",  type=str, dest="offline_path",
                              help="Folder/directory to look for qawali songs. Alternate to internet download")
+    prog_parser.add_argument("--info",  dest="info", action="store_true",
+                             help="Asks the program to report dataset statistics")
 
     prog_args = prog_parser.parse_args()
 
@@ -195,6 +257,10 @@ if __name__ == "__main__":
 
     logger.info("dataset construction site:{}, metadata-file:{}, offline-path:{}".format(str(d_path), str(m_path), str(o_path)))
 
-    qds = QawaliDataSet(d_path, m_path, o_path)
+    qds = QawalRang(d_path, m_path, o_path)
 
-    qds.make()
+    # In case information flag is given dataset is assumed to be already constructed in the given directory
+    if prog_args.info:
+        qds.info()
+    else:
+        qds.make()

@@ -112,8 +112,19 @@ All songs included in the dataset are described by a metadata file of key-value 
 \item start: Timestamp in seconds within origianl song from where snippet was taken
 \item duration: Duration of song snippet in seconds
 \end{enumerate}
-Above metadata description allows easy experimentation and even extension of the dataset. Accompying the dataset is a python program which can (re)construct QawalRang dataset or a section of it by reading the metadata file on the fly. The program supports both offline and oneline modes with the former meaning that songs are not downloaded upon building 
-Description of dataset, how was it created, associated metadata file, information extraction from dataset (explaination of individual metadata fields), how can user extend the dataset and rebuild it. Rationale behind song selection, think about visually representing dataset. TODO: sections?
+Above metadata description allows easy experimentation and even extension of the dataset. Accompying the dataset is a python program which can (re)construct QawalRang dataset or a section of it by reading the metadata file on the fly. The program supports both offline and oneline modes with the former meaning that songs are not downloaded upon building the dataset
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[scale=0.75, width=0.75\columnwidth]{sources}
+  \caption{QawalRang: Distribution by sources}
+\label{fig:figure}
+\end{figure}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[scale=0.75, width=0.75\columnwidth]{artist}
+  \caption{QawalRang: Distribution by artist/performer}
+\label{fig:figure}
+\end{figure}
 
 \section{Qawali Genre Detector}\label{sec:detector}
 
