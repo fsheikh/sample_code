@@ -112,23 +112,24 @@ All songs included in the dataset are described by a metadata file of key-value 
 \item start: Timestamp in seconds within origianl song from where snippet was taken
 \item duration: Duration of song snippet in seconds
 \end{enumerate}
-Above metadata description allows easy experimentation and even extension of the dataset. Accompying the dataset is a python program which can (re)construct QawalRang dataset or a section of it by reading the metadata file on the fly. The program supports both offline and oneline modes with the former meaning that songs are not downloaded upon building the dataset
+
 \begin{figure}[htbp]
   \centering
-  \includegraphics[scale=0.75, width=0.75\columnwidth]{sources}
+  \includegraphics[scale=1.0, width=0.95\columnwidth]{sources}
   \caption{QawalRang: Distribution by sources}
 \label{fig:figure}
 \end{figure}
+Above metadata description allows easy experimentation and even extension of the dataset. Accompying the dataset is a python program which can (re)construct QawalRang dataset or a section of it by reading the metadata file on the fly. The program supports both offline and oneline modes with the former meaning that songs are not downloaded upon building the dataset
 \begin{figure}[htbp]
   \centering
-  \includegraphics[scale=0.75, width=0.75\columnwidth]{artist}
+  \includegraphics[height=4cm, width=0.95\columnwidth]{artist}
   \caption{QawalRang: Distribution by artist/performer}
 \label{fig:figure}
 \end{figure}
 
 \section{Qawali Genre Detector}\label{sec:detector}
 
-The proposed Qawali genre detector works on the principle that most performances include segments with rythym driven by tabla and beat controled by periodic clapping. The detector aims to separate tabla and taali components from the raw audio data, extracts CQT and MFCC from the tabla/taali sources respectively. It then uses heuristics for pitch energy and local mfcc extrema points to reach a binary classification decision for qawali
+The proposed Qawali genre detector works on the principle that most performances include segments with rythym driven by tabla and beat controlled by periodic clapping. The detector aims to separate tabla and taali components from the raw audio data, extracts CQT and MFCC features separately from the tabla/taali sources respectively. It then uses heuristics for pitch energy and local mfcc extrema points to reach a binary classification decision for qawali
 \begin{figure}[htbp]
   \centering
   \includegraphics[scale=1.5, width=0.95\columnwidth]{qawali_detector}
@@ -137,7 +138,39 @@ The proposed Qawali genre detector works on the principle that most performances
 \end{figure}
 
 \subsection{Feature extraction}
-Tabla taali source separation and selection of appropriate features
+Features are extracted from raw audio spectrogram after separating the audio in potential tabla/taali source spectrograms. Let $\boldsymbol{S}$ be an $txm$ audio spectrum matrix decomposed into sorted feature matrix $\boldsymbol{W}$ and coefficients matrix $\boldsymbol{H}$ each of dimensions $txn$ and $nxm$ respectively with non-negative matrix factorization, where $n$ is the number of independent music sources the song is composed of.
+
+\begin{align}\label{eq:eq}
+\boldsymbol{S} = \boldsymbol{W}.\boldsymbol{H}
+\end{align}
+
+We select $l \in (0,n)$ to extract Tabla spectrogram $\boldsymbol{S}_{B}$ 
+
+\begin{align}\label{eq:eq}
+\boldsymbol{S}_{B} = \boldsymbol{W}_{B}.\boldsymbol{H}_{B}
+\end{align}
+where
+\begin{align}\label{eq:eq}
+\boldsymbol{W}_{B} = [\boldsymbol{W}.\boldsymbol{u}_{l} ...]
+\end{align}
+and 
+\begin{align}\label{eq:eq}
+\boldsymbol{H}_{B} = [\boldsymbol{u}_{l}^T.\boldsymbol{H} ...]
+\end{align}
+with $u_{l}$ being a unit column vector from Identity matrix $\boldsymbol{I}$ with size $txt$. In other words spectrogram for tabla source is simply computed
+by selecting columns/rows from feature matrix $\boldsymbol{H}$ and coefficient matrix $\boldsymbol{W}$. Similary taali spectrogram $\boldsymbol{S}_{T}$ can be written as:
+\begin{align}\label{eq:eq}
+\boldsymbol{S}_{T} = \boldsymbol{W}_{T}.\boldsymbol{H}_{T}
+\end{align}
+
+Feature-set for genre detection is then absolute CQT for the tabla source, obtained by mapping CQT from tabla spectrogram as represented by:
+\begin{align}\label{eq:eq}
+\boldsymbol{f}_{CQT} = \lvert f\colon \boldsymbol{S}_{B}\to CQT \rvert
+\end{align}
+and energy of mfcc vector mapped from taali spectrogram:
+\begin{align}\label{eq:eq}
+\boldsymbol{f}_{CQT} = \lvert \lvert {f\colon \boldsymbol{S}_{T}\to MFCC} \rvert \rvert
+\end{align}
 
 \subsection{Binary Classification}
 We aim to make a classifier which can decide if the song represented by the features extracted from tabla and taali components represents a qawali

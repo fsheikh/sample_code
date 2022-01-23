@@ -193,8 +193,17 @@ class QawalRang:
                 else:
                     artistMap[qawali['artist']] = 1
 
+        # pie-chart requires manual conversion to percentages, okay here since labels are limited
         qawaliSizes = [ qs * 100 / songsAnalysed for qs in qawaliSizes if songsAnalysed != 0 ]
         print(qawaliSizes)
+
+        fig = plt.figure(figsize=(10,8))
+        axes = fig.add_subplot(111)
+        axes.pie(qawaliSizes, labels=sourceLabels, colors=sourceColors, autopct="%1.00f%%", startangle=90)
+        axes.axis('equal')
+        plt.tight_layout()
+        plt.savefig(QawalRang.QawalRangSources)
+        plt.close(fig)
 
         # all songs with one artists are added to 'others' category
         artistMap['others'] = 0
@@ -208,18 +217,19 @@ class QawalRang:
         artistCount = filteredArtistMap.values()
         print(artistNames)
         print(artistCount)
-        artistCount = [ac * 100 / sum(artistCount) for ac in artistCount]
-        artistColors = plt.get_cmap('plasma')(np.linspace(0.1, 0.9), len(artistNames))
-        fig, axes = plt.subplots()
-        axes.pie(qawaliSizes, labels=sourceLabels, colors=sourceColors, autopct="%1.00f%%", startangle=90)
-        axes.axis('equal')
-        plt.savefig(QawalRang.QawalRangSources)
-
-
-        fig2, axes2 = plt.subplots()
-        axes2.pie(artistCount, labels=artistNames, colors=artistColors, autopct="%1.00f%%", startangle=90)
-        axes2.axis('equal')
+        artistColors = plt.get_cmap('plasma')(np.linspace(0.25, 0.95), len(artistNames))
+        artistAxis = np.arange(len(filteredArtistMap))
+        fig2 = plt.figure(figsize=(10,8))
+        axes2 = fig2.add_subplot(111)
+        axes2.barh(artistAxis, artistCount, align='center')
+        axes2.set_yticks(artistAxis)
+        axes2.set_yticklabels(artistNames)
+        axes2.invert_yaxis()
+        axes2.set_xlabel('Number of songs')
+        axes2.set_title('QawalRang: Artist map')
+        plt.tight_layout()
         plt.savefig(QawalRang.QawalRangArtists)
+        plt.close(fig2)
 
     @staticmethod
     def download_progress(prog):
