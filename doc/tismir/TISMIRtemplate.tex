@@ -17,6 +17,7 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{lipsum}
+\usepackage{forest}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Title and Author information
@@ -56,6 +57,7 @@ Faheem Sheikh}%
 \authorshort{Sheikh, ~F.} %or, e.g., \authorshort{Author1 et al}
 % \titleshort{Template for TISMIR}
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Document Content
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -89,14 +91,14 @@ genre, classification, qawali, dataset, tabla, taali
 \section{Introduction}\label{sec:intro}
 Qawalis have a long and historic tradition, by some accounts they go back to at least 13th century. They have been used to recite devotional songs, have been sung by groups in shrines. Even today they are popular in Indian subcontinent with performances given on happy occassions, part of songs  in films as well as religious commemorations. 
 
-Qawalis incorporate both classical and modern musical elements, but almost all performance are characteristed by two fold beat elements a tabla which is the primary rythym elemnet and periodic clapping by backing vocals called "taali".
+Qawalis incorporate both classical and modern musical elements, but almost all performances are characteristed by two fold beat elements a tabla which is the primary rythym elemnet and periodic clapping by backing vocals called "taali".
 
 Introudce genre detection as a problem, reference to MIREX tasks and literature survery of genre classification of non-western music
 
 Review of organization of rest of the paper.
 
 \section{Dataset}\label{sec:data}
-Songs in QawalRang dataset have been source from personal collection, web-crawling and popular music streaming online platforms like youtube. The selection criterion behind including a song was based on following points.
+Songs in QawalRang dataset have been sourced from personal collection, web-crawling and popular music streaming online platforms like youtube. The selection criterion behind including a song was based on following points.
 \begin{itemize}
 \item Song is performed by well-known/renowed Qawal parties/groups. This is to remove any doubts about labeleling. Ofcourse this has to traded-off against diversity of performers.
 \item Songs start with a introductory section including both tabla and taali components. In a very small minority of cases where songs start with a vocal improvisation but does contains segments with tabla and taali components at a later timepoint, that snippet is included.
@@ -117,19 +119,19 @@ All songs included in the dataset are described by a metadata file of key-value 
   \centering
   \includegraphics[scale=1.0, width=0.95\columnwidth]{sources}
   \caption{QawalRang: Distribution by sources}
-\label{fig:figure}
+\label{fig:src_dist}
 \end{figure}
 Above metadata description allows easy experimentation and even extension of the dataset. Accompying the dataset is a python program which can (re)construct QawalRang dataset or a section of it by reading the metadata file on the fly. The program supports both offline and oneline modes with the former meaning that songs are not downloaded upon building the dataset
 \begin{figure}[htbp]
   \centering
   \includegraphics[height=4cm, width=0.95\columnwidth]{artist}
   \caption{QawalRang: Distribution by artist/performer}
-\label{fig:figure}
+\label{fig:author_dist}
 \end{figure}
 
 \section{Qawali Genre Detector}\label{sec:detector}
 
-The proposed Qawali genre detector works on the principle that most performances include segments with rythym driven by tabla and beat controlled by periodic clapping. The detector aims to separate tabla and taali components from the raw audio data, extracts CQT and MFCC features separately from the tabla/taali sources respectively. It then uses heuristics for pitch energy and local mfcc extrema points to reach a binary classification decision for qawali
+The proposed Qawali genre classification consists of two stages, a feature extraction and a binary classification stage. The overall scheme works on the principle that typical Qawali performances start with a preamble segment in which with rythym is driven by tabla and beat controlled by periodic clapping. The feature extractor aims to separate tabla and taali components from the raw audio data, and then computes CQT and MFCC features respectively from these sources It then uses heuristics for pitch energy and local mfcc extrema points to reach a binary classification decision for qawali. This proposed system is shown in figure \ref{fig:figure}
 \begin{figure}[htbp]
   \centering
   \includegraphics[scale=1.5, width=0.95\columnwidth]{qawali_detector}
@@ -137,46 +139,82 @@ The proposed Qawali genre detector works on the principle that most performances
 \label{fig:figure}
 \end{figure}
 
-\subsection{Feature extraction}
+\subsection{Feature extractor}
 Features are extracted from raw audio spectrogram after separating the audio in potential tabla/taali source spectrograms. Let $\boldsymbol{S}$ be an $txm$ audio spectrum matrix decomposed into sorted feature matrix $\boldsymbol{W}$ and coefficients matrix $\boldsymbol{H}$ each of dimensions $txn$ and $nxm$ respectively with non-negative matrix factorization, where $n$ is the number of independent music sources the song is composed of.
 
-\begin{align}\label{eq:eq}
+\begin{align}\label{eq:eq1}
 \boldsymbol{S} = \boldsymbol{W}.\boldsymbol{H}
 \end{align}
 
 We select $l \in (0,n)$ to extract Tabla spectrogram $\boldsymbol{S}_{B}$ 
 
-\begin{align}\label{eq:eq}
+\begin{align}\label{eq:eq2}
 \boldsymbol{S}_{B} = \boldsymbol{W}_{B}.\boldsymbol{H}_{B}
 \end{align}
 where
-\begin{align}\label{eq:eq}
+\begin{align}\label{eq:eq3}
 \boldsymbol{W}_{B} = [\boldsymbol{W}.\boldsymbol{u}_{l} ...]
 \end{align}
 and 
-\begin{align}\label{eq:eq}
+\begin{align}\label{eq:eq4}
 \boldsymbol{H}_{B} = [\boldsymbol{u}_{l}^T.\boldsymbol{H} ...]
 \end{align}
 with $u_{l}$ being a unit column vector from Identity matrix $\boldsymbol{I}$ with size $txt$. In other words spectrogram for tabla source is simply computed
 by selecting columns/rows from feature matrix $\boldsymbol{H}$ and coefficient matrix $\boldsymbol{W}$. Similary taali spectrogram $\boldsymbol{S}_{T}$ can be written as:
-\begin{align}\label{eq:eq}
+\begin{align}\label{eq:eq5}
 \boldsymbol{S}_{T} = \boldsymbol{W}_{T}.\boldsymbol{H}_{T}
 \end{align}
 
-Feature-set for genre detection is then absolute CQT for the tabla source, obtained by mapping CQT from tabla spectrogram as represented by:
-\begin{align}\label{eq:eq}
-\boldsymbol{f}_{CQT} = \lvert f\colon \boldsymbol{S}_{B}\to CQT \rvert
-\end{align}
-and energy of mfcc vector mapped from taali spectrogram:
-\begin{align}\label{eq:eq}
-\boldsymbol{f}_{CQT} = \lvert \lvert {f\colon \boldsymbol{S}_{T}\to MFCC} \rvert \rvert
+Feature-set for genre detection is then CQT power for the tabla source matrix, obtained by mapping CQT from tabla spectrogram and taking norm/energy along second dimension. This transforms the tabla spectrogram matrix into a feature vector represented by:
+\begin{align}\label{eq:eq6}
+\boldsymbol{f}_{CQT} = \lvert \lvert f\colon \boldsymbol{S}_{B}\to CQT \rvert \rvert
 \end{align}
 
-\subsection{Binary Classification}
-We aim to make a classifier which can decide if the song represented by the features extracted from tabla and taali components represents a qawali
-This section should explain the gaussian curve fitting on tabla pitch energy and local extrema detection on taali MFCCs
+For tabla source a median MFCC vector is computed by obtaining normalized mfcc vector from taali spectrogram:
+\begin{align}\label{eq:eq7}
+\boldsymbol{f}_{MFCC} = med(\frac{f\colon \boldsymbol{S}_{T}\to MFCC}{\lvert \lvert {f\colon \boldsymbol{S}_{T}\to MFCC} \rvert \rvert})
+\end{align}
 
+\subsection{Binary Classifier}
+Based on tabla/taali features, binary classification on whether the given song can be qualified as qawali or not is based on the following individual deicisions.
+\begin{itemize}
+	\item Tabla detector (\textbf{TD}): Does $\boldsymbol{f}_{CQT}$ represent a tabla source? Result is a non-binary decision with three possibilities\textit{yes(Y)/No(N)/Maybe(M)}.
+	\item TaaLi detector (\textbf{LD}): Does $\boldsymbol{f}_{MFCC}$ represents a taali source? Result is a binary \textit{yes(Y\textsubscript{l})/No(N\textsubscript{l)}} decision.
+\end{itemize}
+This is shown in the decision-tree diagram below, where leaf nodes \textbf{Q} indicate a decision in favor of Qawali and \textbf{NQ} is the node for all other cases. Essentially it means the binary classifier categorizes a song as Qawali only in two cases: first one where both tabla and taali were detected and an additional case where taali has been detected form its feature but tabla detection was marginal. The reason is grounded in the individual source detection methods which are explained next.
 
+\begin{forest}
+[TD,
+	[Y,
+		[TL:Y\textsubscript{l}
+			[\textbf{Q}]]
+		[TL:N\textsubscript{l}
+			[\textbf{NQ}]]
+	]
+	[N,
+		[TL:Y\textsubscript{l}
+			[\textbf{NQ}]]
+		[TL:N\textsubscript{l}
+			[\textbf{NQ}]]
+	]
+	[M,
+		[TL:Y\textsubscript{l}
+			[\textbf{Q}]]
+		[TL:N\textsubscript{l}
+			[\textbf{NQ}]]
+	]
+]
+\end{forest}
+
+For tabla detection a gaussian distribution is fitted on tabla source's CQT power as given in \ref{eq:eq6}
+
+\begin{align}\label{eq:eq8}
+\boldsymbol{f}_{CQT} \sim \mathcal{N}(\mu, \sigma^{2})
+\end{align}
+
+where $\mu \in [p_{1}, p_{2}]$ is the mean pitch within an octave band and $\sigma^{2} < T_{h}$ is the variance of pitch (measured in Hz or midi-notes). $p_{1}$, $p_{2}$ and the threshold $T_{h}$ are design parameters statically chosen at the start of the classification process. Tabla is positively detected if a guassian curve successfully fits with defined parameter ranges. As described above, tabla decision is a non binary decision, meaning that some tolerance is accpeted for gaussian curve parameters to categorize an intermediate decision.
+
+For taali detection, given $M$ MFCC elements we attempt to find a mfcc-index $i \in (0, M-1)$ corresponding to a local extrema point i.e. either $\boldsymbol{f}_{MFCC}(i) \leq \boldsymbol{f}_{MFCC}(j)$ or $\boldsymbol{f}_{MFCC}(i) \geq \boldsymbol{f}_{MFCC}(j)$ where $j \in (m_{1}, m_{2})$. Like tabla detector above here also $m_{1}$ and $m_{2}$ are design parameters, statically assigned at the start of decision process. Taali decision is positive if such a local extrema is found otherwise a negative result is declared.
 
 \section{Results}\label{sec:result}
 
@@ -219,15 +257,6 @@ description of the table.
 \label{tab:table}
 \end{table}
 
-\section{Equations}\label{sec:equations}
-
-Equations should be placed on separate lines and numbered.
-The number should be on the right side, in parentheses,
-as in Eqn.~(\ref{eq:eq}).
-
-\begin{align}\label{eq:eq}
-E = mc^2
-\end{align}
 
 \section{Reproducibility (if applicable)}
 

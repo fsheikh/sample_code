@@ -1,10 +1,9 @@
 \BOOKMARK [1][-]{section.1}{Introduction}{}% 1
 \BOOKMARK [1][-]{section.2}{Dataset}{}% 2
 \BOOKMARK [1][-]{section.3}{Qawali Genre Detector}{}% 3
-\BOOKMARK [2][-]{subsection.3.1}{Feature extraction}{section.3}% 4
-\BOOKMARK [2][-]{subsection.3.2}{Binary Classification}{section.3}% 5
+\BOOKMARK [2][-]{subsection.3.1}{Feature extractor}{section.3}% 4
+\BOOKMARK [2][-]{subsection.3.2}{Binary Classifier}{section.3}% 5
 \BOOKMARK [1][-]{section.4}{Results}{}% 6
 \BOOKMARK [2][-]{subsection.4.1}{Tables should not include}{section.4}% 7
-\BOOKMARK [1][-]{section.5}{Equations}{}% 8
-\BOOKMARK [1][-]{section.6}{Reproducibility \(if applicable\)}{}% 9
-\BOOKMARK [1][-]{section.7}{References}{}% 10
+\BOOKMARK [1][-]{section.5}{Reproducibility \(if applicable\)}{}% 8
+\BOOKMARK [1][-]{section.6}{References}{}% 9
