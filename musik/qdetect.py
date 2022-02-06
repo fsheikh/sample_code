@@ -84,7 +84,8 @@ class QDetect:
             self.m_songList += [os.path.splitext(s)[0] for s in songs if s.endswith('.mp3')]
             self.m_songList += [os.path.splitext(s)[0] for s in songs if s.endswith('.au')]
 
-        logger.info("Following songs will used for evaluation {}...".format(self.m_songList))
+        # TODO: Evaluate if needed, since similar one is within classification function as well
+        #logger.info("Following songs will used for evaluation {}...".format(self.m_songList))
 
         # When reload option is used, existing data is simply overwritten
         if reload:
@@ -301,25 +302,35 @@ class QDetect:
         return taaliD
 
     # Classifies a song as a Qawali based on extracted tabla-taali features
-    def classify(self):
-        # Feature map should be available for classification to work
+    # returns a dictionary with keys: 'total', 'Q' and 'noQ' whose values
+    # are counters for total number of songs processed, detected Qawalis
+    # and nonQawalis
+    # parameters:
+    # ffag: Features From Another Genre previously extracted with decompose function
+    def classify(self, ffag=None):
+        # Feature map is either the one extracted with the same object
+        # or calculated previously and now supplied as an argument.
         featureMapPath = Path(self.m_songDir) / QDetect.FEATURE_DIR / QDetect.EX_FEATURES_FILE
+        if ffag:
+            featureMapPath = ffag
+
         if not featureMapPath.exists():
             logger.error("No features map exist, were features extracted with decomopse?")
             raise RuntimeError
 
         ttMap = np.load(featureMapPath, allow_pickle=True).item()
-
+        songList = [song.split('.')[0] for song in ttMap.keys() if QDetect.TABLA_SUFFIX in song]
+        logger.info("classification will run on following songs {}".format(songList))
 
         counters = {}
         counters['noQ'] = 0
         counters['both'] = 0
         counters[QDetect.TABLA_SUFFIX] = 0
         counters[QDetect.TAALI_SUFFIX] = 0
-        for song in self.m_songList:
+        for song in songList:
             logger.info("\r\nClassification starting for song: {}".format(song))
 
-            # Get the featues, pass them to internal heuristic based function to
+            # Get the features, pass them to internal heuristic based function to
             # detect tabla and taali music sources, combine individual decisions to
             # classify given song as Qawali genre or otherwise
             cqtTablaPower = np.linalg.norm(ttMap[song + '.' + QDetect.TABLA_SUFFIX], axis=1)
@@ -329,9 +340,9 @@ class QDetect:
             if tablaD == Decision.YES and taaliD == Decision.YES:
                 counters['both'] = counters['both'] + 1
                 logger.info("{} categorized as Qawali after detecting tabla and taali".format(song))
-            elif tablaD == Decision.YES and taaliD == Decision.MAYBE:
-                counters[QDetect.TABLA_SUFFIX] = counters[QDetect.TABLA_SUFFIX] + 1
-                logger.info("{} categorized as Qawali after detecting tabla and suspecting taali".format(song))
+            #elif tablaD == Decision.YES and taaliD == Decision.MAYBE:
+            #    counters[QDetect.TABLA_SUFFIX] = counters[QDetect.TABLA_SUFFIX] + 1
+            #    logger.info("{} categorized as Qawali after detecting tabla and suspecting taali".format(song))
             elif taaliD == Decision.YES and tablaD == Decision.MAYBE:
                 counters[QDetect.TAALI_SUFFIX] = counters[QDetect.TAALI_SUFFIX] + 1
                 logger.info("{} categorized as Qawali after detecting taali and suspecting tabla".format(song))
@@ -340,20 +351,53 @@ class QDetect:
                 logger.info("{} is not a Qawali tabla {} taali {}".format(song, tablaD, taaliD))
 
 
-        total = len(self.m_songList)
-        if (total - counters['noQ']) != counters['both'] + counters[QDetect.TABLA_SUFFIX] + counters[QDetect.TAALI_SUFFIX]:
+        counters['total'] = len(songList)
+        counters['Q'] = counters['both'] + counters[QDetect.TAALI_SUFFIX]
+
+        if (counters['total'] - counters['noQ']) != counters['both'] + counters[QDetect.TABLA_SUFFIX] + counters[QDetect.TAALI_SUFFIX]:
             logger.info("Discrepancy in classification results?")
             raise ValueError
 
         logger.info("\r\n--------------------Classification Results----------------------------\r\n")
-        logger.info("Total={} non-Qawalis={} TablaTaali={} Tabla={} Taali={}".format(total,
+        logger.info("Total={} non-Qawalis={} TablaTaali={} Tabla={} Taali={}".format(counters['total'],
                     counters['noQ'], counters['both'], counters[QDetect.TABLA_SUFFIX], counters[QDetect.TAALI_SUFFIX]))
+        return counters
+
+    # Compares genre classification results of qawali against
+    # other genre's extracted features.
+    def compare(self, features_dir):
+        qFeaturesPath = Path(self.m_songDir) / QDetect.FEATURE_DIR / QDetect.EX_FEATURES_FILE
+        otherFeaturesPath = Path(features_dir)
+        if not otherFeaturesPath.exists():
+            logger.error("Feature directory {} does not exist, cannot compare results".format(features_dir))
+            return
+        logger.info("Classify and compare, qawali: {}, primary features: {}"
+                    .format(qFeaturesPath, otherFeaturesPath))
+
+        # First compute qawali stats
+        qResults = self.classify()
+        falseNeg = qResults['noQ']
+        truePositive = qResults['Q']
+        falsePositive = 0
+        trueNeg = 0
+        logger.info("Qawali classification results total:{} true-positive: {} false-negative: {}".format(qResults['total'],
+                    truePositive, falseNeg))
+
+
+        # TODO: Some sanity checks, TP + FN = total qawalis processed
+        # FP + TN = all other genre songs processed
+        precision = truePositive / (truePositive + falsePositive)
+        recall = truePositive / (truePositive + falseNeg)
+        fScore = 2 * (precision * recall) / (precision + recall)
+        accuracy = (truePositive + trueNeg) / (truePositive + trueNeg + falsePositive + falseNeg)
 
 if __name__ == '__main__':
     qParser = argparse.ArgumentParser(description="Qawali genre detection program")
     qParser.add_argument("songs_dir", type=str, help="folder/directory containing songs to be evaluated")
     qParser.add_argument("--reload", action='store_true', help="reload data from songs (required at least once per songs directory)")
     qParser.add_argument("--extract", action='store_true', help="extract suitable audio features from raw data (required at least once)")
+    qParser.add_argument("--compare", dest='compare_dir', nargs='?', metavar='genre features directory',
+                help="generates classification results comparing qawali wtih other genre")
 
     qArgs = qParser.parse_args()
 
@@ -362,8 +406,11 @@ if __name__ == '__main__':
     if qArgs.extract:
         qGenre.decompose()
 
-    qGenre.classify()
+    # comparsion directory provided, classification will run for both primary and qawali
+    # features and produce classification results
+    if qArgs.compare_dir is not None:
+        qGenre.compare(qArgs.compare_dir)
+    else:
+        qGenre.classify()
 
-
-    # TODO: may be dump results in a format which can be easily processed/plotted.
 
