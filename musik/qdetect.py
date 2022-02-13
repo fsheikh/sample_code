@@ -319,7 +319,9 @@ class QDetect:
             raise RuntimeError
 
         ttMap = np.load(featureMapPath, allow_pickle=True).item()
-        songList = [song.split('.')[0] for song in ttMap.keys() if QDetect.TABLA_SUFFIX in song]
+        # keys have the format "song_name.feature_name", where song_name can be in the form
+        # 'genre.some_song'
+        songList = [song.rsplit('.', 1)[0] for song in ttMap.keys() if QDetect.TABLA_SUFFIX in song]
         logger.info("classification will run on following songs {}".format(songList))
 
         counters = {}
@@ -383,13 +385,45 @@ class QDetect:
         logger.info("Qawali classification results total:{} true-positive: {} false-negative: {}".format(qResults['total'],
                     truePositive, falseNeg))
 
+        # features are stored in numpy maps, all genre features in the input features_dir
+        # will be processed
+        # List containing path to other genre features maps
+        # looks like glob returns the path object, needing sort operation to get a list
+        genreList = sorted(otherFeaturesPath.glob("./*.npy"))
+        # counter to keep track of all non-qawali songs processed
+        genreSongs = 0
+        logger.info("Number of genres compared {}".format(len(genreList)))
+        for gFeatures in genreList:
+            gResults = self.classify(gFeatures)
+            trueNeg = trueNeg + gResults['noQ']
+            falsePositive = falsePositive + gResults['Q']
+            if gResults['total'] != 100:
+                logger.warning("Full set of songs from genre features {} not processed!".format(gFeatures))
+            genreSongs = genreSongs + gResults['total']
 
-        # TODO: Some sanity checks, TP + FN = total qawalis processed
+        # Some sanity checks, TP + FN = total qawalis processed
+        if truePositive + falseNeg != qResults['total']:
+            logger.error("Discrepancy in qawali results for comparison TP: {}, FN: {}, total {}".format(
+                        truePositive, falseNeg, qResults['total']))
+            raise ValueError
+
         # FP + TN = all other genre songs processed
+        if trueNeg + falsePositive != genreSongs:
+            logger.error("Discrepancy in qawali results for comparison TP: {}, FN: {}, total {}".format(
+                        truePositive, falseNeg, qResults['total']))
+            raise ValueError
+
         precision = truePositive / (truePositive + falsePositive)
         recall = truePositive / (truePositive + falseNeg)
         fScore = 2 * (precision * recall) / (precision + recall)
-        accuracy = (truePositive + trueNeg) / (truePositive + trueNeg + falsePositive + falseNeg)
+        allCorrect = truePositive + trueNeg
+        allProcessed = truePositive + trueNeg + falsePositive + falseNeg
+        accuracy = allCorrect / allProcessed
+
+        logger.info("\r\n--------------------Comparison Results----------------------------\r\n")
+        logger.info("Number of songs processed={} correct qawali classification ={}".format(allProcessed, allCorrect))
+        logger.info("Precision={} Recall={} fScore={} Accuracy={}".format(
+            precision, recall, fScore, accuracy))
 
 if __name__ == '__main__':
     qParser = argparse.ArgumentParser(description="Qawali genre detection program")
