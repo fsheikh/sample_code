@@ -43,6 +43,99 @@ class Decision(Enum):
     NO = 1
     MAYBE = 2
 
+# Midi-Notes enumerator (suffix 'S' for sharp)
+# Two interesting octave C3 and C4, along with contants for start and end
+class MidiNote(Enum):
+    C1 = 24
+    C3 = 48
+    C3S = 49
+    D3 = 50
+    D3S = 51
+    E3 = 52
+    F3 = 53
+    F3S = 54
+    G3 = 55
+    G3S = 56
+    A3 = 57
+    A3S = 58
+    B3 = 59
+    C4 = 60
+    C4S = 61
+    D4 = 62
+    D4S = 63
+    E4 = 64
+    F4 = 65
+    F4S = 66
+    G4 = 67
+    G4S = 68
+    A4 = 69
+    A4S = 70
+    B4 = 71
+    C8 = 108
+
+
+# Tabla's CQT spread in third ocatve
+class TablaCQT3(Enum):
+    D1 = 1
+    D2 = 2
+    D3 = 3
+    D4 = 4
+    D5 = 5
+    D7 = 7
+    D9 = 9
+    D11 = 11
+    D13 = 13
+
+# Tabla's CQT spread (deviation) in fourth octave
+class TablaCQT4(Enum):
+    D1 = 1
+    D2 = 2
+    D4 = 4
+    D6 = 6
+    D8 = 8
+    D10 = 10
+    D12 = 12
+    D14 = 14
+    D16 = 16
+    D18 = 18
+    D20 = 20
+    D22 = 22
+
+
+# Curve fitting params for tabla detection, in the form of a tuple
+# param1: split frequency between C3 and G4
+# param2: std deviation for fitting to a peak within octave3
+# param3: std deviation of cqt power fitting to a peak in octave 4
+CurveParamsEdge = [(MidiNote.D3S, TablaCQT3.D3, TablaCQT4.D1),
+                   (MidiNote.E3, TablaCQT3.D3, TablaCQT4.D1),
+                   (MidiNote.F3, TablaCQT3.D3, TablaCQT4.D1),
+                   (MidiNote.F3S, TablaCQT3.D3, TablaCQT4.D1),
+                   (MidiNote.G3, TablaCQT3.D3, TablaCQT4.D1),
+                   (MidiNote.G3S, TablaCQT3.D3, TablaCQT4.D1),
+                   (MidiNote.A3, TablaCQT3.D3, TablaCQT4.D1),
+                   (MidiNote.A3S, TablaCQT3.D3, TablaCQT4.D1),
+                   (MidiNote.B3, TablaCQT3.D3, TablaCQT4.D1)]
+
+CurveParamsOctave3 = [(MidiNote.F3, TablaCQT3.D1, TablaCQT4.D1),
+                  (MidiNote.F3, TablaCQT3.D3, TablaCQT4.D1),
+                  (MidiNote.F3, TablaCQT3.D5, TablaCQT4.D1),
+                  (MidiNote.F3, TablaCQT3.D7, TablaCQT4.D1),
+                  (MidiNote.F3, TablaCQT3.D9, TablaCQT4.D1),
+                  (MidiNote.F3, TablaCQT3.D11, TablaCQT4.D1),
+                  (MidiNote.F3, TablaCQT3.D13, TablaCQT4.D1)]
+
+CurveParamsOctave4 = [(MidiNote.F3, TablaCQT3.D4, TablaCQT4.D2),
+                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D4),
+                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D6),
+                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D8),
+                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D10),
+                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D12),
+                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D14),
+                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D16),
+                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D18),
+                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D20),
+                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D22)]
+
 # Objects of this class contain raw-data and features extracted from the songs
 # Supports member processing functions implementing heuristics for Qawali categorization
 class QDetect:
@@ -204,30 +297,23 @@ class QDetect:
         return retVal
 
     @staticmethod
-    def isTabla(cqtPower, mb1=53, mb2=67, mbSpread=20):
+    def isTabla(cqtPower, params):
         """
         cqtPower: CQT power in each octave, orgnized by midi-notes
         https://musicinformationretrieval.com/midi_conversion_table.html
         [mb1, mb2]: Midi-notes internal for may-be decision
         mbSpread: variance of CQT power allowed for may-be decision
         """
-        # C midi-note in first and last octave
-        C1 = 24
-        C8 = 108
-        # First half of third octave
-        C3 = 48
-        F3 = 53
+        if params is None or cqtPower is None:
+            logger.error("Invalid input params to tabla detector")
+            raise ValueError
 
-        if cqtPower.size != (C8-C1):
+        if cqtPower.size != (MidiNote.C8.value - MidiNote.C1.value):
             logger.error("Unexpected tabla CQT-power size: {}".format(cqtPower.size))
             raise ValueError
 
-        # TODO: peak-power spread/variance allowed for positive decision
-        # Should this be parameterized
-        tightDev = 4
-
         # Model for detect peak CQT power for tabla instrument
-        cqtRange = np.arange(C1, C8)
+        cqtRange = np.arange(MidiNote.C1.value, MidiNote.C8.value)
         tablaD = Decision.NO
 
         # Tabla used in most Qawali renditions has a characteristic timber with its
@@ -248,9 +334,9 @@ class QDetect:
         modelDeviation = mFit.params['sigma'].value
 
         # Ideal case, tabla pitch power centered in expected midi-range and is well-centered
-        if QDetect.in_interval(C3, F3, modelCenter) and QDetect.in_interval(0, tightDev, modelDeviation):
+        if QDetect.in_interval(MidiNote.C3.value, params[0].value, modelCenter) and QDetect.in_interval(0, params[1].value, modelDeviation):
             tablaD = Decision.YES
-        elif QDetect.in_interval(mb1, mb2, modelCenter) and QDetect.in_interval(0, mbSpread, modelDeviation):
+        elif QDetect.in_interval(params[0].value, MidiNote.G4.value, modelCenter) and QDetect.in_interval(0, params[2].value, modelDeviation):
             tablaD = Decision.MAYBE
         else:
             logger.info("Tabla not detected, model calculated pitch-power mean={} and std-dev {}".format(modelCenter, modelDeviation))
@@ -307,7 +393,8 @@ class QDetect:
     # and nonQawalis
     # parameters:
     # ffag: Features From Another Genre previously extracted with decompose function
-    def classify(self, ffag=None):
+    # params: Curve fitting params
+    def classify(self, ffag=None, params=None):
         # Feature map is either the one extracted with the same object
         # or calculated previously and now supplied as an argument.
         featureMapPath = Path(self.m_songDir) / QDetect.FEATURE_DIR / QDetect.EX_FEATURES_FILE
@@ -337,7 +424,7 @@ class QDetect:
             # classify given song as Qawali genre or otherwise
             cqtTablaPower = np.linalg.norm(ttMap[song + '.' + QDetect.TABLA_SUFFIX], axis=1)
             mfccTaali = np.median(ttMap[song + '.' + QDetect.TAALI_SUFFIX], axis=1)
-            tablaD = QDetect.isTabla(cqtTablaPower)
+            tablaD = QDetect.isTabla(cqtTablaPower, params)
             taaliD = QDetect.isTaali(mfccTaali)
             if tablaD == Decision.YES and taaliD == Decision.YES:
                 counters['both'] = counters['both'] + 1
@@ -367,7 +454,7 @@ class QDetect:
 
     # Compares genre classification results of qawali against
     # other genre's extracted features.
-    def compare(self, features_dir):
+    def compare(self, features_dir, params):
         qFeaturesPath = Path(self.m_songDir) / QDetect.FEATURE_DIR / QDetect.EX_FEATURES_FILE
         otherFeaturesPath = Path(features_dir)
         if not otherFeaturesPath.exists():
@@ -377,7 +464,7 @@ class QDetect:
                     .format(qFeaturesPath, otherFeaturesPath))
 
         # First compute qawali stats
-        qResults = self.classify()
+        qResults = self.classify(None, params)
         falseNeg = qResults['noQ']
         truePositive = qResults['Q']
         falsePositive = 0
@@ -394,7 +481,7 @@ class QDetect:
         genreSongs = 0
         logger.info("Number of genres compared {}".format(len(genreList)))
         for gFeatures in genreList:
-            gResults = self.classify(gFeatures)
+            gResults = self.classify(gFeatures, params)
             trueNeg = trueNeg + gResults['noQ']
             falsePositive = falsePositive + gResults['Q']
             if gResults['total'] != 100:
@@ -425,6 +512,8 @@ class QDetect:
         logger.info("Precision={} Recall={} fScore={} Accuracy={}".format(
             precision, recall, fScore, accuracy))
 
+        return (accuracy, fScore)
+
 if __name__ == '__main__':
     qParser = argparse.ArgumentParser(description="Qawali genre detection program")
     qParser.add_argument("songs_dir", type=str, help="folder/directory containing songs to be evaluated")
@@ -440,11 +529,72 @@ if __name__ == '__main__':
     if qArgs.extract:
         qGenre.decompose()
 
-    # comparsion directory provided, classification will run for both primary and qawali
-    # features and produce classification results
-    if qArgs.compare_dir is not None:
-        qGenre.compare(qArgs.compare_dir)
-    else:
+    # no comparison needed, just run Qawali classification on given dataset
+    if qArgs.compare_dir is None:
         qGenre.classify()
+    # comparsion directory provided, classify features in this directory
+    # assuming they are from non-Qawali sourced, compare the results against
+    # qawali genre features (located under the directory specified in first argument)
+    else:
+        TweakParams = ["Edge", "O3spread", "O4spread"]
 
+        ParamName = None
 
+        if ParamName == TweakParams[0]:
+            edgeAccuracy=[]
+            edgeFscore=[]
+            edges = [p[0].value for p in CurveParamsEdge]
+            for params in CurveParamsEdge:
+                logger.info("*** Comparing classification results with parameter {} ***".format(params))
+                r = qGenre.compare(qArgs.compare_dir, params)
+                edgeAccuracy.append(r[0])
+                edgeFscore.append(r[1])
+            edgeFig = plt.figure(figsize=(10,8))
+            plt.title('Tabla CQT power: Impact of edge note')
+            plt.plot(edges, edgeAccuracy, "--b", label="Accuracy")
+            plt.plot(edges, edgeFscore, "-.r", label="F-Score")
+            plt.xlabel('Midi-notes in third octave')
+            plt.legend()
+            plt.tight_layout()
+            plt.savefig('edge.png')
+            plt.close(edgeFig)
+
+        if ParamName == TweakParams[1]:
+            o3Accuracy=[]
+            o3Fscore=[]
+            o3s = [p[1].value for p in CurveParamsOctave3]
+            for params in CurveParamsOctave3:
+                logger.info("*** Comparing classification results with parameter {} ***".format(params))
+                r = qGenre.compare(qArgs.compare_dir, params)
+                o3Accuracy.append(r[0])
+                o3Fscore.append(r[1])
+            o3Fig = plt.figure(figsize=(10,8))
+            plt.title('Tabla CQT power: Impact of spread in thrid octave')
+            plt.plot(o3s, o3Accuracy, "--b", label="Accuracy")
+            plt.plot(o3s, o3Fscore, "-.r", label="F-Score")
+            plt.xlabel('Std. deviation of Tabla CQT power in third octave')
+            plt.legend()
+            plt.tight_layout()
+            plt.savefig('o3.png')
+
+        if ParamName == TweakParams[2]:
+            o4Accuracy=[]
+            o4Fscore=[]
+            o4s = [p[2].value for p in CurveParamsOctave4]
+            for params in CurveParamsOctave4:
+                logger.info("*** Comparing classification results with parameter {} ***".format(params))
+                r = qGenre.compare(qArgs.compare_dir, params)
+                o4Accuracy.append(r[0])
+                o4Fscore.append(r[1])
+            o4Fig = plt.figure(figsize=(10,8))
+            plt.title('Tabla CQT power: Impact of spread in fourth octave')
+            plt.plot(o4s, o4Accuracy, "--b", label="Accuracy")
+            plt.plot(o4s, o4Fscore, "-.r", label="F-Score")
+            plt.xlabel('Std.deviation of CQT power in fourth octave')
+            plt.legend()
+            plt.tight_layout()
+            plt.tight_layout()
+            plt.savefig('o4.png')
+
+        if ParamName == None:
+            qGenre.compare(qArgs.compare_dir, (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D14))
