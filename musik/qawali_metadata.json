@@ -611,36 +611,45 @@
     },
     {
       "fid": "q068",
-      "name": "bakhs_deta_tow_baat_hoti",
-      "url": "https://drive.google.com/uc?id=17h8lfu-2J16Ouofj0t3qrIrLE4-Am1vI",
-      "artist": "aziz mian qawal",
-      "download": false,
+      "name": "nit_khair_mangaan",
+      "url": "https://www.youtube.com/watch?v=Ic4-7stYnQw",
+      "artist": "nusrat fateh ali",
+      "download": true,
       "start": 0,
       "duration": 60
     },
     {
       "fid": "q069",
-      "name": "hussan_waley_wafa_nahin",
-      "url": "https://drive.google.com/uc?id=1jU7eNsjOAr4bPy3wEzLnOPD9lwWePmSq",
-      "artist": "tabrez aziz mian",
+      "name": "yaad_e_mustafa",
+      "url": "https://drive.google.com/uc?id=1OqFUl4LYF39yIUXPAWqGDhUUdbYR417Y",
+      "artist": "manzoor santoo",
       "download": false,
       "start": 0,
       "duration": 60
     },
     {
       "fid": "q070",
-      "name": "mere_sarkar",
-      "url": "https://drive.google.com/uc?id=1nd73kHxPPtZH_9VCbuXHPY5Nj0Iic6PG",
-      "artist": "badar bahadar ali",
+      "name": "mera_dil_meri_jaan",
+      "url": "https://drive.google.com/uc?id=10X7fQ-F90DKjeKjFLtUZiqdMjf51T8QY",
+      "artist": "faiz ali faiz",
       "download": false,
       "start": 0,
       "duration": 60
     },
     {
       "fid": "q071",
-      "name": "tasawar_badar",
-      "url": "https://drive.google.com/uc?id=1OPN22TsoylHtN2zAx0Iug1ByRumdXgGo",
-      "artist": "badar bahadar ali",
+      "name": "mera_dhol_mahi",
+      "url": "https://drive.google.com/uc?id=1Yp9qmikE2CXQvq79ODN4TPTu5edmrwAh",
+      "artist": "faryad ali khan",
+      "download": false,
+      "start": 0,
+      "duration": 60
+    },
+    {
+      "fid": "q072",
+      "name": "bekhud_kiye_daitay",
+      "url": "https://drive.google.com/uc?id=1hNnq-l9o3EHbu9EzXu4Y32lwqAQLfWrH",
+      "artist": "asif santoo",
       "download": false,
       "start": 0,
       "duration": 60

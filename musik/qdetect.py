@@ -75,7 +75,7 @@ class MidiNote(Enum):
 
 
 # Tabla's CQT spread in third ocatve
-class TablaCQT3(Enum):
+class TablaO3(Enum):
     D1 = 1
     D2 = 2
     D3 = 3
@@ -87,7 +87,7 @@ class TablaCQT3(Enum):
     D13 = 13
 
 # Tabla's CQT spread (deviation) in fourth octave
-class TablaCQT4(Enum):
+class TablaO4(Enum):
     D1 = 1
     D2 = 2
     D4 = 4
@@ -106,35 +106,33 @@ class TablaCQT4(Enum):
 # param1: split frequency between C3 and G4
 # param2: std deviation for fitting to a peak within octave3
 # param3: std deviation of cqt power fitting to a peak in octave 4
-CurveParamsEdge = [(MidiNote.D3S, TablaCQT3.D3, TablaCQT4.D1),
-                   (MidiNote.E3, TablaCQT3.D3, TablaCQT4.D1),
-                   (MidiNote.F3, TablaCQT3.D3, TablaCQT4.D1),
-                   (MidiNote.F3S, TablaCQT3.D3, TablaCQT4.D1),
-                   (MidiNote.G3, TablaCQT3.D3, TablaCQT4.D1),
-                   (MidiNote.G3S, TablaCQT3.D3, TablaCQT4.D1),
-                   (MidiNote.A3, TablaCQT3.D3, TablaCQT4.D1),
-                   (MidiNote.A3S, TablaCQT3.D3, TablaCQT4.D1),
-                   (MidiNote.B3, TablaCQT3.D3, TablaCQT4.D1)]
+CurveParamsEdge = [(MidiNote.D3S, TablaO3.D3, TablaO4.D1),
+                   (MidiNote.E3, TablaO3.D3, TablaO4.D1),
+                   (MidiNote.F3, TablaO3.D3, TablaO4.D1),
+                   (MidiNote.F3S, TablaO3.D3, TablaO4.D1),
+                   (MidiNote.G3, TablaO3.D3, TablaO4.D1),
+                   (MidiNote.G3S, TablaO3.D3, TablaO4.D1),
+                   (MidiNote.A3, TablaO3.D3, TablaO4.D1),
+                   (MidiNote.A3S, TablaO3.D3, TablaO4.D1),
+                   (MidiNote.B3, TablaO3.D3, TablaO4.D1)]
 
-CurveParamsOctave3 = [(MidiNote.F3, TablaCQT3.D1, TablaCQT4.D1),
-                  (MidiNote.F3, TablaCQT3.D3, TablaCQT4.D1),
-                  (MidiNote.F3, TablaCQT3.D5, TablaCQT4.D1),
-                  (MidiNote.F3, TablaCQT3.D7, TablaCQT4.D1),
-                  (MidiNote.F3, TablaCQT3.D9, TablaCQT4.D1),
-                  (MidiNote.F3, TablaCQT3.D11, TablaCQT4.D1),
-                  (MidiNote.F3, TablaCQT3.D13, TablaCQT4.D1)]
+CurveParamsOctave3 = [(MidiNote.F3, TablaO3.D1, TablaO4.D1),
+                  (MidiNote.F3, TablaO3.D3, TablaO4.D1),
+                  (MidiNote.F3, TablaO3.D5, TablaO4.D1),
+                  (MidiNote.F3, TablaO3.D7, TablaO4.D1),
+                  (MidiNote.F3, TablaO3.D9, TablaO4.D1),
+                  (MidiNote.F3, TablaO3.D11, TablaO4.D1),
+                  (MidiNote.F3, TablaO3.D13, TablaO4.D1)]
 
-CurveParamsOctave4 = [(MidiNote.F3, TablaCQT3.D4, TablaCQT4.D2),
-                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D4),
-                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D6),
-                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D8),
-                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D10),
-                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D12),
-                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D14),
-                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D16),
-                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D18),
-                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D20),
-                    (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D22)]
+CurveParamsOctave4 = [(MidiNote.F3, TablaO3.D4, TablaO4.D4),
+                    (MidiNote.F3, TablaO3.D4, TablaO4.D6),
+                    (MidiNote.F3, TablaO3.D4, TablaO4.D8),
+                    (MidiNote.F3, TablaO3.D4, TablaO4.D10),
+                    (MidiNote.F3, TablaO3.D4, TablaO4.D12),
+                    (MidiNote.F3, TablaO3.D4, TablaO4.D14),
+                    (MidiNote.F3, TablaO3.D4, TablaO4.D16),
+                    (MidiNote.F3, TablaO3.D4, TablaO4.D18),
+                    (MidiNote.F3, TablaO3.D4, TablaO4.D20)]
 
 # Objects of this class contain raw-data and features extracted from the songs
 # Supports member processing functions implementing heuristics for Qawali categorization
@@ -380,7 +378,9 @@ class QDetect:
         """
         if local_max == mfccTaali[M6] or local_min == mfccTaali[M6]:
             taaliD = Decision.YES
-        #elif local_max == mfccTaali[M5]:
+        #elif local_max == mfccTaali[M5] or local_min == mfccTaali[M5]:
+        #    taaliD = Decision.MAYBE
+        #elif local_max == mfccTaali[M7] or local_min == mfccTaali[M7]:
         #    taaliD = Decision.MAYBE
         else:
             logger.info("Taali not detected with m5={} m6={} m7={}".format(mfccTaali[M5], mfccTaali[M6], mfccTaali[M7]))
@@ -394,6 +394,7 @@ class QDetect:
     # parameters:
     # ffag: Features From Another Genre previously extracted with decompose function
     # params: Curve fitting params
+    # returns a map with classification results with keys 'total', 'Q', 'noQ', 'both'
     def classify(self, ffag=None, params=None):
         # Feature map is either the one extracted with the same object
         # or calculated previously and now supplied as an argument.
@@ -428,20 +429,20 @@ class QDetect:
             taaliD = QDetect.isTaali(mfccTaali)
             if tablaD == Decision.YES and taaliD == Decision.YES:
                 counters['both'] = counters['both'] + 1
-                logger.info("{} categorized as Qawali after detecting tabla and taali".format(song))
-            #elif tablaD == Decision.YES and taaliD == Decision.MAYBE:
-            #    counters[QDetect.TABLA_SUFFIX] = counters[QDetect.TABLA_SUFFIX] + 1
-            #    logger.info("{} categorized as Qawali after detecting tabla and suspecting taali".format(song))
+                #logger.info("{} categorized as Qawali after detecting tabla and taali".format(song))
+            elif tablaD == Decision.YES and taaliD == Decision.MAYBE:
+                counters[QDetect.TABLA_SUFFIX] = counters[QDetect.TABLA_SUFFIX] + 1
+                #logger.info("{} categorized as Qawali after detecting tabla and suspecting taali".format(song))
             elif taaliD == Decision.YES and tablaD == Decision.MAYBE:
                 counters[QDetect.TAALI_SUFFIX] = counters[QDetect.TAALI_SUFFIX] + 1
                 logger.info("{} categorized as Qawali after detecting taali and suspecting tabla".format(song))
             else:
                 counters['noQ'] = counters['noQ'] + 1
-                logger.info("{} is not a Qawali tabla {} taali {}".format(song, tablaD, taaliD))
+                #logger.info("{} is not a Qawali tabla {} taali {}".format(song, tablaD, taaliD))
 
 
         counters['total'] = len(songList)
-        counters['Q'] = counters['both'] + counters[QDetect.TAALI_SUFFIX]
+        counters['Q'] = counters['both'] + counters[QDetect.TAALI_SUFFIX] + counters[QDetect.TABLA_SUFFIX]
 
         if (counters['total'] - counters['noQ']) != counters['both'] + counters[QDetect.TABLA_SUFFIX] + counters[QDetect.TAALI_SUFFIX]:
             logger.info("Discrepancy in classification results?")
@@ -512,7 +513,7 @@ class QDetect:
         logger.info("Precision={} Recall={} fScore={} Accuracy={}".format(
             precision, recall, fScore, accuracy))
 
-        return (accuracy, fScore)
+        return (accuracy, fScore, recall, precision)
 
 if __name__ == '__main__':
     qParser = argparse.ArgumentParser(description="Qawali genre detection program")
@@ -531,70 +532,114 @@ if __name__ == '__main__':
 
     # no comparison needed, just run Qawali classification on given dataset
     if qArgs.compare_dir is None:
-        qGenre.classify()
+        qGenre.classify(None, (MidiNote.F3, TablaO3.D4, TablaO4.D14))
     # comparsion directory provided, classify features in this directory
     # assuming they are from non-Qawali sourced, compare the results against
     # qawali genre features (located under the directory specified in first argument)
+    # plot results for various cases, by changing one parameter at a time and keeping
+    # others fixed
     else:
-        TweakParams = ["Edge", "O3spread", "O4spread"]
+        case = "Genre"
 
-        ParamName = None
-
-        if ParamName == TweakParams[0]:
+        if case == "Edge":
             edgeAccuracy=[]
             edgeFscore=[]
+            edgeRecall=[]
+            edgePrecision=[]
             edges = [p[0].value for p in CurveParamsEdge]
             for params in CurveParamsEdge:
                 logger.info("*** Comparing classification results with parameter {} ***".format(params))
                 r = qGenre.compare(qArgs.compare_dir, params)
                 edgeAccuracy.append(r[0])
                 edgeFscore.append(r[1])
+                edgeRecall.append(r[2])
+                edgePrecision.append(r[3])
             edgeFig = plt.figure(figsize=(10,8))
             plt.title('Tabla CQT power: Impact of edge note')
-            plt.plot(edges, edgeAccuracy, "--b", label="Accuracy")
-            plt.plot(edges, edgeFscore, "-.r", label="F-Score")
+            plt.plot(edges, edgeAccuracy, 'b-o', label="Accuracy")
+            plt.plot(edges, edgeFscore, 'k-v', label="F-Score")
+            plt.plot(edges, edgeRecall, 'r-8', label='Recall')
+            plt.plot(edges, edgePrecision, 'm-s', label='Precision')
             plt.xlabel('Midi-notes in third octave')
             plt.legend()
+            plt.grid(True)
             plt.tight_layout()
             plt.savefig('edge.png')
             plt.close(edgeFig)
 
-        if ParamName == TweakParams[1]:
+        if case == "o3Spread":
             o3Accuracy=[]
             o3Fscore=[]
+            o3Recall=[]
+            o3Precision=[]
             o3s = [p[1].value for p in CurveParamsOctave3]
             for params in CurveParamsOctave3:
                 logger.info("*** Comparing classification results with parameter {} ***".format(params))
                 r = qGenre.compare(qArgs.compare_dir, params)
                 o3Accuracy.append(r[0])
                 o3Fscore.append(r[1])
+                o3Recall.append(r[2])
+                o3Precision.append(r[3])
             o3Fig = plt.figure(figsize=(10,8))
-            plt.title('Tabla CQT power: Impact of spread in thrid octave')
-            plt.plot(o3s, o3Accuracy, "--b", label="Accuracy")
-            plt.plot(o3s, o3Fscore, "-.r", label="F-Score")
+            plt.title('Tabla CQT power: Impact of spread in third octave')
+            plt.plot(o3s, o3Accuracy, 'b-o', label="Accuracy")
+            plt.plot(o3s, o3Fscore, 'k-v', label="F-Score")
+            plt.plot(o3s, o3Recall, 'r-8', label="Recall")
+            plt.plot(o3s, o3Precision, 'm-s', label='Precision')
             plt.xlabel('Std. deviation of Tabla CQT power in third octave')
             plt.legend()
+            plt.grid(True)
             plt.tight_layout()
             plt.savefig('o3.png')
 
-        if ParamName == TweakParams[2]:
+        if case == "o4Spread":
             o4Accuracy=[]
             o4Fscore=[]
+            o4Recall=[]
+            o4Precision=[]
             o4s = [p[2].value for p in CurveParamsOctave4]
             for params in CurveParamsOctave4:
                 logger.info("*** Comparing classification results with parameter {} ***".format(params))
                 r = qGenre.compare(qArgs.compare_dir, params)
                 o4Accuracy.append(r[0])
                 o4Fscore.append(r[1])
+                o4Recall.append(r[2])
+                o4Precision.append(r[3])
+
             o4Fig = plt.figure(figsize=(10,8))
             plt.title('Tabla CQT power: Impact of spread in fourth octave')
-            plt.plot(o4s, o4Accuracy, "--b", label="Accuracy")
-            plt.plot(o4s, o4Fscore, "-.r", label="F-Score")
+            plt.plot(o4s, o4Accuracy, 'b-o', label="Accuracy")
+            plt.plot(o4s, o4Fscore, 'k-v', label="F-Score")
+            plt.plot(o4s, o4Recall, 'r-8', label='Recall')
+            plt.plot(o4s, o4Precision, 'm-s', label='Precision')
             plt.xlabel('Std.deviation of CQT power in fourth octave')
             plt.legend()
+            plt.grid(True)
             plt.tight_layout()
             plt.tight_layout()
             plt.savefig('o4.png')
 
-        if ParamName == None:
-            qGenre.compare(qArgs.compare_dir, (MidiNote.F3, TablaCQT3.D4, TablaCQT4.D14))
+        if case == "Genre":
+            genreFeatures = Path(qArgs.compare_dir)
+            genreNames = sorted(genreFeatures.glob("./*.npy"))
+            genreAccuracy = {}
+            for gName in genreNames:
+                print(gName)
+                ret = qGenre.classify(genreFeatures / gName, (MidiNote.F3, TablaO3.D4, TablaO4.D14))
+                genreAccuracy[gName.stem] = 100 * ret['noQ'] / ret['total']
+
+            # add qawali accuracy results
+            qRet = qGenre.classify(None, (MidiNote.F3, TablaO3.D4, TablaO4.D14))
+            genreAccuracy['qawali'] = 100 * qRet['Q'] / qRet['total']
+            items = np.arange(len(genreAccuracy))
+            genreFig = plt.figure(figsize=(10,8))
+            plt.title('Accuracy of qawali detector per Genre')
+            barList = plt.bar(items, list(genreAccuracy.values()))
+            for elem in barList:
+                elem.set_color('b')
+            plt.grid(True)
+            plt.xticks(items, tuple(genreAccuracy.keys()), rotation=70)
+            plt.savefig('genreA.png')
+
+        if case == None:
+            qGenre.compare(qArgs.compare_dir, (MidiNote.F3, TablaO3.D4, TablaO4.D14))
