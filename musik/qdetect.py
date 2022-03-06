@@ -102,10 +102,19 @@ class TablaO4(Enum):
     D22 = 22
 
 
+# Local extrema for Taali MFcc's (assuming 13 points)
+class TaaliExtrema(Enum):
+    M4 = 4
+    M5 = 5
+    M6 = 6
+    M7 = 7
+    M8 = 8
+
 # Curve fitting params for tabla detection, in the form of a tuple
 # param1: split frequency between C3 and G4
 # param2: std deviation for fitting to a peak within octave3
 # param3: std deviation of cqt power fitting to a peak in octave 4
+# param4: optional used to vary location of taali MFCC extrema point
 CurveParamsEdge = [(MidiNote.D3S, TablaO3.D3, TablaO4.D1),
                    (MidiNote.E3, TablaO3.D3, TablaO4.D1),
                    (MidiNote.F3, TablaO3.D3, TablaO4.D1),
@@ -134,6 +143,10 @@ CurveParamsOctave4 = [(MidiNote.F3, TablaO3.D4, TablaO4.D4),
                     (MidiNote.F3, TablaO3.D4, TablaO4.D18),
                     (MidiNote.F3, TablaO3.D4, TablaO4.D20)]
 
+TaaliParams = [(MidiNote.F3, TablaO3.D4, TablaO4.D14, TaaliExtrema.M5),
+              (MidiNote.F3, TablaO3.D4, TablaO4.D14, TaaliExtrema.M6),
+              (MidiNote.F3, TablaO3.D4, TablaO4.D14, TaaliExtrema.M7)]
+
 # Objects of this class contain raw-data and features extracted from the songs
 # Supports member processing functions implementing heuristics for Qawali categorization
 class QDetect:
@@ -146,6 +159,7 @@ class QDetect:
     SUPPORTED_SAMPLE_RATES = [44100, 22050]
     FRAME_LENGTH = 1024
     CQT_BINS = 84
+    MFCC_POINTS = 13
     def __init__(self, songDir, reload=False, sampleRate=44100):
         # Raw data extracted from songs represented in a map with
         # song name (without extension) as key
@@ -342,48 +356,26 @@ class QDetect:
         return tablaD
 
     @staticmethod
-    def isTaali(mfccTaali, allNeg=True):
-        MfccCount = 13
-        M5 = 5
-        M6 = 6
-        M7 = 7
+    def isTaali(mfccTaali, extremePoint=None):
         taaliD = Decision.NO
-        if mfccTaali.size != MfccCount:
+        if mfccTaali.size != QDetect.MFCC_POINTS:
             logger.error("Unexpected number {} of Mfcc given to taali detector".format(mfccTaali.size))
             raise ValueError()
 
-
         # We look for an oscillating pattern between 5-7 Mfcc's either +, -, +, or -, +, -
-        # Two exceptions are allowed:
-        #   Mfcc7 is negative but still higher than Mfcc6
-        #   all three interesting Mfcc are lower than zero
-        # in both these cases we return indeterminate decision from taali feature, so that
-        # qawali genre decision is deferred to tabla feature
-
-        # 2nd attempt expressing above
-        # 6th mfcc is a local extreme (max/min)
-        local_max = max([mfccTaali[M5], mfccTaali[M6], mfccTaali[M7]])
-        local_min = min([mfccTaali[M5], mfccTaali[M6], mfccTaali[M7]])
-        """
-        if mfccTaali[M5] > 0 and mfccTaali[M7] > 0 and mfccTaali[M6] < 0:
+        # essentially a local max/min
+        pointsOfInterest = [ mfccTaali[TaaliExtrema.M5.value], mfccTaali[TaaliExtrema.M6.value],
+                             mfccTaali[TaaliExtrema.M7.value]]
+        # In case no option is supplied, local extrema assumed to be at middle point
+        extPoint = TaaliExtrema.M6.value if extremePoint == None else extremePoint.value
+        # 6th mfcc (middle point) is a local extreme (max/min)
+        local_max = max(pointsOfInterest)
+        local_min = min(pointsOfInterest)
+        if local_max == mfccTaali[extPoint] or local_min == mfccTaali[extPoint]:
             taaliD = Decision.YES
-        elif mfccTaali[M5] < 0 and mfccTaali[M7] < 0 and mfccTaali[M6] > 0:
-            taaliD = Decision.YES
-        elif mfccTaali[M5] > 0 and mfccTaali[M6] < 0 and mfccTaali[M7] > mfccTaali[M6]:
-            taaliD = Decision.MAYBE
-        #elif allNeg and mfccTaali[M5] < 0 and mfccTaali[M6] < 0 and mfccTaali[M7] < 0:
-        #    taaliD = Decision.MAYBE
-        elif mfccTaali[M5] > 0 and mfccTaali[M6] > 0 and mfccTaali[M7] < 0:
-            taaliD = Decision.MAYBE
-        """
-        if local_max == mfccTaali[M6] or local_min == mfccTaali[M6]:
-            taaliD = Decision.YES
-        #elif local_max == mfccTaali[M5] or local_min == mfccTaali[M5]:
-        #    taaliD = Decision.MAYBE
-        #elif local_max == mfccTaali[M7] or local_min == mfccTaali[M7]:
-        #    taaliD = Decision.MAYBE
         else:
-            logger.info("Taali not detected with m5={} m6={} m7={}".format(mfccTaali[M5], mfccTaali[M6], mfccTaali[M7]))
+            logger.info("Taali not detected with m5={} m6={} m7={}".format(mfccTaali[TaaliExtrema.M5.value],
+                mfccTaali[TaaliExtrema.M6.value], mfccTaali[TaaliExtrema.M7.value]))
 
         return taaliD
 
@@ -425,8 +417,9 @@ class QDetect:
             # classify given song as Qawali genre or otherwise
             cqtTablaPower = np.linalg.norm(ttMap[song + '.' + QDetect.TABLA_SUFFIX], axis=1)
             mfccTaali = np.median(ttMap[song + '.' + QDetect.TAALI_SUFFIX], axis=1)
+            taaliParam = params[3] if len(params) == 4 else None
             tablaD = QDetect.isTabla(cqtTablaPower, params)
-            taaliD = QDetect.isTaali(mfccTaali)
+            taaliD = QDetect.isTaali(mfccTaali, taaliParam)
             if tablaD == Decision.YES and taaliD == Decision.YES:
                 counters['both'] = counters['both'] + 1
                 #logger.info("{} categorized as Qawali after detecting tabla and taali".format(song))
@@ -539,7 +532,7 @@ if __name__ == '__main__':
     # plot results for various cases, by changing one parameter at a time and keeping
     # others fixed
     else:
-        case = "Genre"
+        case = "Taali"
 
         if case == "Edge":
             edgeAccuracy=[]
@@ -616,7 +609,6 @@ if __name__ == '__main__':
             plt.legend()
             plt.grid(True)
             plt.tight_layout()
-            plt.tight_layout()
             plt.savefig('o4.png')
 
         if case == "Genre":
@@ -640,6 +632,34 @@ if __name__ == '__main__':
             plt.grid(True)
             plt.xticks(items, tuple(genreAccuracy.keys()), rotation=70)
             plt.savefig('genreA.png')
+
+        if case == "Taali":
+            tAccuracy=[]
+            tFscore=[]
+            tRecall=[]
+            tPrecision=[]
+            tX = [p[3].value for p in TaaliParams]
+            for params in TaaliParams:
+                logger.info("*** Comparing classification results with Taali extrema point {} ***".format(params))
+                r = qGenre.compare(qArgs.compare_dir, params)
+                tAccuracy.append(r[0])
+                tFscore.append(r[1])
+                tRecall.append(r[2])
+                tPrecision.append(r[3])
+
+            tFig = plt.figure(figsize=(10,8))
+            plt.title('Qawali classification: Impact of Taali MFCC')
+            width = 0.2
+            plt.bar([e - width for e in tX], tAccuracy, width=width, label='Accuracy')
+            plt.bar([e for e in tX], tFscore, width=width, label='F-Score')
+            plt.bar([e + width for e in tX], tRecall, width=width, label='Recall')
+            plt.bar([e + 2*width for e in tX], tPrecision, width=width, label='Precision')
+            plt.xticks(tX, ['M5', 'M6', 'M7'])
+            plt.legend()
+            plt.grid(True)
+            plt.tight_layout()
+            plt.savefig('taali_mfcc.png')
+
 
         if case == None:
             qGenre.compare(qArgs.compare_dir, (MidiNote.F3, TablaO3.D4, TablaO4.D14))

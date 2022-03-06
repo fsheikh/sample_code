@@ -76,7 +76,7 @@ Faheem Sheikh}%
 %
 
 \begin{abstract}
-A new dataset containing 64 Qawali songs of one-minute duration along with tagged metadata is presented. This dataset is used for genre detection of Qawali songs against popular western music genres. The unsupervised genre classification algorithm is based on source separation of two major components typical of Qawali performances namely tabla and taali. The algorithm shows a detection rate of almost 80\% with average false positive across other genres to be around 8\%. Dataset is accompanined with python programs used to construct and extend the dataset as well as repdrocuing the results presented in this study. \end{abstract}
+A new dataset containing 72 Qawali songs of one-minute duration along with tagged metadata is presented. Majority of samples in the dataset exhibit strong similarity in the fundamental musical properties. This is demonstrated by using the dataset for Qawali genre detection against popular western music genres. Qawali detection is a hueristic based unsupervised genre classification algorithm is based on source separation of two major components typical of Qawali performances namely tabla and taali. The algorithm shows a mean accuracy across genres of more than 90\% with a recall of more than 80\%. Dataset release is accompanined with python programs used to construct and extend the dataset as well as reproducuing the results presented in this study. \end{abstract}
 %
 \begin{keywords}
 genre, classification, qawali, dataset, tabla, taali
@@ -218,20 +218,38 @@ For taali detection, given $M$ MFCC elements we attempt to find a mfcc-index $i 
 
 \section{Results}\label{sec:result}
 
-Tables must be created using a word processor's table function,
-not tabbed text.
-Tables should be included in the manuscript.
-The final layout will place the tables as close to their first
-citation as possible.
+In this section we present the impact of design parameters of binary classifier proposed in previous section. Since the classifier detects tabla and taali components independently, we discuss the results of varying tabla detection parameters first.
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[scale=1.0, width=0.95\columnwidth]{edge}
+  \caption{TablaDetection: Edge note in third octave}
+\label{fig:src_edge}
+\end{figure}
 
-All tables must be cited within the main text, numbered with Arabic
-numerals in consecutive order (e.g. Table 1, Table 2, etc.).
+Next comes the impact of chosing CQT energy spread in third octave
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[scale=1.0, width=0.95\columnwidth]{o3}
+  \caption{TablaDetection: CQT variance in third octave}
+\label{fig:src_o3}
+\end{figure}
 
-Each table must have an accompanying descriptive title.
-This should clearly and concisely summarise the content and/or
-use of the table.
-A short additional table legend is optional to offer a further
-description of the table.
+
+For "Maybe" decision of Tabla detection in fourth octave we have to select a larger energy variance for guassian curve fitting. Too large a value will increase false positive and too low a value results in missed qawali detections.
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[scale=1.0, width=0.95\columnwidth]{o4}
+  \caption{TablaDetection: CQT variance in fourth octave}
+\label{fig:src_o4}
+\end{figure}
+
+Based on above we chose the following parameters for Tabla detection, octave 3 with spread() for yes and octave 4 with (). The results of this classifier are then used to generate accuracy results per Genre shown in figure
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[scale=1.0, width=0.95\columnwidth]{genreA}
+  \caption{Qawali detection per Genre}
+\label{fig:src_genre}
+\end{figure}
 
 \subsection{Tables should not include}
 
