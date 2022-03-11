@@ -76,7 +76,7 @@ Faheem Sheikh}%
 %
 
 \begin{abstract}
-A new dataset containing 72 Qawali songs of one-minute duration along with tagged metadata is presented. Majority of samples in the dataset exhibit strong similarity in the fundamental musical properties. This is demonstrated by using the dataset for Qawali genre detection against popular western music genres. Qawali detection is a hueristic based unsupervised genre classification algorithm is based on source separation of two major components typical of Qawali performances namely tabla and taali. The algorithm shows a mean accuracy across genres of more than 90\% with a recall of more than 80\%. Dataset release is accompanined with python programs used to construct and extend the dataset as well as reproducuing the results presented in this study. \end{abstract}
+A new dataset containing 72 Qawali songs of one-minute duration along with tagged metadata is presented. Majority of samples in the dataset exhibit strong similarity in the fundamental musical properties. This is demonstrated by using the dataset for Qawali genre detection against popular western music genres. Qawali detection is a hueristic based unsupervised genre classification algorithm is based on source separation of two major components typical of Qawali performances namely tabla and taali. The algorithm shows a mean accuracy across genres of more than 90\% with a recall of more than 76\%. Dataset release is accompanined with python programs used to construct and extend the dataset as well as reproducuing the results presented in this study. \end{abstract}
 %
 \begin{keywords}
 genre, classification, qawali, dataset, tabla, taali
@@ -89,7 +89,7 @@ genre, classification, qawali, dataset, tabla, taali
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Introduction}\label{sec:intro}
-Qawalis have a long and historic tradition, by some accounts they go back to at least 13th century. They have been used to recite devotional songs, have been sung by groups in shrines. Even today they are popular in Indian subcontinent with performances given on happy occassions, part of songs  in films as well as religious commemorations. 
+Qawalis have a long and historic tradition in indian subcontinent, by some accounts they go back to at least 13th century. Indian music traditionally has developed with musical families and one of the foremost musical families "Qawal Baccha Ghrana" \citep{JayashreeBhat} is credited with refining this singing form as distinctive genre. They have been used to recite devotional songs, have been sung by groups in shrines. Even today they are popular in Indian subcontinent with performances given on happy occassions, part of songs  in films as well as religious commemorations. 
 
 Qawalis incorporate both classical and modern musical elements, but almost all performances are characteristed by two fold beat elements a tabla which is the primary rythym elemnet and periodic clapping by backing vocals called "taali".
 
@@ -218,7 +218,9 @@ For taali detection, given $M$ MFCC elements we attempt to find a mfcc-index $i 
 
 \section{Results}\label{sec:result}
 
-In this section we present the impact of design parameters of binary classifier proposed in previous section. Since the classifier detects tabla and taali components independently, we discuss the results of varying tabla detection parameters first.
+The ideas of previous section have been programmed into a qawali detector. This program is based on popular MIR library librosa  \citep{brian_mcfee_2022_6097378}, it uses an open source optimization library ~\citep{newville_matthew_2014} but has no other external dependencies. The program includes steps to separate songs into tabla taali components, calculating CQT and MFCC features from these source, individual tabla, taali detection culminating in overall classification of the song as Qawali or otherwise. The proposed Qawali classifier operates on four design parameters. In this section we discuss the impact of each of these parameters in detail leading to a selection of these parameters for the final classification results across Genres.
+
+Since the classifier detects tabla and taali components independently, we discuss the results of varying tabla detection parameters first.
 \begin{figure}[htbp]
   \centering
   \includegraphics[scale=1.0, width=0.95\columnwidth]{edge}
@@ -241,6 +243,14 @@ For "Maybe" decision of Tabla detection in fourth octave we have to select a lar
   \includegraphics[scale=1.0, width=0.95\columnwidth]{o4}
   \caption{TablaDetection: CQT variance in fourth octave}
 \label{fig:src_o4}
+\end{figure}
+
+For Taali detection we focus on finding a local extrema with the MFCC distribution of the taali source separated from the song. Based on prelimianary investigated, start and end of MFCC function was seen not be the determining factor in Qawali taali sources. The impact of on choosing local extrema point to one of 5th, 6th and 7th MFCC is shown in the figure below. Based on this hueristic 6th MFCC point was chosen to detect Taali source within the song.
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[scale=1.0, width=0.95\columnwidth]{taali_mfcc}
+  \caption{TaaliDetection: MFCC local extremum impact}
+\label{fig:src_mfcc}
 \end{figure}
 
 Based on above we chose the following parameters for Tabla detection, octave 3 with spread() for yes and octave 4 with (). The results of this classifier are then used to generate accuracy results per Genre shown in figure
@@ -281,28 +291,10 @@ Based on above we chose the following parameters for Tabla detection, octave 3 w
 If the content of your submission relates to data or software
 that has been deposited in a code or preservation repository,
 please provide summary information here, along with a DOI that
-links to the deposited code/data.
-
-
-
-\section{References}
-
-All citations must be listed at the end of the text file,
-in alphabetical order of authors' surnames.
-References should not be listed if they are not cited in
-the main text.
-This journal uses the APA system.
-Please visit the journal's website
-for examples of referencing format.\endnote{Link to citation examples: \\
+links to the deposited code/data. Add here link to github repo containing
+source and code, how to arrange DOI?\endnote{Link to citation examples: \\
 \url{http://transactions.ismir.net/about/submissions/\#References}}
 
-In this template, you can use \verb=\citep{}= to include references
-surrounded by parentheses, such as~\citep{KneesS16_MusicSimilarityRetrieval_SPRINGER}, and \verb=\cite{}=
-for references embedded in the text,
-such as~\cite{WeihsJVR16_MusicDataAnalysis_CRC},
-\cite{SerraEtAl13_RoadmapMIR_CreativeCommon},
-\cite{Lerch15_AudioContentAnalysis_WILEY},
-or~\cite{Mueller15_FMP_SPRINGER}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

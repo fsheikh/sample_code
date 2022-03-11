@@ -1,0 +1,21 @@
+\begin{thebibliography}{}
+
+\bibitem[Bhat, 2009]{JayashreeBhat}
+Bhat, J.~T. (2009).
+\newblock {\em Hindustani Vocal Music}.
+\newblock Abhinav Publications New Delhi.
+
+\bibitem[McFee et~al., 2022]{brian_mcfee_2022_6097378}
+McFee, B., Metsai, A., McVicar, M., Balke, S., Thomé, C., Raffel, C., Zalkow,
+  F., Malek, A., Dana, Lee, K., Nieto, O., Ellis, D., Mason, J., Battenberg,
+  E., Seyfarth, S., Yamamoto, R., viktorandreevichmorozov, Choi, K., Moore, J.,
+  Bittner, R., Hidaka, S., Wei, Z., nullmightybofo, Weiss, A., Hereñú, D.,
+  Stöter, F.-R., Friesch, P., Vollrath, M., Kim, T., and Thassilo (2022).
+\newblock librosa/librosa: 0.9.1.
+
+\bibitem[Newville et~al., 2014]{newville_matthew_2014}
+Newville, M., Stensitzki, T., Allen, D.~B., and Ingargiola, A. (2014).
+\newblock {LMFIT: Non-Linear Least-Square Minimization and Curve-Fitting for
+  Python}.
+
+\end{thebibliography}
