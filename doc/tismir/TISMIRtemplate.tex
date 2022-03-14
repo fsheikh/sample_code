@@ -93,16 +93,37 @@ Qawalis have a long and historic tradition in indian subcontinent, by some accou
 
 Qawalis incorporate both classical and modern musical elements, but almost all performances are characteristed by two fold beat elements a tabla which is the primary rythym elemnet and periodic clapping by backing vocals called "taali".
 
-Introudce genre detection as a problem, reference to MIREX tasks and literature survery of genre classification of non-western music
+Introudce genre detection as a problem \citep{music_genre_survey}, reference to MIREX tasks and literature survery of genre classification of non-western music. Comparison has been made against \citep{gtzan}
 
 Review of organization of rest of the paper.
 
-\section{Dataset}\label{sec:data}
-Songs in QawalRang dataset have been sourced from personal collection, web-crawling and popular music streaming online platforms like youtube. The selection criterion behind including a song was based on following points.
+\section{QawalRang Dataset}\label{sec:data}
+Songs in QawalRang dataset have been sourced from from internet music sharing platform(s), among others, youtube\endnote{YouTube: \\
+\url{www.youtube.com}}
+ as well as from author(s) personal collection. The advantage of sourcing from web is the availability of huge number of songs, however the sheer number of available recordings, does not gaurantee diversity.  For example it is hard to find old or classical pieces on publically available platform. On the other hand, personal collections may contain limited releases or rare recoding(s) but then building a well represented dataset exclusively with personal collection with songs converted from old musical artifacts (compact disks/casettes) is also challenging. With this in mind QawalRang songs are a mixture from internet and personal collection. Table 
+\ref{tab:sources} shows the distribution of songs in QawalRang dataset.
+\begin{table}[htpb]
+\centering
+  \begin{tabular}{|c | c|}
+  \toprule
+  \bfseries Source & \bfseries Dataset Share(\%) \\
+  \hline \hline
+  Youtube  & 61 \\
+  \hline
+  Personal & 30 \\
+  \hline
+  Web-Crawler & 9  \\
+  \bottomrule
+  \end{tabular}
+  \caption{QawalRang Source Distribution}
+\label{tab:sources}
+\end{table}
+
+QawalRang data contains songs from the above mentioned sources with the following criteria in mind.
 \begin{itemize}
-\item Song is performed by well-known/renowed Qawal parties/groups. This is to remove any doubts about labeleling. Ofcourse this has to traded-off against diversity of performers.
-\item Songs start with a introductory section including both tabla and taali components. In a very small minority of cases where songs start with a vocal improvisation but does contains segments with tabla and taali components at a later timepoint, that snippet is included.
-\item Songs performed in classical/semi-classical pattern have been preferred, this makes QawalRang dataset unique and reduces overlapp with other common genre like pop and rock. For this reason songs that follow a modern mixture of qawali with mainstream music are avoided.
+\item Song is performed by well-known/renowed Qawal artists/groups (also called Qawal parties). Like other musical genres Qawali is a fluid musical form with a huge scope for improvisation. While constructing this dataset, one of the aim was to stay as close as possible to the original Qawali form, while achieving sufficient artist diversity.
+\item Songs start with a introductory section including both essential rythym elements namely tabla and taali. These two components make Qawali really distinctive as compared to other Indian subcontinent music genres. In a very small minority of cases where songs start with a vocal improvisation but does contains segments with tabla and taali components at a later timepoint, that snippet is included.
+\item Songs performed in classical/semi-classical pattern have been preferred, this makes QawalRang dataset unique and reduces overlapp with other common genre like pop, folk and film music. Songs that follow a modern mixture of Qawali, overlapping traditional tabla/taali components with mainstream instruments are avoided.
 \end{itemize}
 
 All songs included in the dataset are described by a metadata file of key-value pairs. The key-values are governed by a json schema which defines the following keys:
@@ -111,20 +132,16 @@ All songs included in the dataset are described by a metadata file of key-value 
 \item name: song's original/descriptive name
 \item artist: performer's or Qawal party's name
 \item location: URL for the full song
-\item start: Timestamp in seconds within origianl song from where snippet was taken
+\item start: Timestamp in seconds within original song from where snippet was taken
 \item duration: Duration of song snippet in seconds
 \end{enumerate}
 
+This description allows easy experimentation and extension of the dataset. For songs originating from personal collection, a link to shared location is provided so that there is no ambiguity on the perofmance included in the dataset. Accompying the dataset is a python program which can (re)construct QawalRang dataset or a section of it by reading the metadata file on the fly. The program supports both offline and oneline modes with the former meaning that songs are not downloaded upon building the dataset if user points to a local path containing the songs.Figure \ref{fig:author_dist} shows artist distribution in QawalRang dataset. As anyone remotely familiar with Qawali genre will sure acknowledge that Nusrat Fateh Ali Khan\endnote{Nusrat Fateh Ali Khan: \\
+\url{https://www.britannica.com/biography/Nusrat-Fateh-Ali-Khan}} and his group are the foremost exponents of this genre at least in the last few decades. They popularized the Qawali genre with countless performance across the world throughout 70s/80s/90s. Thus it made sense to include a large share of songs from this group not least because to their ready availability. Category of 'others' includes about 10 songs from one artist each. Rest of the dataset is quite evenly disrtibuted among selected artists.
+
 \begin{figure}[htbp]
   \centering
-  \includegraphics[scale=1.0, width=0.95\columnwidth]{sources}
-  \caption{QawalRang: Distribution by sources}
-\label{fig:src_dist}
-\end{figure}
-Above metadata description allows easy experimentation and even extension of the dataset. Accompying the dataset is a python program which can (re)construct QawalRang dataset or a section of it by reading the metadata file on the fly. The program supports both offline and oneline modes with the former meaning that songs are not downloaded upon building the dataset
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[height=4cm, width=0.95\columnwidth]{artist}
+  \includegraphics[scale=1.0, width=0.95\columnwidth]{artist}
   \caption{QawalRang: Distribution by artist/performer}
 \label{fig:author_dist}
 \end{figure}
@@ -273,17 +290,6 @@ Based on above we chose the following parameters for Tabla detection, octave 3 w
   or separated into ``Table 1'' and ``Table 2''.
 \end{itemize}
 
-\begin{table}[htpb]
-\centering
-  \begin{tabular}{ll}
-  \toprule
-  \bfseries String Value & \bfseries Numeric Value \\ \midrule
-  Hello ISMIR  & 2017          \\
-  \bottomrule
-  \end{tabular}
-  \caption{Table captions should be placed below the table.}
-\label{tab:table}
-\end{table}
 
 
 \section{Reproducibility (if applicable)}

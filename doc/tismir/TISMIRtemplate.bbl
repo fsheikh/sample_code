@@ -18,4 +18,16 @@ Newville, M., Stensitzki, T., Allen, D.~B., and Ingargiola, A. (2014).
 \newblock {LMFIT: Non-Linear Least-Square Minimization and Curve-Fitting for
   Python}.
 
+\bibitem[Sturm, 2014]{music_genre_survey}
+Sturm, B.~L. (2014).
+\newblock A survey of evaluation in music genre recognition.
+\newblock {\em Adaptive Mutlimedia Retrieval: Semantics, Context, and
+  Adaptation. Lecture Notes in Computer Science}, 8382:29--66.
+
+\bibitem[Tzanetakis and Cook, 2002]{gtzan}
+Tzanetakis, G. and Cook, P. (2002).
+\newblock Musical genre classification of audio signals.
+\newblock {\em IEEE Transactions on Speech and Audio Processing},
+  10(5):293--302.
+
 \end{thebibliography}

@@ -532,7 +532,7 @@ if __name__ == '__main__':
     # plot results for various cases, by changing one parameter at a time and keeping
     # others fixed
     else:
-        case = "Taali"
+        case = "None"
 
         if case == "Edge":
             edgeAccuracy=[]

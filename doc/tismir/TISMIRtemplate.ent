@@ -1,4 +1,19 @@
 \@doanenote {1}
+macro:->YouTube:
+\\
+\url
+{www.youtube.com}
+\@endanenote 
+\@doanenote {2}
+macro:->Nusrat
+Fateh
+Ali
+Khan:
+\\
+\url
+{https://www.britannica.com/biography/Nusrat-Fateh-Ali-Khan}
+\@endanenote 
+\@doanenote {3}
 macro:->Link
 to
 citation
