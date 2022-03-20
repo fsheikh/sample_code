@@ -13,10 +13,36 @@ McFee, B., Metsai, A., McVicar, M., Balke, S., Thomé, C., Raffel, C., Zalkow,
   Stöter, F.-R., Friesch, P., Vollrath, M., Kim, T., and Thassilo (2022).
 \newblock librosa/librosa: 0.9.1.
 
+\bibitem[Mirex, 2020]{mirex}
+Mirex (2020).
+\newblock Audio k-pop genre classification.
+\newblock
+  \url{https://www.music-ir.org/mirex/wiki/2020:Audio_K-POP_Genre_Classification}.
+\newblock Accessed: 2022-03-19.
+
 \bibitem[Newville et~al., 2014]{newville_matthew_2014}
 Newville, M., Stensitzki, T., Allen, D.~B., and Ingargiola, A. (2014).
 \newblock {LMFIT: Non-Linear Least-Square Minimization and Curve-Fitting for
   Python}.
+
+\bibitem[Panagakis et~al., 2014]{panagakis}
+Panagakis, Y., Kotropoulos, C.~L., and Arce, G.~R. (2014).
+\newblock Music genre classification via joint sparse low-rank representation
+  of audio features.
+\newblock {\em IEEE/ACM Transactions on Audio, Speech, and Language
+  Processing}, 22(12):1905--1917.
+
+\bibitem[Qureshi et~al., 1986]{qureshi1986sufi}
+Qureshi, R., Qureshi, R.~B., and Blacking, J. (1986).
+\newblock {\em Sufi music of India and Pakistan: sound, context and meaning in
+  Qawwali}, volume~1.
+\newblock CUP Archive.
+
+\bibitem[Records, 2022]{nusrat}
+Records, R.~W. (2022).
+\newblock {Nusrat Fateh Ali Khan} real world records.
+\newblock \url{https://realworldrecords.com/artists/nusratfatehalikhan/}.
+\newblock Accessed: 2022-03-19.
 
 \bibitem[Sturm, 2014]{music_genre_survey}
 Sturm, B.~L. (2014).
@@ -29,5 +55,12 @@ Tzanetakis, G. and Cook, P. (2002).
 \newblock Musical genre classification of audio signals.
 \newblock {\em IEEE Transactions on Speech and Audio Processing},
   10(5):293--302.
+
+\bibitem[Virtanen, 2007]{virtanen}
+Virtanen, T. (2007).
+\newblock Monaural sound source separation by nonnegative matrix factorization
+  with temporal continuity and sparseness criteria.
+\newblock {\em IEEE Transactions on Audio, Speech, and Language Processing},
+  15(3):1066--1074.
 
 \end{thebibliography}

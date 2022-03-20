@@ -1,24 +1,24 @@
 \@doanenote {1}
+macro:->Tabla
+\\
+\url
+{https://sriveenavani.com/tabla}
+\@endanenote 
+\@doanenote {2}
+macro:->Keherwa
+\\
+\url
+{https://www.taalgyan.com/taals/keherwa}
+\@endanenote 
+\@doanenote {3}
+macro:->Dadra
+\\
+\url
+{https://www.taalgyan.com/taals/dadra/}
+\@endanenote 
+\@doanenote {4}
 macro:->YouTube:
 \\
 \url
 {www.youtube.com}
-\@endanenote 
-\@doanenote {2}
-macro:->Nusrat
-Fateh
-Ali
-Khan:
-\\
-\url
-{https://www.britannica.com/biography/Nusrat-Fateh-Ali-Khan}
-\@endanenote 
-\@doanenote {3}
-macro:->Link
-to
-citation
-examples:
-\\
-\url
-{http://transactions.ismir.net/about/submissions/\#References}
 \@endanenote 

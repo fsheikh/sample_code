@@ -1,8 +1,10 @@
 \BOOKMARK [1][-]{section.1}{Introduction}{}% 1
-\BOOKMARK [1][-]{section.2}{QawalRang Dataset}{}% 2
-\BOOKMARK [1][-]{section.3}{Qawali Genre Detector}{}% 3
-\BOOKMARK [2][-]{subsection.3.1}{Feature extractor}{section.3}% 4
-\BOOKMARK [2][-]{subsection.3.2}{Binary Classifier}{section.3}% 5
-\BOOKMARK [1][-]{section.4}{Results}{}% 6
-\BOOKMARK [2][-]{subsection.4.1}{Tables should not include}{section.4}% 7
-\BOOKMARK [1][-]{section.5}{Reproducibility \(if applicable\)}{}% 8
+\BOOKMARK [1][-]{section.2}{QawwalRang Dataset}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Sources}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Selection}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Diversity}{section.2}% 5
+\BOOKMARK [1][-]{section.3}{Qawwali Genre Detector}{}% 6
+\BOOKMARK [2][-]{subsection.3.1}{Feature extractor}{section.3}% 7
+\BOOKMARK [2][-]{subsection.3.2}{Binary Classifier}{section.3}% 8
+\BOOKMARK [1][-]{section.4}{Results \046 Discussion}{}% 9
+\BOOKMARK [1][-]{section.5}{Reproducibility}{}% 10
