@@ -33,8 +33,6 @@ from lmfit.models import GaussianModel
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(message)s')
 logger = logging.getLogger(__name__)
-#stdoutHandler = logging.StreamHandler(sys.stdout)
-#logger.addHandler(stdoutHandler)
 
 
 # Tri-state decision enum
