@@ -17,6 +17,21 @@ macro:->Dadra
 {https://www.taalgyan.com/taals/dadra/}
 \@endanenote 
 \@doanenote {4}
+macro:->Indian
+Music
+Genre
+Dataset
+\\
+\url
+{https://www.kaggle.com/datasets/winchester19/indian-music-genre-dataset}
+\@endanenote 
+\@doanenote {5}
+macro:->MusicBrainz
+\\
+\url
+{https://musicbrainz.org/tag/qawwali}
+\@endanenote 
+\@doanenote {6}
 macro:->YouTube:
 \\
 \url
