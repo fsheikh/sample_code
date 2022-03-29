@@ -43,7 +43,7 @@ Anonymous }%
 %
 % "Mandatory" (if missing will print the complete list of authors,
 % including the \thanks symbols)
-\authorref{Anonymous,~F.}
+\authorref{Anonymous,~A.}
 %
 % (Optional)
 % \journalyear{2017}
@@ -54,7 +54,7 @@ Anonymous }%
 
 % Remaining Pages (Optional)
 %
-\authorshort{Anonymous, ~F.} %or, e.g., \authorshort{Author1 et al}
+\authorshort{Anonymous, ~A.} %or, e.g., \authorshort{Author1 et al}
 % \titleshort{Template for TISMIR}
 
 
@@ -102,11 +102,31 @@ Rest of this paper is organized as follows: Next section presents the "QawwalRan
 
 \section{QawwalRang Dataset}\label{sec:data}
 
-\subsection{Sources}
+QawwalRang dataset is a collection of 72 expert labeled songs. Each song, typically, is an excerpt from a much longer original recording. This excerpt is re-sampled at 44.1 KHz and converted into a single (mono) channel. The resulting song is tagged with a set of metadata values capturing its origin and creation process as detailed below. 
 
-QawwalRang dataset is a collection of 72 expert labeled songs. Each song is an excerpt from a much longer original recording/performance. This excerpt is re-sampled at 44.1 KHz and converted into a single (mono) channel. The duration of the excerpt is configurable with default value of 1 minute. Original songs come from three sources namely, from internet music sharing platform(s), among others, YouTube\endnote{YouTube: \\
-\url{www.youtube.com}}, author(s) personal collection and crawling the web for Qawwali songs. The advantage of sourcing from internet is the availability of huge number of songs, however the sheer number of available recordings, does not guarantee diversity.  For example it is hard to find old or classical pieces on publicly available platform. On the other hand, personal collections may contain limited releases or rare recording(s) but then building a well represented dataset exclusively with personal collection has challenges of it own. For example digital conversion of songs from old analog musical artifacts (compact disks/cassettes) is both a time and resource consuming effort.Table 
-\ref{tab:sources} shows the distribution of songs in QawwalRang dataset.
+\subsection{Selection}
+Surprisingly, even though Qawwali is an old and popular genre, manual labeling of songs as Qawwali is a non-trivial task. This is partly due to close association of Qawwali with so-called "sufi" music which can be performed in other genres like Folk or Bhajan as well. Additionally, wrong labeling in online databases is also due to the improvisation aspect, artists can mix/match Qawwali with modern music forms like pop music. In order to achieve a meaningful labeling strategy, QawwalRang construction involved inducting songs with the following criteria:
+\begin{itemize}
+\item Song is performed by well-known/renowned Qawal artists/groups (also called Qawal parties). While collected items for this dataset, one of the aim was to stay as close as possible to the original Qawwali form, while achieving sufficient artist diversity. Including songs from artists associated primarily with Qawwali genre reduces the sample space and makes the labeling obvious both structurally and perceptually.
+\item Songs must have an introductory section including both essential rhythm elements namely Tabla and Taali. These two components make Qawwali perceptually distinct as compared to other musical genres of Indian subcontinent and can be easily identified by a listening expert. In a very small minority of cases where songs start with a vocal/instrument improvisation but does contains segments with Tabla and Taali components at a later time-point, an offset is incorporated to skip to the time-segments containing Tabla and Taali components.
+\item Songs performed in classical/semi-classical style have been preferred, this reduces overlap with other genres like pop, folk and film music. Songs that follow a modern mixture of Qawwali, overlapping traditional Tabla/Taali components with mainstream instruments are avoided.
+\end{itemize}
+
+After a song fulfilling the above criteria is selected, next step is to create a metadata entry for it. The metadata entry follows a key-value interface which defines the following keys:
+\begin{enumerate}
+\item ID: unique identifier of the song in the data-set
+\item Name: song's descriptive name suitable for searching in global databases
+\item Artist: performer's or Qawwal party's name
+\item Location: URL of the original song from which excerpt has been taken. For songs from personal collection, samples are uploaded to an accessible place in cloud and a URL provided.
+\item Start: Time-stamp in seconds within original song from where snippet was taken
+\item Duration: Duration of song snippet in seconds, default is 1-minute. The default value is chosen with the consideration that some Qawwali performance can easily have a running time of 20-30 minutes.
+\end{enumerate}
+
+As a result, construction of QawwalRang dataset produces an associated metadata structure which completely specifies the dataset. Users can simply rebuilt the dataset with software operating on just this modifiable metadata structure. Please refer to the Reproducibility section for details on how this is achieved.
+
+\subsection{Sources}
+Our first preference was to source QawwalRang songs solely from personal collections. This was in part motivated by the first point in the selection criteria, namely to include as many classical Qawwali songs as possible. However poor recording quality, non-availability of old recordings and the effort of ripping material off from cassettes/compact-disks and conversion to digital format proved quite daunting. To overcome these challenges we turned to internet where a huge cache of songs is available but there also, ratio of songs fulfilling the selection criteria to the total number of Qawwali songs returned by a search engine is surprisingly low. Eventually QawwalRang songs originate from three sources i.e. internet music sharing platform(s), among others, YouTube\endnote{YouTube: \\
+\url{www.youtube.com}}, author(s) personal collection and crawling the web for Qawwali songs. Table \ref{tab:sources} shows the distribution of sources in QawwalRang dataset.
 \begin{table}[htpb]
 \centering
   \begin{tabular}{|c | c|}
@@ -123,42 +143,24 @@ QawwalRang dataset is a collection of 72 expert labeled songs. Each song is an e
   \caption{QawwalRang: Source Distribution}
 \label{tab:sources}
 \end{table}
-\subsection{Selection}
-
-Qawwali being an old and popular genre, there is a lot of room for improvisation, which makes even manual genre labeling of songs as Qawwali a non-trivial task. For instance a Qawwali performance may overlap with other regional Folk genres or it may contains elements characteristic of western pop music. To achieve a meaningful labeling strategy, QawwalRang dataset inducted samples with the following criteria:
-\begin{itemize}
-\item Song is performed by well-known/renowned Qawal artists/groups (also called Qawal parties). While constructing this dataset, one of the aim was to stay as close as possible to the original Qawwali form, while achieving sufficient artist diversity. Including songs from artists associated primarily with Qawwali genre reduces the sample space and makes the labeling more reliable. 
-\item Songs start with a introductory section including both essential rhythm elements namely Tabla and Taali. These two components make Qawwali really distinctive as compared to other musical genres of Indian subcontinent. In a very small minority of cases where songs start with a vocal/instrument improvisation but does contains segments with Tabla and Taali components at a later time-point, an offset is incorporated to skip to the time-segments containing Tabla and Taali components.
-\item Songs performed in classical/semi-classical pattern have been preferred, again this reduces overlap with other genres like pop, folk and film music. Songs that follow a modern mixture of Qawwali, overlapping traditional Tabla/Taali components with mainstream instruments are avoided.
-\end{itemize}
-
-All songs included in the dataset are described by a metadata structure consisting of key-value pairs with following keys defined:
-\begin{enumerate}
-\item ID: unique identifier of the song in the data-set
-\item Name: song's descriptive name suitable for searching in global databases
-\item Artist: performer's or Qawwal party's name
-\item Location: URL of the original song from which excerpt has been taken
-\item Start: Time-stamp in seconds within original song from where snippet was taken
-\item Duration: Duration of song snippet in seconds, default is 1-minute
-\end{enumerate}
-
-This metadata is part of a release package including QawwalRang dataset and associated software which is able to reconstruct and extend the dataset based on the metadata structure. Please refer to the Reproducibility section for details.
 
 \subsection{Diversity}
 
-During compilation of presented dataset, special attention has been given to diversity of performances. It means to include songs from artists with different styles, active-periods and musical preferences. Figure \ref{fig:author_dist} shows artist distribution in QawwalRang dataset. Among the selected artists Nusrat Fateh Ali Khan (1948-1997) \citep{nusrat} and his group contribute a major share. Readers familiar with Qawwali genre will probably know that Nusrat and his group were the foremost exponents of this genre in the last quarter of previous century. They popularized Qawwali genre with countless performances across the world throughout 70s/80s/90s and have remained widely popular and relevant even in recent times. This made procuring songs from this group much easier. Category of 'others' includes about 10 songs from one artist each. Rest of the dataset is quite evenly distributed among other selected artists.
+During compilation of presented dataset, every attempt has been made to include songs from artists with different styles, active-periods and musical preferences. Figure \ref{fig:author_dist} shows artist distribution in QawwalRang dataset. This may see skewed at first, but among the selected artists Nusrat Fateh Ali Khan (1948-1997) \citep{nusrat} and his group contribute a major share. Readers familiar with Qawwali genre will probably know that Nusrat and his group were the foremost exponents of this genre in the last quarter of previous century. They popularized Qawwali genre with tireless performances across the world throughout 70s/80s/90s and have remained widely popular and relevant even in recent times. In that sense their big share in the dataset is merited. The next big contribution comes from 'others' category which is actually 9 songs each from a different artist. Rest of the dataset is quite evenly distributed among other selected artists which brings the total number of artists in the dataset to be 23.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[scale=1.0, width=1.0\columnwidth]{artist}
+  \includegraphics[scale=1.0, width=0.95\columnwidth]{artist}
   \caption{QawwalRang: Artist Distribution}
 \label{fig:author_dist}
 \end{figure}
 
 \section{Qawwali Genre Detector}\label{sec:detector}
 
-The main motivation for developing a Qawwali classifier is to evaluate suitability of QawwalRang dataset for music information retrieval (MIR) research. We wanted to study fundamental signal properties of the excerpts in the dataset and see if those properties can offer insights into (dis)similarity of Qawwali when compared to western genres. Two of the most common signal properties used in music genre detection algorithms are Constant-Q Transform (CQT) and Mel-Frequency Cepstral Coefficients (MFCC) \citep{panagakis}. Former is the time-frequency representation of an audio signal with frequency separation modeled on human ear, while the later captures the timbre quality of the signal. As mentioned before all songs in the presented dataset include characteristic Qawwali rhythm components namely Tabla and Taali, these components are extracted from polyphonic audio using non-negative matrix factorization, an algorithm \citep{virtanen} suitable for unsupervised sound source separation.
-The proposed Qawwali genre classification thus consists of two stages, a feature extraction and a binary classification stage. The feature extractor separates Tabla and Taali components from the raw audio data then uses CQT to model the former and MFCC to model the later component. The rationale of computing CQT from separated Tabla source is the drum-like instrument being recognizable with spectral energy in lower octaves. MFCC are on the other hand better suited for Taali since the periodic clap is a short-time highly transient event without a fixed frequency distribution. The binary classification stages uses heuristics for pitch energy and local MFCC extrema points to reach a binary classification decision for Qawwali. This proposed system is shown in figure \ref{fig:block_dia}
+The main motivation for developing a Qawwali classifier is to evaluate suitability of QawwalRang dataset for music information retrieval (MIR) research. We wanted to study fundamental signal properties of the Qawwali samples; to be able to draw parallels between Qawwali and western music genres. Two of the most common signal properties used in music genre detection algorithms are Constant-Q Transform (CQT) and Mel-Frequency Cepstral Coefficients (MFCC) \citep{panagakis}. Former is the time-frequency representation of an audio signal with frequency separation modeled on human ear, while the later captures the timbre quality of the signal.Instead of directly extracting these properties or features (as they are sometimes referred to) from polyphonic audio samples in the dataset, we factor in the characteristic Qawwali rhythm components namely Tabla and Taali. The idea is to first extract these components from polyphonic audio using non-negative matrix factorization, an algorithm \citep{virtanen} suitable for unsupervised sound source separation. Tabla, being the main percussion instrument and Qawwali supporting limited Taals, is expected to contribute a big chunk of spectral energy in lower octaves. This hints towards the suitability of CQT feature extracted from Tabla separated sound. Taali on the other hand is a short-time transient event without a fixed spectral distribution, while contributing a unique timbre to the Qawwali sound. Thus MFCC seems like an appropriate feature choice for Taali separated source.
+
+The proposed Qawwali genre classification thus consists of two stages, a feature extraction and a binary classification stage. The feature extractor separates Tabla and Taali components from the raw audio data then extracts CQT and MFCC from each component respectively. Individual decisions on Tabla and Taali detection are based on heuristics for CQT pitch energy and local MFCC extrema points. This is then fed to a binary classifier which decides if the song processed by the system is classified as Qawwali or otherwise. The overall scheme is shown in Figure \ref{fig:block_dia}
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[scale=1.5, width=0.95\columnwidth]{qawali_detector}
@@ -187,30 +189,30 @@ and
 \begin{align}\label{eq:eq4}
 \boldsymbol{H}_{B} = [\boldsymbol{u}_{l}^T.\boldsymbol{H} ...]
 \end{align}
-with $u_{l}$ being a unit column vector from Identity matrix $\boldsymbol{I}$ with size ${t\times t}$. In other words spectrogram for Tabla source is simply computed
-by selecting columns/rows from feature matrix $\boldsymbol{H}$ and coefficient matrix $\boldsymbol{W}$. Similarly Taali spectrogram $\boldsymbol{S}_{T}$ can be written as:
+with $u_{l}$ being a unit column vector from Identity matrix $\boldsymbol{I}$ with size ${t\times t}$. In other words spectrogram for Tabla source is computed
+by selecting columns from feature matrix $\boldsymbol{H}$ and rows from coefficient matrix $\boldsymbol{W}$. Lower column vectors are chosen for Tabla while choosing higher column vectors for Taali spectrogram $\boldsymbol{S}_{T}$ expressed as:
 \begin{align}\label{eq:eq5}
 \boldsymbol{S}_{T} = \boldsymbol{W}_{T}.\boldsymbol{H}_{T}
 \end{align}
 
-Feature-set for genre detection is then CQT power for the Tabla source matrix, obtained by mapping CQT from Tabla spectrogram and taking norm/energy along second dimension. This transforms the Tabla spectrogram matrix into a feature vector represented by:
+For Tabla detection, extracted feature is CQT energy, obtained by mapping CQT from Tabla spectrogram and taking norm/energy along second dimension. This transforms the Tabla spectrogram matrix into a feature vector represented by:
 \begin{align}\label{eq:eq6}
 \boldsymbol{f}_{CQT} = \lvert \lvert f\colon \boldsymbol{S}_{B}\to CQT \rvert \rvert
 \end{align}
 
-For Tabla source a median MFCC vector is computed by obtaining normalized MFCC vector from Taali spectrogram:
+For Taali detection, a median MFCC vector is computed by obtaining normalized MFCC vector from Taali spectrogram as follows:
 \begin{align}\label{eq:eq7}
 \boldsymbol{f}_{MFCC} = med(\frac{f\colon \boldsymbol{S}_{T}\to MFCC}{\lvert \lvert {f\colon \boldsymbol{S}_{T}\to MFCC} \rvert \rvert})
 \end{align}
 
 \subsection{Binary Classifier}
 
-Based on extracted Tabla and Taali features, binary classification on whether the given song can be qualified as Qawwali or another genre is based on the following individual decisions.
+Qawwali genre detector is a binary classifier labeling each song as Qawwali or  non-Qawwali, i.e. any other genre. It operates on the individual decisions produces by Tabla and Taali detectors, which in turn are based on extracted CQT and MFCC features. Below is a summary of individual component detection:
 \begin{itemize}
-	\item Tabla detector (\textbf{TD}): Does $\boldsymbol{f}_{CQT}$ represent a Tabla source? Result is a non-binary decision with three possibilities\textit{yes(Y)/No(N)/Maybe(M)}.
-	\item TaaLi detector (\textbf{TL}): Does $\boldsymbol{f}_{MFCC}$ represents a Taali source? Result is a binary \textit{yes(Y\textsubscript{l})/No(N\textsubscript{l)}} decision.
+	\item Tabla detector (\textbf{TD}): Does $\boldsymbol{f}_{CQT}$ represent a Tabla source? Result is a non-binary decision with three possibilities \textit{Yes(Y)/No(N)/Potential(P)}. The rationale for allowing an indeterminate decision at component level is that Tabla can be tuned to a different tonic, resulting in shift of CQT energy.
+	\item TaaLi detector (\textbf{TL}): Does $\boldsymbol{f}_{MFCC}$ represents a Taali source? This is based on extrema points within MFCC vector. Result is a binary \textit{Yes(Y\textsubscript{l})/No(N\textsubscript{l)}} decision.
 \end{itemize}
-This is shown in the decision-tree diagram below, where leaf nodes \textbf{Q} indicate a decision in favor of Qawwali and \textbf{NQ} is the node for all other cases. Essentially it means the binary classifier categorizes a song as Qawwali only in two cases: first one where both Tabla and Taali were detected and an additional case where Taali has been detected form MFCC but Tabla detection from CQT was a marginal call. The reason is grounded in the individual source detection methods which are explained next.
+Overall binary classification scheme is shown in the decision-tree diagram below, where leaf nodes \textbf{Q} indicate a decision in favor of Qawwali and \textbf{NQ} is any other Non-Qawwali genre. Essentially it means the binary classifier categorizes a song as Qawwali only in two cases: first one where both Tabla and Taali were detected and an additional case where Taali has been detected form MFCC but Tabla detection from CQT was a "potential" call. 
 
 \begin{forest}
 [TD,
@@ -226,7 +228,7 @@ This is shown in the decision-tree diagram below, where leaf nodes \textbf{Q} in
 		[TL:N\textsubscript{l}
 			[\textbf{NQ}]]
 	]
-	[M,
+	[P,
 		[TL:Y\textsubscript{l}
 			[\textbf{Q}]]
 		[TL:N\textsubscript{l}
@@ -235,18 +237,18 @@ This is shown in the decision-tree diagram below, where leaf nodes \textbf{Q} in
 ]
 \end{forest}
 
-For Tabla detection a Gaussian distribution is fitted on Tabla source's CQT power as given in \ref{eq:eq6}
+Tabla detection attempts to fit a Gaussian distribution onto energy in CQT bins as shown below \ref{eq:eq8}
 
 \begin{align}\label{eq:eq8}
 \boldsymbol{f}_{CQT} \sim \mathcal{N}(\mu, \sigma^{2})
 \end{align}
 
-where $\mu \in [p_{1}, p_{2}]$ is the mean pitch within an octave band and $\sigma^{2} < T_{h}$ is the variance of pitch (measured in musical notes). $p_{1}$, $p_{2}$ and fixed parameters chosen at the star of the classification process where as threshold $T_{h}$ is a tunable parameter. Tabla is positively detected if a Gaussian curve successfully fits with $\mu \in [p_{1}, e_{n}]$ with a reasonably small threshold value. As described above, Tabla detection is a non binary decision, meaning that an in-determinate decision is made with $\mu \in [p_{1}, e_{p}]$, here a larger value of threshold is tolerated. Anything other outcome amounts to negative Tabla decision. Here $e_{p}$ stands for edge-pitch parameter tunable during experiments.  
+where $\mu \in [p_{1}, p_{2}]$ is the mean pitch within an octave band and $\sigma^{2} < T_{h}$ is the variance of pitch (measured in musical notes). This is akin to finding a peak in CQT energy profile, albeit giving weight to neighboring bins as well. $p_{1}$, $p_{2}$ and fixed parameters chosen at the star of the classification process where as threshold $T_{h}$ is a tunable parameter indicating within how many notes of the peak majority of energy is concentrated. Tabla is positively detected if a Gaussian curve successfully fits with $\mu \in [p_{1}, e_{n}]$ with a reasonably small threshold value. A potential decision for Tabla detection is made in case of $\mu \in [e_{n}, p_{2}]$, where a larger value of threshold is tolerated with $e_{n}$ being edge-pitch parameter tunable during experiments.  Failure to fit a distribution in either of these two ranges results in negative Tabla decision. 
 
-For Taali detection, given $M$ MFCC elements we attempt to find a MFCC-index $i \in (0, M-1)$ corresponding to a local extrema point i.e. either $\boldsymbol{f}_{MFCC}(i) \leq \boldsymbol{f}_{MFCC}(j)$ or $\boldsymbol{f}_{MFCC}(i) \geq \boldsymbol{f}_{MFCC}(j)$ where $j \in (m_{1}, m_{2})$. Like Tabla detector above here also $m_{1}$ and $m_{2}$ are design parameters, statically assigned at the start of decision process. Taali decision is positive if such a local extrema is found otherwise a negative result is declared.
+For Taali detection, fitting a distribution is not plausible due to much lower number of coefficients as compared to CQT bins. Here, we attempt to find sudden change in the MFCC vector considering short bursts of hand clapping. Given $M$ element MFCC vector with MFCC-index $i \in (0, M-1)$, Taali detector searches a local extrema point i.e. either $\boldsymbol{f}_{MFCC}(i) \leq \boldsymbol{f}_{MFCC}(j)$ or $\boldsymbol{f}_{MFCC}(i) \geq \boldsymbol{f}_{MFCC}(j)$ where $j$ is a tunable parameter. Taali decision is positive in case local extrema is found at a certain $j$ index.
 
 \section{Results \& Discussion}\label{sec:result}
-Experimental results for Qawwali classifier have been obtained with two sets of parameters: fixed and tunable. Among fixed parameters is the numbers of independent sources assumed to constitute a Qawwali, expressed by ${n}$ in (\ref{eq:eq1}). It is assumed that a performance in QawwalRang dataset contains 4 independent sources namely Vocals, Harmonium, Tabla and Taali, out of which the last two are of interest to the proposed Qawwali classifier. Number of CQT bins in (\ref{eq:eq6}) is fixed at 84 ranging between musical notes (midi-numbers) C1(24) and C8(108). Tabla detection is based on CQT measurements between third and fourth octaves which means $p_{1}$ and $p_{2}$ in (\ref{eq:eq8}) are set to C3(50) and G4(67) respectively. The last fixed parameter is the number of MFCC used in Taali detection meaning $\boldsymbol{f}_{MFCC}$ in (\ref{eq:eq7}) is a one dimensional vector with $M$=13 coefficients. Source separation, CQT and MFCC are computed with corresponding functions from librosa \citep{brian_mcfee_2022_6097378}, while curve fitting on Tabla CQT to find a peak of CQT energy in third and fourth octave has been done with the help of lmfit optimization library ~\citep{newville_matthew_2014}.
+Experimental results for Qawwali classifier have been obtained with two sets of parameters: fixed and tunable. Among fixed parameters is the numbers of independent sources assumed to constitute a Qawwali, expressed by ${n}$ in (\ref{eq:eq1}). It is assumed that each performance in QawwalRang dataset contains 4 independent sources namely Vocals, Harmonium, Tabla and Taali, out of which the last two are of interest to the proposed Qawwali classifier. Tabla source in (\ref{eq:eq2}) is constructed with first and second column vectors of feature matrix while second and fourth column vectors constitute Taali source in (\ref{eq:eq5}). Second fixed parameter of the experiments is the number of CQT bins in (\ref{eq:eq6}) which is fixed at 84 ranging between musical notes (midi-numbers) C1(24) and C8(108). Tabla detection is based on CQT measurements between third and fourth octaves which means $p_{1}$ and $p_{2}$ in (\ref{eq:eq8}) are set to C3(50) and G4(67) respectively. The last fixed parameter is the number of MFCC used in Taali detection meaning $\boldsymbol{f}_{MFCC}$ in (\ref{eq:eq7}) is a one dimensional vector with $M$=13 coefficients. Source separation, CQT and MFCC are computed with corresponding functions from librosa \citep{brian_mcfee_2022_6097378}, while curve fitting on Tabla CQT to find a peak of CQT energy in third and fourth octave has been done with the help of lmfit optimization library ~\citep{newville_matthew_2014}.
 
 The tunable parameters of the experiments (with reference to previous section) are: edge-note within third octave ($e_{n}$), CQT energy threshold in third ($T_{3h}$) and fourth octave ($T_{4h}$) for Tabla detection and index ($j$) of local MFCC extrema for Taali detection. The proposed Qawwali classifier is governed by these four design parameters. In this section we discuss the impact of each of these parameters in detail leading to a set of values used for classifying Qawwali against other genres in GTZAN dataset. An assessment on each of these parameters in studied in light of four figures of merit (FOM) \citep{music_genre_survey}: \textit{Accuracy}, \textit{Recall}, \textit{F-measure} and \textit{Precision}.
 
