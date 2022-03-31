@@ -5,6 +5,13 @@ Bhat, J.~T. (2009).
 \newblock {\em Hindustani Vocal Music}.
 \newblock Abhinav Publications New Delhi.
 
+\bibitem[Gulati et~al., 2014]{carnatic_dataset}
+Gulati, S., Bellur, A., Salamon, J., H.G., R., Ishwar, V., Murthy, H.~A., and
+  Serra, X. (2014).
+\newblock Automatic tonic identification in indian art music: Approaches and
+  evaluation.
+\newblock {\em Journal of New Music Research}, 43(1):53--71.
+
 \bibitem[McFee et~al., 2022]{brian_mcfee_2022_6097378}
 McFee, B., Metsai, A., McVicar, M., Balke, S., Thomé, C., Raffel, C., Zalkow,
   F., Malek, A., Dana, Lee, K., Nieto, O., Ellis, D., Mason, J., Battenberg,
@@ -38,6 +45,13 @@ Panagakis, Y., Kotropoulos, C.~L., and Arce, G.~R. (2014).
   of audio features.
 \newblock {\em IEEE/ACM Transactions on Audio, Speech, and Language
   Processing}, 22(12):1905--1917.
+
+\bibitem[Pezoa et~al., 2016]{json}
+Pezoa, F., Reutter, J.~L., Suarez, F., Ugarte, M., and Vrgo{\v{c}}, D. (2016).
+\newblock Foundations of json schema.
+\newblock In {\em Proceedings of the 25th International Conference on World
+  Wide Web}, pages 263--273. International World Wide Web Conferences Steering
+  Committee.
 
 \bibitem[Qureshi et~al., 1986]{qureshi1986sufi}
 Qureshi, R., Qureshi, R.~B., and Blacking, J. (1986).

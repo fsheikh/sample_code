@@ -3,46 +3,44 @@ Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
 The top-level auxiliary file: TISMIRtemplate.aux
 The style file: apalike.bst
 Database file #1: TISMIRtemplate.bib
-Warning--I didn't find a database entry for "carnatic_music"
-You've used 10 entries,
+You've used 12 entries,
             1935 wiz_defined-function locations,
-            531 strings with 5788 characters,
-and the built_in function-call counts, 4160 in all, are:
-= -- 377
-> -- 260
-< -- 7
-+ -- 96
-- -- 94
-* -- 374
-:= -- 774
-add.period$ -- 30
-call.type$ -- 10
-change.case$ -- 95
-chr.to.int$ -- 10
-cite$ -- 10
-duplicate$ -- 124
-empty$ -- 228
-format.name$ -- 106
-if$ -- 770
+            544 strings with 6305 characters,
+and the built_in function-call counts, 5304 in all, are:
+= -- 487
+> -- 326
+< -- 8
++ -- 120
+- -- 118
+* -- 476
+:= -- 964
+add.period$ -- 37
+call.type$ -- 12
+change.case$ -- 117
+chr.to.int$ -- 12
+cite$ -- 12
+duplicate$ -- 165
+empty$ -- 298
+format.name$ -- 132
+if$ -- 1001
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 8
-newline$ -- 53
-num.names$ -- 30
-pop$ -- 80
+missing$ -- 10
+newline$ -- 63
+num.names$ -- 36
+pop$ -- 103
 preamble$ -- 1
-purify$ -- 97
+purify$ -- 119
 quote$ -- 0
-skip$ -- 98
+skip$ -- 129
 stack$ -- 0
-substring$ -- 212
-swap$ -- 7
-text.length$ -- 1
+substring$ -- 283
+swap$ -- 18
+text.length$ -- 2
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 56
+type$ -- 68
 warning$ -- 0
-while$ -- 24
+while$ -- 32
 width$ -- 0
-write$ -- 127
-(There was 1 warning)
+write$ -- 154
