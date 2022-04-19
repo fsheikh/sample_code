@@ -1,0 +1,136 @@
+\documentclass[nocolor,a4paper, colorlinks, linkcolor=true]{moderncv}
+\moderncvtheme[black]{classic}
+
+\firstname{\Huge\textbf{Faheem}}
+\familyname{\Huge\textbf{Sheikh}}
+\title{Curriculam Vitae}
+\address{Edith-Stein-Ring, 10}{89081, Ulm, Germany} 
+\mobile{+49-176-4650-4127}
+\email{fahim.sheikh@gmail.com}
+
+\extrainfo{\linkedinsocialsymbol: \href{https://www.linkedin.com/in/faheem-sheikh-3556298}{faheem-sheikh}\\\ \githubsocialsymbol: \href{https://github.com/fsheikh}{fsheikh}}
+\photo[70pt][0.1pt]{faheem.jpg}
+
+\begin{document}
+\hypersetup{urlcolor=blue}
+\maketitle
+\par{\emph{System engineer with more than a decade of experience in automotive, embedded software and high performance computing domains. Looking to advance my career in focus areas of digital signal processing and machine learning.}}
+
+\section{Professional Experience}
+\subsection{\textsc{Software Industry}}
+\cventry{2017--2022}{Development Specialist}{BMW Car IT GmbH}{Ulm}{}
+{For next generation infotainment ECUs of BMW cars, wrote modern multithreaded
+embedded Linux services in C++ to support software updates, diagnosis and inter-node
+communications. Expert level analysis skills to root-cause bugs on both
+\href{https://www.yoctoproject.org/}{yocto Linux} and bare-metal platforms. Proficient in developing and debugging low-level software
+including board support packages, bootloaders and device drivers. Comfortable enhancing existing software infrastructure/tools, e.g. supported automated testing of audio stack by writing real-time voice detection algorithms based on octave band heuristics to monitor bluetooth/radio/playback audio quality in cars.}
+
+\cventry{2016--2017}{Software Consultant}{}{Lahore}{}
+{Developed software-defined radio applications for a Canadian firm consolidating modem
+technologies used by various civil services. Wrote digital I/Q modulation/demodulation
+algorithms and associated tests in C++ using open source software like \href{https://liquidsdr.org}{Liquid SDR} and
+\href{www.gnuradio.org}{GNU Radio}. For another client in the USA, wrote a python application for spectrum
+sensing to detect UAVs operating nearby based on \href{https://www.ettus.com/sdr-software/uhd-usrp-hardware-driver/}{URSP} hardware.}
+
+\cventry{2015--2016}{Fireeye (now Trellix)}{Software Developer}{Lahore}{}
+{Software developer within the Operating Systems R\&D team. This involved system programming in C++, debugging Linux device drivers and developing components of a virtual machine monitor on x86 vPro platforms. My responsibilities included finding and fixing bugs in the virtualization layer thus increasing the stability and reliability of guest operating systems hosted on an open source microkernel (\href{https://hypervisor.org}{NOVA}). I also extensively micro-benchmarked the virtualization software.}
+
+\cventry{2007--2015}{Mentor Graphics (now Siemens)}{Staff Engineer}{Lahore}{}
+{Lead engineer in a team spread across geographical boundaries, responsible for
+delivering embedded virtualization solutions for automotive software combining ECU
+functionality such as in-vehicle infotainment and advanced drivers assistance.The work
+involved low level programming of ARM v8 architecture, OS paravirtualization and
+virtualized driver development using \href{https://developer.ibm.com/technologies/linux/articles/l-virtio}{virtIO}. Added remote processor (\href{https://www.kernel.org/doc/Documentation/rpmsg.txt}{rpmsg}) support in embedded hypervisor to host guest operating systems on heterogeneous multi-core
+processors. \\\ As a software engineer co-developed optimized math, signal and image processing \href{https://www.businesswire.com/news/home/20130617006661/en/AltiVec-Software-Libraries-Now-Available-for-Freescale-QorIQ-T4240-Processor}{libraries} in
+C/C++; these libraries are for embedded high performance computing machines
+including heterogeneous multicore platforms like GPGPUs, and SIMD vector
+architectures like CUDA \href{https://developer.nvidia.com/cuda-gpus}{GPUs}, PowerPC \href{www.nxp.com/docs/en/reference-manual/ALTIVECPEM.pdf}{Altivec}, Intel x86 \href{https://www.intel.com/content/www/us/en/architecture-and-technology/avx-512-overview.html}{AVX}, ARM \href{https://www.arm.com/why-arm/technologies/neon}{NEON} etc. I was also one of the maintainers for Mentor RTOS Nucleus; in particular enabling it for symmetric multiprocessing on ARM \href{https://developer.arm.com/ip-products/processors/cortex-a/cortex-a9}{Cortex} and MIPS \href{https://s3-eu-west-1.amazonaws.com/downloads-mips/documents/MIPS32_1004K_1211.pdf}{1004K} processors.}
+
+\subsection{\textsc{Academics}}
+\cventry{2015--2015}{Visiting Faculty}{Information Technology University}{Lahore}{}
+{Taught Microprocessor and Assembly Language to junior year students. Introduced x86 and ARM assembly language for developing and debugging simple programs. Helped
+students to understand x86/ARM architectural differences. Memory, device models and interrupt controllers on PC were also covered.}
+
+\cventry{2011-2011}{Adjunct Assistant Professor}{Lahore University of Management Sciences}{Lahore}{}
+{Taught Digital Signal Processing to senior year students. The course introduced fundamental signal processing concepts with lab exercises used for reinforcement. }
+
+\cventry{2007--2007}{Visiting Research Scholar}{Georgia Institute of Technology}{Atlanta, GA, USA}{}
+{My research focused on signal processing techniques to enable wideband sensing in cognitive
+radios. In my \href{http://prr.hec.gov.pk/jspui/bitstream/123456789/2059/1/704S.pdf}{thesis} I proposed an efficient scheme for multi-channel sensing in dynamic
+spectrum access networks using DFT filter banks. Also investigated the tradeoff between energy
+detection performance and sensing time under various traffic models characterized with
+unknown noise, bandwidth and fading constraints.}
+%
+\section{Education}
+\cventry{2005--2009}{PhD Computer Engineering}{Lahore University of Management Sciences}{Lahore}{}{\textit{Thesis: Multi-rate signal processing for software and cognitive radios}}
+\cventry{2003--2005}{MS Computer Engineering}{Lahore University of Management Sciences}{Lahore}{}{\textit{Silver Medal}}
+\cventry{1999--2003}{BSC Electrical Engineering}{University of Engineering and Technology Lahore}{Lahore}{}{Class Rank: 4/60; \textit{Specialization: Computer Engineering}}
+
+\section{Skills}
+\subsection{\textsc{Programming}}
+\cvline{}{
+\begin{itemize}
+\item C, C++ (11/14), Boost and STL
+\item Python, Java, Assembly language
+\item Unix shell (multiple-flavors) scripting
+\end{itemize}
+}
+\subsection{\textsc{Scientific Software}}
+\cvline{}{
+\begin{itemize}
+\item GNU \href{https://www.gnu.org/software/octave/index}{Octave}
+\item MATLAB and its object oriented \href{https://www.mathworks.com/products/matlab/object-oriented-programming.html}{framework}
+\item Numpy, \href{https://www.scipy.org/}{scipy}, \href{https://pytorch.org/docs/stable/index.html}{PyTorch}
+\item OpenCL, OpenMP
+\item \href{https://lmfit.github.io/lmfit-py/}{lmfit}, \href{https://librosa.org/doc/latest/index.html}{librosa}
+\end{itemize}
+}
+\subsection{\textsc{Open source}}
+\cvline{}{
+\begin{itemize}
+\item \textbf{Contributed projects}:  \href{https://github.com/jgaeddert/liquid-dsp}{Liquid SDR}, \href{https://github.com/pvachon/pygpt}{Python GPT parser}
+\item Linux: \href{}{systemd}, \href{https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/}{Gpiod}, \href{https://github.com/crayzeewulf/libserial}{Serial}, \href{https://man7.org/linux/man-pages/man1/strace.1.html}{strace}, \href{https://man7.org/linux/man-pages/man5/sysfs.5.html}{sysfs}
+\item Debugging: \href{https://compiler-rt.llvm.org/}{Clang sanitizers}, \href{https://valgrind.org/}{valgrind}, \href{https://www.gnu.org/software/binutils/}{GNU binutils}
+\item Testing: \href{https://github.com/google/googletest}{gtest/gmock}, \href{https://llvm.org/docs/LibFuzzer.html}{libfuzzer}
+\item Version control: Git, Gerrit, GitLab
+\item Virtualization: \href{https://www.qemu.org/}{QEMU}, \href{https://www.docker.com/}{Docker}
+\item Bootloaders: \href{https://www.denx.de/wiki/U-Boot}{U-Boot}, \href{https://source.android.com/setup/build/running}{android fastboot}, \href{https://github.com/dgibson/dtc}{Device tree}
+\item Build systems: \href{https://www.yoctoproject.org/docs/1.6/bitbake-user-manual/bitbake-user-manual.html}{bitbake}, \href{https://www.yoctoproject.org/docs/1.6/bitbake-user-manual/bitbake-user-manual.html}{cmake}, \href{https://www.gnu.org/software/make/}{GNU make}, \href{https://buildroot.org/}{BuildRoot}
+\end{itemize}
+}
+\subsection{\textsc{Wireless \& Signal Processing}}
+\cvline{}{
+\begin{itemize}
+\item \href{https://github.com/jgaeddert/liquid-dsp}{Liquid SDR}, \href{https://www.gnuradio.org/}{GNU Radio}, \href{https://www.omg.org/spec/VSIPL++/1.2/About-VSIPL++/}{VSIPL++}
+\item Standards: IEEE 802.11b, 802.16b and 802.22
+\end{itemize}
+}
+\subsection{\textsc{Automotive}}
+\cvline{}{
+\begin{itemize}
+\item \href{https://www.iso.org/standard/72439.html}{Diagnostics ISO 14299}, \href{https://www.iso.org/standard/43464.html}{Functional Safety ISO 26262},
+\item GENIVI, \href{https://at.projects.genivi.org/wiki/pages/viewpage.action?pageId=5472311}{CommonAPI},\href{https://github.com/COVESA/dlt-daemon}{DLT}
+\item \href{https://some-ip.com/}{SOME-IP}
+\end{itemize}
+}
+
+\section{Honors \& Awards}
+\cventry{2019}{Travel Grant}{400\$}{BMW Car IT GmbH}{Partial funding for attending ISMIR host at TU Delft}{}
+\cventry{2009}{Travel Grant}{1500\$}{Mentor Graphics}{Funding for attending Embedded systems conference in Boston}{}
+\cventry{2007}{Travel Grant}{500\$}{ICASSP committee}{Conference support grant award to attend Internation conference on Acoustics, Speech and Signal Processing}{}
+\cventry{2007}{Distinction}{LUMS}{Placed on Dean's honor List graduating class MS 2007}{}{}
+\cventry{2003--2008}{Study Grant}{5000\$}{Higher Education Commission Pakistan}{Indigenous PhD scholarship}
+{}
+\section{Projects}
+\cvline{}{
+\begin{itemize}
+\item Developed an embedded coding \href{https://github.com/GermanAutolabs/Embedded-coding-challenge}{challenge} for a former employer to help hire candidates
+\item Released an \href{https://zenodo.org/record/6408796\#.Yl6d6lxBw5k}{audio dataset} for Qawwali genre classification and associated software
+\item Extended an open source python \href{https://github.com/pvachon/pygpt}{tool} to parse GPT headers from partition blobs/images
+\item Developed asynchronous \href{https://github.com/starnight/libgpiod-example/pull/1/files}{monitoring} of GPIO line activity in C++ on Linux.
+\item Implemented a sound-level \href{https://github.com/jgaeddert/liquid-dsp/pull/153}{meter} according to IEC 62585 standard in C language
+\end{itemize}}
+\nocite{*}
+\bibliographystyle{plain}
+\bibliography{publications}
+\end{document}

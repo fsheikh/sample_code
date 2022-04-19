@@ -1,0 +1,57 @@
+\begin{thebibliography}{1}
+
+\bibitem{vsipl}
+Stefan Seefeld, Faheem Sheikh, and Brooks Moses.
+\newblock A matlab-to-target development workflow using sourcery vsipl++
+  (\textbf{Best paper award}).
+\newblock In {\em 2012 IEEE Conference on High Performance Extreme Computing},
+  2012.
+
+\bibitem{devicetree}
+Faheem Sheikh.
+\newblock Device tree partitioning for multicore, multi-os embedded software
+  designs.
+\newblock
+  \href{https://www.embedded.com/device-tree-partitioning-for-multicore-multi-os-embedded-software-designs/}{embedded.com},
+  2014.
+\newblock Accessed: 2022-03-19.
+
+\bibitem{rtos}
+Faheem Sheikh, Irfan Ahmad, and Dan Driscoll.
+\newblock Booting an rtos on symmetric multiprocessors.
+\newblock
+  \href{https://www.embedded.com/booting-an-rtos-on-symmetric-multiprocessors/}{embedded.com},
+  2010.
+\newblock Accessed: 2022-03-19.
+
+\bibitem{icassp}
+Faheem Sheikh and Shahid Masud.
+\newblock Efficient sample rate conversion for multi-standard software defined
+  radios.
+\newblock In {\em 2007 IEEE International Conference on Acoustics, Speech and
+  Signal Processing - ICASSP '07}, volume~2, pages II--329--II--332, 2007.
+
+\bibitem{iscas}
+Faheem Sheikh and Shahid Masud.
+\newblock Improved factorization for sample rate conversion in software defined
+  radios.
+\newblock In {\em 2007 IEEE International Symposium on Circuits and Systems},
+  pages 2526--2529, 2007.
+
+\bibitem{elsedsp}
+Faheem Sheikh and Shahid Masud.
+\newblock Sample rate conversion filter design for multi-standard software
+  radios.
+\newblock {\em Digital Signal Processing}, 20(1):3--12, 2010.
+
+\bibitem{micpro}
+Faheem Sheikh, Shahid Masud, and Rehan Ahmed.
+\newblock Superscalar architecture design for high performance dsp operations.
+\newblock {\em Microprocessor and Microsystems}, 33(2):154–160, mar 2009.
+
+\bibitem{ietsp}
+Faheem Sheikh, Shahid Masud, and Benny Bing.
+\newblock Harmonic power detection in wideband cognitive radios.
+\newblock {\em IET Signal Processing}, 3(1):40--50, 2009.
+
+\end{thebibliography}
