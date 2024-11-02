@@ -1,0 +1,34 @@
+{
+    "ulTranslation": {
+        "ul1": "heim",
+        "ul2": "Über uns",
+        "ul3": "Kontaktieren Sie uns",
+        "ul4": "Blog posten",
+        "ul5": "Blog durchsuchen"
+    },
+    "logRegTranslation": {
+        "login": "Login",
+        "register": "einloggen",
+        "logOut": "abmelden"
+    },
+    "blogTopics": {
+        "Literature": "Literatur",
+        "Music": "Musik",
+        "Politics": "Politik",
+        "Culture": "Kultur",
+        "Technology": "Technologie"
+    },
+    "postBlog": {
+        "AuthorName": "Name des Autors:",
+        "PreviewImage": "Bildvorschau: (Optional)",
+        "BlogCategory": "Blog-Kategorie auswählen:",
+        "BlogLang": "Blog-Sprache auswählen:",
+        "BlogTitle": "Blogtitel...",
+        "BlogContent": "Bloginhalt..."
+    },
+    "blogLang": {
+        "English": "Englisch",
+        "German": "Deutsch",
+        "Urdu": "Urdu"
+    }
+}
