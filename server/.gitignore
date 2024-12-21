@@ -1,0 +1,9 @@
+*.txt
+*.png
+*.log
+*.pdf
+*.dat
+
+package.json
+package-lock.json
+node_modules
