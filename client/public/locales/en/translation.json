@@ -1,0 +1,34 @@
+{
+    "ulTranslation": {
+        "ul1": "Home",
+        "ul2": "About Us",
+        "ul3": "Contact Us",
+        "ul4": "Post Blog",
+        "ul5": "Search Blog"
+    },
+    "logRegTranslation": {
+        "login": "  Login",
+        "register": "Log In",
+        "logOut": "Log Out"
+    },
+    "blogTopics": {
+        "Literature": "Literature",
+        "Music": "Music",
+        "Politics": "Politics",
+        "Culture": "Culture",
+        "Technology": "Technology"
+    },
+    "postBlog": {
+        "AuthorName": "Author Name:",
+        "PreviewImage": "Preview Image: (Optional)",
+        "BlogCategory": "Select Blog-Category:",
+        "BlogLang": "Select Blog-Lang:",
+        "BlogTitle": "Blog Title...",
+        "BlogContent": "Blog Content..."
+    },
+    "blogLang": {
+        "English": "English",
+        "German": "German",
+        "Urdu": "Urdu"
+    }
+}
