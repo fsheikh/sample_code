@@ -1,0 +1,34 @@
+{
+    "ulTranslation": {
+        "ul1": "گھر",
+        "ul2": "ہمارے بارے میں",
+        "ul3": "ہم سے رابطہ کریں۔",
+        "ul4": "بلاگ پوسٹ کریں",
+        "ul5": "بلاگ تلاش کریں"
+    },
+    "logRegTranslation": {
+        "login": "لاگ ان",
+        "register": "لاگ ان",
+        "logOut": "لاگ آؤٹ"
+    },
+    "blogTopics": {
+        "Literature": "ادب",
+        "Music": "موسیقی",
+        "Politics": "سیاست",
+        "Culture": "ثقافت",
+        "Technology": "ٹیکنالوجی"
+    },
+    "postBlog": {
+        "AuthorName": ":مصنف کا نام",
+        "PreviewImage": "پیش نظارہ تصویر: (اختیاری)",
+        "BlogCategory": ":بلاگ زمرہ منتخب کریں",
+        "BlogLang": ":بلاگ کی زبان منتخب کریں",
+        "BlogTitle": "...بلاگ کا عنوان",
+        "BlogContent": "...بلاگ کا مواد"
+    },
+    "blogLang": {
+        "English": "انگریزی",
+        "German": "جرمن",
+        "Urdu": "اردو"
+    }
+}
