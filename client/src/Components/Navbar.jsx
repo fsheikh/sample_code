@@ -51,7 +51,7 @@ const Navbar = () => {
               <h3 className='text-white mr-3 ml-4'>DeUrdu</h3>
             </Link>
             <Link to={`/${i18.language}`}>
-              <h3 className='text-white'> ڈی اردو </h3>
+              <h3 className='text-white'> ڈردو </h3>
             </Link>
           </div>
             <div className="flex gap-1">
