@@ -1,6 +1,7 @@
 import React from 'react'
 
 const Cards = ({img,title,description}) => {
+    // https://tailwindcss.com/docs/display
     return (
         <div className='flex flex-col w-[250px] m-6 border-2 border-black text-center p-2 rounded-lg'>
             <img src={img} alt="Placeholder Image" className='p-2 bg-slate-700 rounded-lg'/>
