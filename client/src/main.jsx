@@ -8,8 +8,9 @@ const root = createRoot(document.getElementById('root'));
 
 root.render(
 <Auth0Provider
-    domain="dev-2mlojserqc0ytr8b.us.auth0.com"
-    clientId="NyjTsxGX6tAxOxKL6JkjzR6hY7MKhHn4"
+    // https://auth0.com/docs/get-started/applications/configure-private-key-jwt
+    domain={import.meta.env.VITE_AUTH0_DOMAIN_ID}
+    clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
     authorizationParams={{
       redirect_uri: "http://localhost:5173/en"
     }}
