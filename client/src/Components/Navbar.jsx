@@ -122,8 +122,12 @@ const Navbar = () => {
             <Link to={`/${i18.language}`}>
               <button className='text-white font-medium ml-4 hover:bg-gray-500 transition px-3 py-1 rounded-lg hover:text-white'>{ul1}</button>
             </Link>
+            <Link to={`/${i18.language}/about-us`}>
               <button className='text-white font-medium ml-4 hover:bg-gray-500 transition px-3 py-1 rounded-lg hover:text-white'>{ul2}</button>
+            </Link>
+            <Link to={`/${i18.language}/contact-us`}>
               <button className='text-white font-medium ml-4 hover:bg-gray-500 transition px-3 py-1 rounded-lg hover:text-white'>{ul3}</button>
+            </Link>
           </div>
           <div className="flex gap-6">
             <Link to={`/${i18.language}/post-blog`}>

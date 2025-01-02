@@ -6,6 +6,8 @@ import BlogCategoryPage from "./Pages/blogCategoryPage"
 import i18 from 'i18next'
 import Login from "./Pages/Login"
 import Register from "./Pages/Register"
+import ContactUs from "./Pages/ContactUs"
+import AboutUs from "./Pages/AboutUs"
 
 function App() {
 
@@ -19,6 +21,8 @@ function App() {
         <Route path="/" element={<Navigate to={`/${i18.language}`}/>} />
 
         <Route path={"/:lng"} element={<Home/>}/>
+        <Route path={"/:lng/about-us"} element={<AboutUs/>}/>
+        <Route path={"/:lng/contact-us"} element={<ContactUs/>}/>
         <Route path={"/:lng/login"} element={<Login/>}/>
         <Route path={"/:lng/register"} element={<Register/>}/>
         <Route path="/:lng/post-blog" element={<PostBlog/>}/>
