@@ -21,6 +21,7 @@ const ImagesSlidebar = () => {
   return (
     <div className="slide-container">
       <Fade>
+      {/* https://www.digitalocean.com/community/tutorials/4-uses-of-javascripts-arraymap-you-should-know - usage of .map() */}
         {fadeImages.map((fadeImage, index) => (
           <div key={index}>
             <img style={{ width: '100%', height: '580px', objectFit: 'cover' }} src={fadeImage.url} alt={`Slide ${index + 1}`}/>
