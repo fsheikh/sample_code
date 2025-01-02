@@ -23,7 +23,7 @@ const db = new sqlite3.Database(DB_NAME, (err) => {
 // Make the database connection available to routes
 app.use((req, res, next) => {
   req.db = db; // Attach the database connection to the request object
-  next();
+  next(); // https://expressjs.com/en/guide/writing-middleware.html - purple of using next() middleware
 });
 
 // Routes
