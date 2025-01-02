@@ -1,6 +1,7 @@
 import express from 'express';
 import sqlite3 from 'sqlite3';
 import multer from 'multer';
+import { IMAGE_UPLOAD_PATH } from '../Config.js';
 
 const router = express.Router();
 
@@ -14,25 +15,27 @@ const db = new sqlite3.Database('deurdu.db', (err) => {
 });
 
 // Configure multer for file uploads
-const storage = multer.diskStorage({
+const storage = multer.diskStorage({ //multer.diskStorage is used to configure where and how files are stored.
   destination: (req, file, cb) => {
-    cb(null, './pictures'); // Folder to save uploaded images
+    cb(null, IMAGE_UPLOAD_PATH); // Folder to save uploaded images - defined in Config.js file
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + '-' + file.originalname);
   },
 });
 
+// TBD: Image upload functionality is not complete yet. Needs further implementation.
 const upload = multer({ storage });
 
 // Create (POST) a new blog
 router.post('/postblog', upload.single('image'), (req, res) => {
   const { author_name, blog_category, blog_language, blog_title, blog_content } = req.body;
-  const image = req.file ? req.file.filename : null;
+  const image = req.file ? req.file.filename : null; // req.file.file/filename contains the path where the file is saved.
+
 
   const sql = `INSERT INTO postblog 
     (author_name, image, blog_category, blog_language, blog_title, blog_content)
-    VALUES (?, ?, ?, ?, ?, ?)`;
+    VALUES (?, ?, ?, ?, ?, ?)`; // The ? syntax used in the SQL query is a placeholder for dynamic values that will be provided at runtime. https://www.sqlite.org/lang_expr.html (Move to 4.Parameters).
 
   db.run(sql, [author_name, image, blog_category, blog_language, blog_title, blog_content], function (err) {
     if (err) {
