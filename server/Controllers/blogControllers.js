@@ -47,6 +47,7 @@ router.post('/postblog', upload.single('image'), (req, res) => {
 });
 
 
+// TBD: Further action pending on client code review and testing.
 // Read (GET) all blogs
 router.get('/', (req, res) => {
   const limit = req.query.limit || 20; // Default to 20 if not provided
