@@ -1,7 +1,7 @@
-import express from 'express';
-import cors from 'cors';
+import express from 'express'; // part of node.js or we can say - that it's the framework of node.js (https://expressjs.com/)
+import cors from 'cors'; // package to enable communication between different port numbers of client & server
 import sqlite3 from 'sqlite3'; // Import sqlite3
-import blogControllerRoutes from './Controllers/blogControllers.js';
+import blogRoutes from './Controllers/blogControllers.js'; //blogRoutes is the instance of blogController file - means that we are importing the functions from blogController file to here
 import { DB_NAME } from './Config.js' // importing the database name from the config.js file
 
 const app = express();
@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use('/blogs', blogControllerRoutes);
+app.use('/blogs', blogRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello World');
