@@ -44,8 +44,8 @@ const Navbar = () => {
 
       {/* This is the 1st navbar */}
       <div className= "bg-green-700}">
-        <div className={`flex bg-green-700 gap-[1150px] ${i18.language === 'ur' ? 'gap-[1130px]' : 'gap-[1150px'}
-                                                          ${i18.language === 'de' ? 'gap-[1090px]' : 'gap-[1140px'}`}>
+        <div className={`flex bg-green-700 gap-[1150px] ${i18.language === 'ur' ? 'gap-[1130px]' : 'gap-[1150px]'}
+                                                          ${i18.language === 'de' ? 'gap-[1090px]' : 'gap-[1140px]'}`}>
           <div className="flex flex-row items-center">
             <Link to={`/${i18.language}`}>
               <h3 className='text-white mr-3 ml-4'>DeUrdu</h3>
