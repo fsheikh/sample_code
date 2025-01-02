@@ -1,18 +1,9 @@
 import express from 'express';
-import sqlite3 from 'sqlite3';
 import multer from 'multer';
 import { IMAGE_UPLOAD_PATH } from '../Config.js';
+import db from '../Config.js';
 
 const router = express.Router();
-
-// SQLite3 database connection
-const db = new sqlite3.Database('deurdu.db', (err) => {
-  if (err) {
-    console.error('Database connection failed:', err);
-  } else {
-    console.log('Connected to the SQLite database');
-  }
-});
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({ //multer.diskStorage is used to configure where and how files are stored.
@@ -81,7 +72,7 @@ router.get('/search', (req, res) => {
     params.push(language);
   }
 
-  db.all(sql, params, (err, rows) => {
+  db.all(sql, params, (err, rows) => { // db.all is to fetch the data
     if (err) {
       return res.status(500).json({ message: 'Error fetching blogs', error: err });
     }
@@ -114,7 +105,7 @@ router.put('/:id', (req, res) => {
     SET author_name = ?, blog_category = ?, blog_language = ?, blog_title = ?, blog_content = ? 
     WHERE id = ?`;
 
-  db.run(sql, [author_name, blog_category, blog_language, blog_title, blog_content, id], function (err) {
+  db.run(sql, [author_name, blog_category, blog_language, blog_title, blog_content, id], function (err) { // db.run is to execute the command
     if (err) {
       return res.status(500).json({ message: 'Error updating blog', error: err });
     }
