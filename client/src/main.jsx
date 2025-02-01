@@ -1,21 +1,15 @@
-import { createRoot } from 'react-dom/client'
-import App from './App.jsx'
-import './index.css'
-import './i18.js'
-import { Auth0Provider } from '@auth0/auth0-react';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { ClerkProvider } from '@clerk/clerk-react'; // Remove RedirectToSignIn import since it's not needed here
+import App from './App.jsx';
+import './index.css';
 
-const root = createRoot(document.getElementById('root'));
+const PUBLISHABLE_KEY = 'pk_test_c2VjdXJlLXR1cnRsZS02Mi5jbGVyay5hY2NvdW50cy5kZXYk';
 
-root.render(
-<Auth0Provider
-    // https://auth0.com/docs/get-started/applications/configure-private-key-jwt
-    domain={import.meta.env.VITE_AUTH0_DOMAIN_ID}
-    clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
-    authorizationParams={{
-      redirect_uri: "http://localhost:5173/en"
-    }}
-  >
-    {/* https://www.w3schools.com/react/react_jsx.asp#:~:text=JSX%20allows%20us%20to%20write%20HTML%20elements%20in%20JavaScript%20and,easier%20to%20write%20React%20applications. */}
-    <App />
-  </Auth0Provider>,
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+      <App />
+    </ClerkProvider>
+  </React.StrictMode>
 );
