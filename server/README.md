@@ -17,3 +17,16 @@ The `package-lock.json` file will be automatically generated when you install yo
 npm install
 ```
 This command installs the dependencies listed in the new `package.json` and regenerates the `package-lock.json` file.
+
+### **3️⃣ To Start The Server**
+The `index.js || server.js` file will be automatically runned when you will run this script on your terminal, simply run:
+
+If Installed:
+```bash
+nodemon index.js
+```
+
+If not Installed (Install it first...):
+```bash
+npm install -g nodemon
+```
