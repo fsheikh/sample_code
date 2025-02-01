@@ -12,3 +12,5 @@ i18.use(LanguageDetector).use(initReactI18next).use(Backend).init({
             loadPath: '/locales/{{lng}}/translation.json', // This is the path to your translation files
         },
     })
+
+export default i18;
