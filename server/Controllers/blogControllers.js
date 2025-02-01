@@ -46,8 +46,27 @@ router.get('/', (req, res) => {
   db.all(sql, [limit], (err, rows) => {
     if (err) {
       return res.status(500).json({ message: 'Error fetching blogs', error: err });
-    }
+    } 
     res.status(200).json({ blogs: rows });
+  });
+});
+
+// Read (GET) top authors
+router.get('/top-authors', (req, res) => {
+  const sql = `
+    SELECT author_name, COUNT(*) AS blog_count 
+    FROM postblog
+    GROUP BY author_name
+    ORDER BY blog_count DESC 
+    LIMIT 10
+  `;
+
+  db.all(sql, (err, rows) => {
+    if (err) {
+      console.error('Error fetching top authors:', err);
+      return res.status(500).json({ error: 'Internal Server Error', message: err.message });
+    }
+    res.status(200).json(rows);
   });
 });
 
