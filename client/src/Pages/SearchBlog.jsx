@@ -8,10 +8,19 @@ const SearchBlog = () => {
   const [authorName, setAuthorName] = useState('');
   const [category, setCategory] = useState('');
   const [language, setLanguage] = useState('');
+  const [topAuthors, setTopAuthors] = useState([]);
+  const [selectedAuthor, setSelectedAuthor] = useState("");
 
   // Fetch all blogs initially
   useEffect(() => {
     fetchBlogs();
+  }, []);
+
+  // Fetch top authors when the component loads
+  useEffect(() => {
+    axios.get("http://localhost:3030/blogs/top-authors")
+      .then(response => setTopAuthors(response.data))
+      .catch(error => console.error("Error fetching authors:", error));
   }, []);
 
   // Function to fetch blogs based on filters
@@ -26,7 +35,7 @@ const SearchBlog = () => {
         },
       })
       .then((response) => {
-        console.log('Blogs received on frontend: ', response.data.result);
+        console.log('Blogs received on frontend: ', response.data.blogs);
         setBlogs(response.data.blogs || []);
       })
       .catch((error) => console.error('Error fetching blogs: ', error));
@@ -39,7 +48,7 @@ const SearchBlog = () => {
     fetchBlogs(selectedCategory, authorName, language);
   };
 
-  // Handle Author name change
+  // Handle Author name change from text input
   const handleAuthorChange = (event) => {
     const name = event.target.value;
     setAuthorName(name);
@@ -53,12 +62,19 @@ const SearchBlog = () => {
     fetchBlogs(category, authorName, selectedLanguage);
   };
 
+  // Handle Top Author selection from dropdown
+  const handleSelectedAuthorChange = (event) => {
+    const author = event.target.value;
+    setSelectedAuthor(author);
+    fetchBlogs(category, author, language); // Fetch blogs of the selected top author
+  };
+
   return (
     <>
       <Navbar />
 
       {/* Input fields for filtering */}
-      <div className="mt-14 mb-10 flex gap-52 text-center justify-center">
+      <div className="mt-14 mb-10 flex gap-52 text-center items-center justify-center">
         {/* Author Name Input */}
         <div className="flex flex-col">
           <label>Write Author Name:</label>
@@ -69,6 +85,22 @@ const SearchBlog = () => {
             value={authorName}
             onChange={handleAuthorChange}
           />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label>Select Top Author:</label>
+          <select
+            className="border-[2px] border-black rounded-lg pl-1"
+            value={selectedAuthor}
+            onChange={handleSelectedAuthorChange}
+          >
+            <option value="">-- Select an Author --</option>
+            {topAuthors.map((author, index) => (
+              <option key={index} value={author.author_name}>
+                {author.author_name} ({author.blog_count} posts)
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Blog Category Dropdown */}
