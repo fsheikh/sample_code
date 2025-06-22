@@ -1,0 +1,12 @@
+<nav class="main-nav">
+  <ul>
+    {% assign current_lang = page.lang | default: site.default_lang %}
+    {% for link in site.nav_links[current_lang] %}
+      <li><a href="{{ link.url }}"
+        lang="{{ current_lang }}"
+        {% if current_lang == 'ur' %}style="font-family: 'Noto Nastaliq Urdu'"{% endif %}>
+      {{ link.name }}
+    </a></li>
+    {% endfor %}
+  </ul>
+</nav>
