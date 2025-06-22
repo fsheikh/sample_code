@@ -1,0 +1,187 @@
+---
+---
+
+body {
+  font-family: 'Noto Nastaliq Urdu', 'Noto Naskh Urdu', 'Helvetica Neue', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  color: $text-color;
+  background-color: $background-color;
+}
+
+.site-header {
+  background-color: $header-bg;
+  padding: 1rem;
+  
+  h1 {
+    margin: 0;
+    font-size: 3.5rem;
+    color: $title-color;
+    direction: rtl;
+    font-family: 'Noto Nastaliq Urdu', 'Noto Naskh Urdu';
+  }
+      
+  h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: $subtitle-color;
+    direction: ltr;
+  }
+    
+  .header-actions {
+    display: flex;
+    gap: 1rem;
+    
+    input {
+        padding: 0.5rem;
+        border: 1px solid $border-color;
+    }
+      
+    button {
+      padding: 0.5rem 1rem;
+      background-color: $button-bg;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  }
+}
+
+.main-nav {
+  background-color: $nav-bg;
+  padding: 1rem 0;
+  font-size: 2.0rem;
+  
+  ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    
+    li {
+      margin: 0 1.5rem;
+      text-decoration: none;
+      a {
+        text-decoration: none;
+      } 
+      a[lang="UR"]{
+        font-family: 'Noto Nastaliq Urdu', 'Noto Naskh Urdu' !important;
+        text-rendering: optimizeLegibility;
+        direction: rtl;
+        unicode-bidi: bidi-override;
+        text-transform: none !important;
+        color: $nav-link-color;
+        
+        &:hover {
+          color: $nav-link-hover;
+        }
+      }
+    }
+  }
+}
+
+.content {
+  min-height: 60vh;
+  padding: 2rem;
+  background-image: none;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: $content-text;
+  
+  p, li {
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+}
+
+.banner-header {
+  background-color: #008000; /* Green color */
+  color: white;
+  padding: 1.5rem;
+  text-align: right;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.banner-header h1 {
+  margin: 0;
+  font-size: 2.2rem;
+}
+
+.banner-header p {
+  margin: 0.5rem 0 0;
+  font-size: 1.2rem;
+  opacity: 0.9;
+  text-align: end;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row-reverse; /* This makes RTL layout */
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Space between elements */
+}
+.intro {
+  text-align: center;
+}
+.intro_urdu {
+  text-align: center;
+  display: block;
+  direction: rtl;
+  font-family: 'Noto Nastaliq Urdu', 'Noto Naskh Urdu';
+
+}
+.content-blocks {
+    text-align: center;
+    display: block;
+}
+.content-blocks_ur {
+    text-align: center;
+    display: block;
+    direction: rtl;
+    font-family: 'Noto Nastaliq Urdu', 'Noto Naskh Urdu';
+}
+footer {
+  background-color: $footer-bg;
+  padding: 2rem;
+  text-align: center;
+  
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    
+    {
+      color: $footer-link;
+      text-decoration: none;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.language-selector {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.language-selector .lang-link {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+}
+
+.language-selector .lang-link.active {
+    text-decoration: underline;
+}

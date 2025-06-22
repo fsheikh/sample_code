@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="{{ site.default_lang }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page.title }} | {{ site.title }}</title>
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  <link rel="icon" href="{{ site.favicon }}">
+  <link rel="stylesheet" href="https://github.githubassets.com/assets/github-emoji-fe1b72a9e5.js">
+</head>
+<body>
+  {% include header.html %}
+  
+  <main class="content">
+    {% if page.image %}
+    <center>
+      <img src="{{ page.image | relative_url }}" 
+           alt="{{ page.image_alt | default: 'Image' }}" 
+           width="40%"> <!-- Set width/height as needed -->
+    </center>
+    {% endif %}
+    
+    {{ content }}
+  </main>
+  
+  {% include footer.html %}
+
+</body>
+</html>

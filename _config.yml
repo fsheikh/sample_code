@@ -1,0 +1,97 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely edit after that. If you find
+# yourself editing this file very often, consider using Jekyll's data files
+# feature for the data you need to update frequently.
+#
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+#
+# If you need help with YAML syntax, here are some quick references for you:
+# https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
+# https://learnxinyminutes.com/docs/yaml/
+#
+# Site settings
+# These are used to personalize your new site. If you look in the HTML files,
+# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
+# You can create any custom variable you would like, and they will be accessible
+# in the templates via {{ site.myvariable }}.
+
+title: Deurdu
+description: A webportal featuring translated and original works in Deutsch, Urdu and English
+baseurl: ""
+url: ""
+favicon: "/assets/images/favicon.ico"
+
+# Multilingual support
+languages: ["EN", "DE", "UR"]
+default_lang: "EN"
+
+# Emoji Support
+plugins:
+  - jemoji
+
+# Include language directories in processing
+include:
+  - _de
+  - _ur
+
+# Exclude from processing
+exclude:
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+
+# Navigation
+nav_links:
+  EN:
+    - name: "Literature"
+      url: "/literature"
+    - name: "Music"
+      url: "/music"
+    - name: "Politics"
+      url: "/politics"
+    - name: "Culture"
+      url: "/culture"
+    - name: "Technology"
+      url: "/technology"
+  DE:
+    - name: "Literatur"
+      url: "/_de/literature"
+    - name: "Musik"
+      url: "/_de/music"
+    - name: "Politik"
+      url: "/_de/politics"
+    - name: "Kultur"
+      url: "/_de/culture"
+    - name: "Technologie"
+      url: "/_de/technology"
+  UR:
+    - name: "ادب"
+      url: "/_ur/literature"
+    - name: "موسیقی"
+      url: "/_ur/music"
+    - name: "سیاست"
+      url: "/_ur/politics"
+    - name: "ثقافت"
+      url: "/_ur/culture"
+    - name: "ٹیکنالوجی"
+      url: "/_ur/technology"
+
+footer_links:
+  - name: "About Us"
+    url: "/about"
+  - name: "Site Info"
+    url: "/site-info"
+  - name: "Post Content"
+    url: "/post-content"
+  - name: "Rules"
+    url: "/rules"
