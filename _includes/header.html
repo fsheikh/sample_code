@@ -13,10 +13,19 @@
                 <button>Login</button>
             </div>
             <div class="language-selector">
-                <a href="{{ site.baseurl }}/" class="lang-link {% if page.lang == 'EN' or page.lang == nil %}active{% endif %}">EN</a>
-                <a href="{{ site.baseurl }}/_de/" class="lang-link {% if page.lang == 'DE' %}active{% endif %}">DE</a>
-                <a href="{{ site.baseurl }}/_ur/" class="lang-link {% if page.lang == 'UR' %}active{% endif %}">UR</a>
-            </div>
+                <details>
+                    <summary>
+                        {% if page.lang == 'EN' or page.lang == nil %}EN
+                        {% elsif page.lang == 'DE' %}DE
+                        {% elsif page.lang == 'UR' %}UR{% endif %}
+                    </summary>
+                    <div class="language-options">
+                        <a href="{{ site.baseurl }}/" class="lang-link">English (EN)</a>
+                        <a href="{{ site.baseurl }}/_de/" class="lang-link">Deutsch (DE)</a>
+                        <a href="{{ site.baseurl }}/_ur/" class="lang-link">اردو (UR)</a>
+                    </div>
+                </details>
+        </div>
         </div>
         <div class="site-header">
             <h2> Dürdu </h2>
