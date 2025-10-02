@@ -144,10 +144,11 @@ body {
     display: block;
 }
 .content-blocks_ur {
-    text-align: center;
+    text-align: right;
     display: block;
     direction: rtl;
     font-family: 'Noto Nastaliq Urdu', 'Noto Naskh Urdu';
+    font-size: 18px;
 }
 footer {
   background-color: $footer-bg;
