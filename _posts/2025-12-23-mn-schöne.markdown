@@ -1,0 +1,28 @@
+---
+layout: default
+lang: DE
+title:  "Munir Niazi: Wie wir das schöne Leben lebten"
+date:   2025-12-23
+tag: german literature
+---
+### Dichter: [Munir Niazi](https://en.wikipedia.org/wiki/Munir_Niazi)
+### Original Titel:  خوبصورت زندگی کو ہم نے کیسے گزارا
+### Arbeitstitel: Wie wir das schöne Leben lebten
+
+<div class="content-blocks">
+<p>
+Wie würde heute vergehen, was würde morgen sein? <br>
+Wie vergäßen wir den gestern, einen Tag voller Pein? <br>
+
+</p>
+Wie viele Tage blieben uns, wie vieles noch zu tun, <br>
+Wie vieles noch zu ertragen, bis es wird Ruhn?
+</p>
+
+<p>
+Verloren ein schlichter Gedanke im seltsamen Gewühl, <br>
+Nutzloser Kummer verzehrte unser menschliches Gefühl.
+</p>
+</div>
+
+##### Übersetzer: Faheem Sheikh mit KI Unterstützung
