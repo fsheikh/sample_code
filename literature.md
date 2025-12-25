@@ -4,7 +4,13 @@ lang: EN
 title: Literature
 permalink: /literature
 ---
-<div class="content-blocks">
-  <!-- Content will be loaded here -->
-    <p>Under construction!</p>
-</div>
+
+{% for tag in site.tags %}
+  {% if tag[0] == "english literature" %}
+  <ul>
+    {% for post in tag[1] %}
+      <li><a href="{{ post.url }}">{{ post.title }}</a></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+{% endfor %}
