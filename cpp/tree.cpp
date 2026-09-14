@@ -1,8 +1,10 @@
 #include <algorithm>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <vector>
+#include <stack>
 
 using namespace std;
 template<typename T>
@@ -11,7 +13,9 @@ using point = pair<T, T>;
 enum class DIRECTION {
     NONE,
     LEFT,
-    RIGHT
+    RIGHT,
+    UP,
+    DOWN,
 };
 
 // A parent vertex can have two (Left/Right) childern
@@ -45,17 +49,74 @@ public:
         for (auto& point : inputPoints) {
             insert(point);
         }
+        m_stack.push(m_root.get());
     }
     void show() {
         std::cout << "Printing the contents of tree with depth=" << m_depth << std::endl;
         list(m_root.get());
     }
 
+    point<T> nearest(const point<T>& p) {
+
+        size_t minDistance = std::numeric_limits<size_t>::max();
+        size_t level = 0;
+        DIRECTION dir = DIRECTION::DOWN;
+        while (not m_stack.empty()) {
+            auto currentVertex = m_stack.top();
+            if (currentVertex->left == nullptr && currentVertex->right == nullptr) {
+                size_t distance = (currentVertex->vertex.first - p.first) * (currentVertex->vertex.first - p.first) +
+                            (currentVertex->vertex.second - p.second) * (currentVertex->vertex.second - p.second);
+                m_stack.pop();
+                minDistance = distance;
+                std::cout << "Reached leaf node with distance: " << distance << std::endl;
+               dir = DIRECTION::UP;
+                continue;
+            }
+            if (dir == DIRECTION::DOWN) {
+                level = level % D;
+                if (level == 0) {
+                    if (p.first < currentVertex->vertex.first) {
+                        if (currentVertex->left != nullptr) {
+                            m_stack.push(currentVertex->left.get());
+                        }
+                    } else {
+                        if (currentVertex->right != nullptr) {
+                            m_stack.push(currentVertex->right.get());
+                        }
+                    }
+                } else if (p.second < currentVertex->vertex.second) {
+                    if (currentVertex->left != nullptr) {
+                        m_stack.push(currentVertex->left.get());
+                    }
+                } else {
+                    if (currentVertex->right != nullptr) {
+                        m_stack.push(currentVertex->right.get());
+                    }
+                }
+                std::cout << "Going down the tree with Distance= " << minDistance << std::endl;
+                level++;
+            } else {
+                size_t distance = (currentVertex->vertex.first - p.first) * (currentVertex->vertex.first - p.first) +
+                            (currentVertex->vertex.second - p.second) * (currentVertex->vertex.second - p.second);
+                if (distance <= minDistance) {
+                    minDistance = distance;
+                    std::cout << "Reached minimum Distance= " << minDistance << std::endl;
+                    m_nearestPoint = currentVertex->vertex;
+                }
+                m_stack.pop();
+                std::cout << "Going up the tree with Distance= " << minDistance << std::endl;
+            }
+        }
+        cout << "Finished processing the tree withDistance= " << minDistance << std::endl;
+        return m_nearestPoint;
+    }
+    
     ~Tree() = default;
 private:
     unique_ptr<Vertex<T>> m_root;
     size_t m_depth;
-
+    stack<Vertex<T>*> m_stack;
+    point<T> m_nearestPoint;
     void insert(const point<T>& p) {
         size_t level = 0;
         DIRECTION dir = DIRECTION::NONE;
@@ -120,6 +181,9 @@ int main()
     Tree<int> tree({point<int>(2,7), point<int>(17,15), point<int>(9,1), point<int>(10,19), point<int>(13,15), point<int>(6,12)}, point<int>(3,6));
     tree.show();
 
-    Tree<int> tree2({point<int>(2,2), point<int>(4,7), point<int>(1,3), point<int>(2,4), point<int>(5,4), point<int>(7,2)}, point<int>(3,6));
-    tree2.show();
+    //Tree<int> tree2({point<int>(2,2), point<int>(4,7), point<int>(1,3), point<int>(2,4), point<int>(5,4), point<int>(7,2)}, point<int>(3,6));
+    //tree2.show();
+
+    auto nearest = tree.nearest(point<int>(7,2));
+    std::cout << "Nearest point in the tree: (" << nearest.first << ", " << nearest.second << ")" << std::endl;
 }
